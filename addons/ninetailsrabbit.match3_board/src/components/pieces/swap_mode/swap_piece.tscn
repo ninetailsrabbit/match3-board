@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://86cb5uvabm7j"]
+
+[ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/components/pieces/swap_mode/swap_piece.gd" id="1_ptyn7"]
+
+[node name="SwapPiece" type="Node2D"]
+script = ExtResource("1_ptyn7")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]

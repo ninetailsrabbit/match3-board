@@ -12,6 +12,9 @@ func _enter_tree() -> void:
 	if not DirAccess.dir_exists_absolute(MyPluginSettings.PluginTemporaryReleaseUpdateDirectoryPath):
 		DirAccess.make_dir_recursive_absolute(MyPluginSettings.PluginTemporaryReleaseUpdateDirectoryPath)
 	
+	add_custom_type("Match3Board", "Node2D", preload("src/match3_board.gd"), preload("assets/board.svg"))
+	add_custom_type("PieceDefinitionResource", "Resource", preload("src/components/pieces/piece_definition_resource.gd"), preload("assets/piece.svg"))
+
 
 func _exit_tree() -> void:
 	MyPluginSettings.remove_settings()
@@ -20,6 +23,9 @@ func _exit_tree() -> void:
 		update_notify_tool_instance.free()
 		update_notify_tool_instance = null
 
+	remove_custom_type("PieceDefinitionResource")
+	remove_custom_type("Match3Board")
+	
 ## Update tool referenced from https://github.com/MikeSchulze/gdUnit4/blob/master/addons/gdUnit4
 func _setup_updater() -> void:
 	if MyPluginSettings.is_update_notification_enabled():

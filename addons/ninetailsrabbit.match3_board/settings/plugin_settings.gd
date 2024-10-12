@@ -1,8 +1,8 @@
 @tool
 class_name MyPluginSettings extends RefCounted
 
-const PluginPrefixName: String = "my_plugin" ## The folder name
-const GitRepositoryName: String = "my-plugin"
+const PluginPrefixName: String = "ninetailsrabbit.match3_board" ## The folder name
+const GitRepositoryName: String = "match3-board"
 
 static var PluginName: String = "MyPlugin"
 static var PluginProjectName: String = ProjectSettings.get_setting("application/config/name")

@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://b43jr3pipnh13"]
+
+[ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/components/pieces/swap_mode/line_connector_piece.gd" id="1_wfs0i"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_v5dgu"]
+
+[node name="LineConnectorPiece" type="Node2D"]
+script = ExtResource("1_wfs0i")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+
+[node name="PieceArea" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PieceArea"]
+shape = SubResource("RectangleShape2D_v5dgu")
