@@ -51,7 +51,7 @@ func contain_special_piece() -> bool:
 func pieces() -> Array[PieceUI]:
 	var current_pieces: Array[PieceUI] = []
 	
-	current_pieces.assign(PluginUtilities.remove_falsy_values(cells.map(func(grid_cell: GridCellUI): return grid_cell.current_piece)))
+	current_pieces.assign(Match3BoardPluginUtilities.remove_falsy_values(cells.map(func(grid_cell: GridCellUI): return grid_cell.current_piece)))
 	
 	return current_pieces
 	
@@ -65,7 +65,7 @@ func all_pieces_are_of_type(type: PieceDefinitionResource.PieceType) -> bool:
 
 #region Cell position in sequence
 func middle_cell() -> GridCellUI:
-	return PluginUtilities.middle_element(cells)
+	return Match3BoardPluginUtilities.middle_element(cells)
 
 
 func top_edge_cell():

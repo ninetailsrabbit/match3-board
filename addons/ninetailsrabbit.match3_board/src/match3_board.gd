@@ -186,7 +186,7 @@ func prepare_board():
 				
 				grid_cells[column].append(grid_cell)
 		
-		grid_cells_flattened.append_array(PluginUtilities.flatten(grid_cells))
+		grid_cells_flattened.append_array(Match3BoardPluginUtilities.flatten(grid_cells))
 		
 		add_pieces(available_pieces)
 		
@@ -267,7 +267,7 @@ func get_cell_or_null(column: int, row: int):
 	
 func cross_cells_from(origin_cell: GridCellUI) -> Array[GridCellUI]:
 	var cross_cells: Array[GridCellUI] = []
-	cross_cells.assign(PluginUtilities.remove_duplicates(
+	cross_cells.assign(Match3BoardPluginUtilities.remove_duplicates(
 		grid_cells_from_row(origin_cell.row) + grid_cells_from_column(origin_cell.column))
 	)
 	
@@ -278,7 +278,7 @@ func cross_diagonal_cells_from(origin_cell: GridCellUI) -> Array[GridCellUI]:
 	var distance: int = grid_width + grid_height
 	var cross_diagonal_cells: Array[GridCellUI] = []
 	
-	cross_diagonal_cells.assign(PluginUtilities.remove_falsy_values(PluginUtilities.remove_duplicates(
+	cross_diagonal_cells.assign(Match3BoardPluginUtilities.remove_falsy_values(Match3BoardPluginUtilities.remove_duplicates(
 	  	diagonal_top_left_cells_from(origin_cell, distance)\
 	 	+ diagonal_top_right_cells_from(origin_cell, distance)\
 		+ diagonal_bottom_left_cells_from(origin_cell, distance)\
@@ -360,7 +360,7 @@ func grid_cell_from_piece(piece: PieceUI):
 func grid_cells_from_row(row: int) -> Array[GridCellUI]:
 	var cells: Array[GridCellUI] = []
 	
-	if grid_cells.size() > 0 and PluginUtilities.value_is_between(row, 0, grid_height - 1):
+	if grid_cells.size() > 0 and Match3BoardPluginUtilities.value_is_between(row, 0, grid_height - 1):
 		for column in grid_width:
 			cells.append(grid_cells[column][row])
 	
@@ -370,7 +370,7 @@ func grid_cells_from_row(row: int) -> Array[GridCellUI]:
 func grid_cells_from_column(column: int) -> Array[GridCellUI]:
 	var cells: Array[GridCellUI] = []
 		
-	if grid_cells.size() > 0 and PluginUtilities.value_is_between(column, 0, grid_width - 1):
+	if grid_cells.size() > 0 and Match3BoardPluginUtilities.value_is_between(column, 0, grid_width - 1):
 		for row in grid_height:
 			cells.append(grid_cells[column][row])
 	
@@ -432,13 +432,13 @@ func find_horizontal_sequences(cells: Array[GridCellUI]) -> Array[Sequence]:
 					sequences.append(Sequence.new(current_matches, Sequence.Shapes.Horizontal))
 					current_matches.clear()
 			else:
-				if PluginUtilities.value_is_between(current_matches.size(), min_match, max_match):
+				if Match3BoardPluginUtilities.value_is_between(current_matches.size(), min_match, max_match):
 					sequences.append(Sequence.new(current_matches, Sequence.Shapes.Horizontal))
 				
 				current_matches.clear()
 				current_matches.append(current_cell)
 			
-			if current_cell == valid_cells.back() and PluginUtilities.value_is_between(current_matches.size(), min_match, max_match):
+			if current_cell == valid_cells.back() and Match3BoardPluginUtilities.value_is_between(current_matches.size(), min_match, max_match):
 				sequences.append(Sequence.new(current_matches, Sequence.Shapes.Horizontal))
 				
 			previous_cell = current_cell
@@ -467,13 +467,13 @@ func find_vertical_sequences(cells: Array[GridCellUI]) -> Array[Sequence]:
 					sequences.append(Sequence.new(current_matches, Sequence.Shapes.Vertical))
 					current_matches.clear()
 			else:
-				if PluginUtilities.value_is_between(current_matches.size(), min_match, max_match):
+				if Match3BoardPluginUtilities.value_is_between(current_matches.size(), min_match, max_match):
 					sequences.append(Sequence.new(current_matches, Sequence.Shapes.Vertical))
 					
 				current_matches.clear()
 				current_matches.append(current_cell)
 			
-			if current_cell.in_same_grid_position_as(valid_cells.back().board_position()) and PluginUtilities.value_is_between(current_matches.size(), min_match, max_match):
+			if current_cell.in_same_grid_position_as(valid_cells.back().board_position()) and Match3BoardPluginUtilities.value_is_between(current_matches.size(), min_match, max_match):
 				sequences.append(Sequence.new(current_matches, Sequence.Shapes.Vertical))
 				
 			previous_cell = current_cell
@@ -504,7 +504,7 @@ func find_tshape_sequence(sequence_a: Sequence, sequence_b: Sequence):
 				var cells: Array[GridCellUI] = []
 				
 				## We need to iterate manually to be able append the item type on the array
-				for cell: GridCellUI in PluginUtilities.remove_duplicates(horizontal_sequence.cells + vertical_sequence.cells):
+				for cell: GridCellUI in Match3BoardPluginUtilities.remove_duplicates(horizontal_sequence.cells + vertical_sequence.cells):
 					cells.append(cell)
 								
 				return Sequence.new(cells, Sequence.Shapes.TShape)
@@ -530,7 +530,7 @@ func find_lshape_sequence(sequence_a: Sequence, sequence_b: Sequence):
 				var cells: Array[GridCellUI] = []
 				
 				## We need to iterate manually to be able append the item type on the array
-				for cell: GridCellUI in PluginUtilities.remove_duplicates(horizontal_sequence.cells + vertical_sequence.cells):
+				for cell: GridCellUI in Match3BoardPluginUtilities.remove_duplicates(horizontal_sequence.cells + vertical_sequence.cells):
 					cells.append(cell)
 				
 				return Sequence.new(cells, Sequence.Shapes.LShape)
@@ -707,7 +707,7 @@ func swap_pieces(from_grid_cell: GridCellUI, to_grid_cell: GridCellUI) -> void:
 	if from_grid_cell.can_swap_piece_with(to_grid_cell):
 		var matches: Array[Sequence] = []
 		
-		for sequence: Sequence in PluginUtilities.remove_falsy_values([
+		for sequence: Sequence in Match3BoardPluginUtilities.remove_falsy_values([
 			find_match_from_cell(from_grid_cell), 
 			find_match_from_cell(to_grid_cell)
 		]):
@@ -761,12 +761,12 @@ func fill_pieces() -> void:
 		
 
 func lock_all_pieces() -> void:
-	for piece: PieceUI in PluginUtilities.find_nodes_of_custom_class(self, PieceUI):
+	for piece: PieceUI in Match3BoardPluginUtilities.find_nodes_of_custom_class(self, PieceUI):
 		piece.lock()
 
 
 func unlock_all_pieces() -> void:
-	for piece: PieceUI in PluginUtilities.find_nodes_of_custom_class(self, PieceUI):
+	for piece: PieceUI in Match3BoardPluginUtilities.find_nodes_of_custom_class(self, PieceUI):
 		piece.unlock()
 
 
@@ -785,7 +785,7 @@ func draw_preview_grid() -> void:
 			debug_preview_node = Node2D.new()
 			debug_preview_node.name = "BoardEditorPreview"
 			add_child(debug_preview_node)
-			PluginUtilities.set_owner_to_edited_scene_root(debug_preview_node)
+			Match3BoardPluginUtilities.set_owner_to_edited_scene_root(debug_preview_node)
 			
 		for column in grid_width:
 			for row in grid_height:
@@ -799,7 +799,7 @@ func draw_preview_grid() -> void:
 				current_cell_sprite.position = Vector2(cell_size.x * column + cell_offset.x, cell_size.y * row + cell_offset.y)
 				
 				debug_preview_node.add_child(current_cell_sprite)
-				PluginUtilities.set_owner_to_edited_scene_root(current_cell_sprite)
+				Match3BoardPluginUtilities.set_owner_to_edited_scene_root(current_cell_sprite)
 				
 				if current_cell_sprite.texture:
 					var cell_texture_size = current_cell_sprite.texture.get_size()
@@ -812,7 +812,7 @@ func draw_preview_grid() -> void:
 					current_piece_sprite.position = current_cell_sprite.position
 					
 					debug_preview_node.add_child(current_piece_sprite)
-					PluginUtilities.set_owner_to_edited_scene_root(current_piece_sprite)
+					Match3BoardPluginUtilities.set_owner_to_edited_scene_root(current_piece_sprite)
 					
 					if current_piece_sprite.texture:
 						var piece_texture_size = current_piece_sprite.texture.get_size()

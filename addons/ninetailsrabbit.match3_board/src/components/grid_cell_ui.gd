@@ -229,7 +229,7 @@ func available_neighbours(include_diagonals: bool = false) -> Array[GridCellUI]:
 	var neighbours: Array[GridCellUI] = []
 	
 	if include_diagonals:
-		neighbours.assign(PluginUtilities.remove_falsy_values([
+		neighbours.assign(Match3BoardPluginUtilities.remove_falsy_values([
 			neighbour_up,
 			neighbour_bottom,
 			neighbour_right,
@@ -241,7 +241,7 @@ func available_neighbours(include_diagonals: bool = false) -> Array[GridCellUI]:
 		]))
 	else:
 		
-		neighbours.assign(PluginUtilities.remove_falsy_values([
+		neighbours.assign(Match3BoardPluginUtilities.remove_falsy_values([
 			neighbour_up,
 			neighbour_bottom,
 			neighbour_right,
