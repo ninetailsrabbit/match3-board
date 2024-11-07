@@ -1,6 +1,6 @@
 class_name SequenceConsumer extends Node
 
-@onready var board = get_tree().get_first_node_in_group(Match3Preloader.BoardGroupName)
+@onready var board: Match3Board = get_tree().get_first_node_in_group(Match3Preloader.BoardGroupName)
 
 func _enter_tree() -> void:
 	name = "SequenceConsumer"

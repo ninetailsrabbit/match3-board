@@ -14,7 +14,8 @@ func _enter_tree() -> void:
 	
 	add_custom_type("Match3Board", "Node2D", preload("src/match3_board.gd"), preload("assets/board.svg"))
 	add_custom_type("PieceDefinitionResource", "Resource", preload("src/components/pieces/piece_definition_resource.gd"), preload("assets/piece.svg"))
-
+	add_custom_type("PieceUI", "Node2D", preload("src/components/pieces/piece_ui.gd"), preload("assets/piece_ui.svg"))
+ 
 
 func _exit_tree() -> void:
 	MyPluginSettings.remove_settings()
@@ -23,6 +24,7 @@ func _exit_tree() -> void:
 		update_notify_tool_instance.free()
 		update_notify_tool_instance = null
 
+	remove_custom_type("PieceUI")
 	remove_custom_type("PieceDefinitionResource")
 	remove_custom_type("Match3Board")
 	

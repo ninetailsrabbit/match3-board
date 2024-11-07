@@ -1,6 +1,9 @@
 @tool
 class_name Match3Board extends Node2D
 
+const MinGridWidth: int = 3
+const MinGridHeight: int = 3
+
 signal swapped_pieces(from: PieceUI, to: PieceUI, matches: Array[Sequence])
 signal swap_requested(from: PieceUI, to: PieceUI)
 signal swap_failed(from: GridCellUI, to: GridCellUI)
@@ -13,7 +16,7 @@ signal prepared_board
 signal locked
 signal unlocked
 
-@export_group("Debug")
+@export_group("Editor Debug 🪲")
 @export var preview_grid_in_editor: bool = false:
 	set(value):
 		if value != preview_grid_in_editor:
@@ -36,17 +39,28 @@ signal unlocked
 	Match3Preloader.GreenGem,
 	Match3Preloader.YellowGem,
 	Match3Preloader.PurpleGem
-]
-
-@export var odd_cell_texture: Texture2D = Match3Preloader.OddCellTexture
-@export var even_cell_texture: Texture2D = Match3Preloader.EvenCellTexture
+]:
+	set(value):
+		if preview_pieces != value:
+			preview_pieces = value
+			draw_preview_grid()
+@export var odd_cell_texture: Texture2D = Match3Preloader.OddCellTexture:
+	set(value):
+		if odd_cell_texture != value:
+			odd_cell_texture = value
+			draw_preview_grid()
+@export var even_cell_texture: Texture2D = Match3Preloader.EvenCellTexture:
+	set(value):
+		if even_cell_texture != value:
+			even_cell_texture = value
+			draw_preview_grid()
 @export var empty_cells: Array[Vector2] = []:
 	set(value):
 		if empty_cells != value:
 			empty_cells = value
 			draw_preview_grid()
 			
-@export_group("Size")
+@export_group("Size 🔲")
 @export var grid_width: int = 8:
 	set(value):
 		if grid_width != value:
@@ -63,26 +77,38 @@ signal unlocked
 		if value != cell_size:
 			cell_size = value
 			draw_preview_grid()
-@export var cell_offset: Vector2i = Vector2i(5, 10):
+@export var cell_offset: Vector2i = Vector2i(25, 25):
 	set(value):
 		if value != cell_offset:
 			cell_offset = value
 			draw_preview_grid()
 
-@export_group("Matches")
-@export var pieces_collision_layer: int = 1
+@export_group("Matches 💎")
+## The layer value from 1 to 32 that is the amount Godot supports. The inside areas will have this layer value to detect other pieces or be detected.
+@export_range(1, 32, 1) var pieces_collision_layer: int = 8
+## The swap mode to use on this board, each has its own particularities and can be changed at runtime.
 @export var swap_mode: Match3Preloader.BoardMovements = Match3Preloader.BoardMovements.Adjacent
 @export var fill_mode =  Match3Preloader.BoardFillModes.FallDown
+## The available pieces this board can generate to be used by the player
 @export var available_pieces: Array[PieceDefinitionResource] = []
+## The available moves when the board is prepared. 
+## This is only informative and only emits signals based on the movements used but does not block the board.
 @export var available_moves_on_start: int = 25
+## When enabled, the matches that could appear in the first board preparation will stay there and be consumed as sequences
 @export var allow_matches_on_start: bool = false
+## When enabled, horizontal matchs between pieces are allowed
 @export var horizontal_shape: bool = true
+## When enabled, vertical matchs between pieces are allowed
 @export var vertical_shape: bool = true
+## When enabled, TShape matchs between pieces are allowed
 @export var tshape: bool = true
+## When enabled, LShape  matchs between pieces are allowed
 @export var lshape: bool = true
+## The minimum amount of pieces to make a match valid
 @export var min_match: int = 3:
 	set(value):
 		min_match = max(3, value)
+## The maximum amount of pieces a match can have.
 @export var max_match: int  = 5:
 	set(value):
 		max_match = max(min_match, value)
@@ -92,10 +118,6 @@ signal unlocked
 @export var max_special_match: int = 2:
 	set(value):
 		max_special_match = max(min_special_match, value)
-
-
-const MinGridWidth: int = 3
-const MinGridHeight: int = 3
 
 
 var pieces_by_swap_mode: Dictionary = {
@@ -804,11 +826,13 @@ func draw_preview_grid() -> void:
 				if current_cell_sprite.texture:
 					var cell_texture_size = current_cell_sprite.texture.get_size()
 					current_cell_sprite.scale = Vector2(cell_size.x / cell_texture_size.x, cell_size.y / cell_texture_size.y)
-						
-				if preview_pieces.size():
+				
+				var available_preview_pieces = Match3BoardPluginUtilities.remove_falsy_values(preview_pieces)
+				
+				if available_preview_pieces.size() > 0:
 					var current_piece_sprite: Sprite2D = Sprite2D.new()
 					current_piece_sprite.name = "Piece_Column%d_Row%d" % [column, row]
-					current_piece_sprite.texture = preview_pieces.pick_random()
+					current_piece_sprite.texture = available_preview_pieces.pick_random()
 					current_piece_sprite.position = current_cell_sprite.position
 					
 					debug_preview_node.add_child(current_piece_sprite)
@@ -827,8 +851,8 @@ func remove_preview_sprites() -> void:
 			debug_preview_node.free()
 			debug_preview_node = null
 	
-		for child: Node2D in get_children(true).filter(func(node: Node): return node is Node2D):
-			child.free()
+	for child: Node2D in get_children(true).filter(func(node: Node): return node is Node2D):
+		child.free()
 #endregion
 
 #region Signal callbacks

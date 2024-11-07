@@ -1,13 +1,13 @@
 class_name LineConnectorPiece extends PieceUI
 
-@onready var sprite: Sprite2D = $Sprite2D
-@onready var piece_area: Area2D = $PieceArea
-
-var mouse_region: Button
+#@onready var sprite: Sprite2D = $Sprite2D
+#@onready var piece_area: Area2D = $PieceArea
+#
+#var mouse_region: Button
 var line_connector: LineConnector
 
 func _ready() -> void:
-	prepare_sprite(sprite)
+	#prepare_sprite(sprite)
 	
 	piece_area.collision_layer = board.pieces_collision_layer
 	piece_area.collision_mask = 0

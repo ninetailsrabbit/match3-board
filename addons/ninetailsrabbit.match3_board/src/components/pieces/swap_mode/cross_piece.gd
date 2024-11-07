@@ -1,15 +1,15 @@
 class_name CrossPiece extends PieceUI
 
 @onready var draggable_sprite: DraggableSprite2D = $DraggableSprite2D
-@onready var detection_area: Area2D = $DraggableSprite2D/DetectionArea
-@onready var piece_area: Area2D = $PieceArea
+#@onready var detection_area: Area2D = $DraggableSprite2D/DetectionArea
+#@onready var piece_area: Area2D = $PieceArea
 @onready var detection_area_collision: CollisionShape2D = $DraggableSprite2D/DetectionArea/CollisionShape2D
 @onready var piece_area_collision: CollisionShape2D = $PieceArea/CollisionShape2D
 
 var original_z_index: int = 0
 
 func _ready() -> void:
-	prepare_sprite(draggable_sprite)
+	#prepare_sprite(draggable_sprite)
 	prepare_area_detectors()
 	
 	original_z_index = draggable_sprite.z_index
