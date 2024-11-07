@@ -11,6 +11,8 @@ signal swap_rejected(from: PieceUI, to: PieceUI)
 signal consume_requested(sequence: Sequence)
 signal piece_selected(piece: PieceUI)
 signal piece_unselected(piece: PieceUI)
+signal piece_holded(piece: PieceUI)
+signal piece_released(piece: PieceUI)
 signal state_changed(from: Match3Preloader.BoardState, to: Match3Preloader.BoardState)
 signal prepared_board
 signal locked
@@ -275,7 +277,6 @@ func draw_piece_on_cell(grid_cell: GridCellUI, new_piece: PieceUI) -> void:
 
 		grid_cell.remove_piece()
 		grid_cell.assign_piece(new_piece)
-
 #endregion
 
 #region Cells

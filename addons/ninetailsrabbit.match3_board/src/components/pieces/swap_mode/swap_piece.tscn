@@ -1,29 +1,12 @@
-[gd_scene load_steps=5 format=3 uid="uid://86cb5uvabm7j"]
+[gd_scene load_steps=3 format=3 uid="uid://86cb5uvabm7j"]
 
 [ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/components/pieces/swap_mode/swap_piece.gd" id="1_ptyn7"]
-[ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/components/pieces/piece_definition_resource.gd" id="2_3b82t"]
 [ext_resource type="Texture2D" uid="uid://ctiniq36c2dh7" path="res://addons/ninetailsrabbit.match3_board/src/debug_ui/preview_pieces/blue_gem.png" id="2_xrp0j"]
-
-[sub_resource type="Resource" id="Resource_x4lk6"]
-script = ExtResource("2_3b82t")
-id = &"blue"
-name = "bluegem"
-description = ""
-weight = 1.0
-type = 0
-shape = "blue"
-can_be_swapped = true
-can_be_moved = true
-can_be_shuffled = true
-can_be_triggered = false
-can_be_replaced = true
-can_be_consumed = true
 
 [node name="SwapPiece" type="Node2D" node_paths=PackedStringArray("sprite")]
 position = Vector2(150, 87)
 script = ExtResource("1_ptyn7")
 sprite = NodePath("Sprite2D")
-piece_definition = SubResource("Resource_x4lk6")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_xrp0j")

@@ -74,6 +74,22 @@ static func value_is_between(number: int, min_value: int, max_value: int, inclus
 		return number > min(min_value, max_value) and number < max(min_value, max_value)
 
 
+## Only works for native nodes like Area2D, Camera2D, etc.
+## Example NodePositioner.find_nodes_of_type(self, Control.new())
+static func find_nodes_of_type(node: Node, type_to_find: Node) -> Array:
+	var  result := []
+	
+	var childrens = node.get_children(true)
+
+	for child in childrens:
+		if child.is_class(type_to_find.get_class()):
+			result.append(child)
+		else:
+			result.append_array(find_nodes_of_type(child, type_to_find))
+	
+	return result
+
+
 ## Only works for native custom class not for GDScriptNativeClass
 ## Example NodePositioner.find_nodes_of_custom_class(self, MachineState)
 static func find_nodes_of_custom_class(node: Node, class_to_find: Variant) -> Array:
@@ -88,6 +104,34 @@ static func find_nodes_of_custom_class(node: Node, class_to_find: Variant) -> Ar
 			result.append_array(find_nodes_of_custom_class(child, class_to_find))
 	
 	return result
+	
+
+## Only works for native Godot Classes like Area3D, Camera2D, etc.
+## Example NodeTraversal.first_node_of_type(self, Control.new())
+static func first_node_of_type(node: Node, type_to_find: Node):
+	if node.get_child_count() == 0:
+		return null
+
+	for child in node.get_children():
+		if child.is_class(type_to_find.get_class()):
+			type_to_find.free()
+			return child
+	
+	type_to_find.free()
+	
+	return null
+	
+## Only works for native custom class not for GDScriptNativeClass
+## Example NodeTraversal.first_node_of_custom_class(self, MachineState)
+static func first_node_of_custom_class(node: Node, class_to_find: GDScript):
+	if node.get_child_count() == 0:
+		return null
+
+	for child in node.get_children():
+		if child.get_script() == class_to_find:
+			return child
+	
+	return null
 	
 
 static func set_owner_to_edited_scene_root(node: Node) -> void:
