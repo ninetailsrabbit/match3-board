@@ -19,9 +19,13 @@
 - [📦 Installation](#-installation)
 - [Getting started 🚀](#getting-started-)
 - [Editor preview 🪲](#editor-preview-)
+  - [Parameters](#parameters)
 - [Board size](#board-size)
+  - [Parameters](#parameters-1)
 - [Match configuration](#match-configuration)
 - [GridCellUI](#gridcellui)
+  - [Position](#position)
+  - [Empty cell](#empty-cell)
 
 # 📦 Installation
 
@@ -50,7 +54,7 @@ This feature provides a preview of your game board before it's fully initialized
 - **_Add Empty Spaces:_** Easily adjust the spacing between game pieces.
 - **_Experiment with Textures:_** Test different textures for cells and pieces without affecting the final game.
 
-You have available default textures on this plugin to visualize a preview in the editor, feel free to use your own ones.
+You have available default textures on this plugin to visualize a preview in the editor, feel free to use your own ones. The nodes that are drawn are not the scenes that the board uses in the game, they are just sprites.
 
 ⚠️ _This preview is temporary and will be removed when the game starts_ ⚠️
 
@@ -59,6 +63,8 @@ You have available default textures on this plugin to visualize a preview in the
 ![editor_preview_match_3](images/editor_preview_match_3.png)
 
 ---
+
+## Parameters
 
 - **Preview grid in editor:** Enable or disable the preview
 - **Clean current preview:** Removes the current preview from the editor
@@ -75,7 +81,14 @@ You have available default textures on this plugin to visualize a preview in the
 
 ---
 
-With the `preview enabled`, any changes you make to the board's parameters _(like grid size or piece definitions)_ will be instantly reflected in the preview window. This allows you to quickly iterate and experiment with different configurations
+## Parameters
+
+- **Grid width:** The row width of the grid, a width of 7 means that 7 pieces will be drawed by row
+- **Grid height:** The column height of the grid, a height o 8 means that 8 pieces will be drawed by column
+- **Cell size:** The size of the cell in the world in the shape of Vector2(x, y). It's recommended to keep this values equals for better display
+- **Cell offset:** The offset from the corner if you want to create more space.
+
+ℹ️ _\_With the `preview enabled`, any changes you make to the board's parameters _(like grid size or piece definitions)\_ will be instantly reflected in the preview window. This allows you to quickly iterate and experiment with different configurations\_\_ ℹ️
 
 # Match configuration
 
@@ -83,4 +96,14 @@ WIP
 
 # GridCellUI
 
-Each square in the preview represents a GridCellUI node. This node serves as a visual representation of a cell within the game grid and is not designed for customization.
+Each square in the preview represents a `GridCellUI` node. This node serves as a visual representation of a cell within the game grid and is not designed for customization _(although nothing prevents you from doing so)_
+
+The Swaps between pieces are done via this `GridCellUI` node so **_the pieces are never directly interacted with_**, it is the cells that contain the checks and commands to see if the swap is possible or not.
+
+## Position
+
+To obtain the position of a cell you have access to variables `row`, `column` and method `board_position()`. This method returns a `Vector2i(row, column)`
+
+## Empty cell
+
+If the position of this cell match with any of the `empty_cells` vectors from the `Match3Board`, this cell will change the variable `can_contain_piece` to false and you can choose if draw the background texture or not with the variable `draw_background_texture`.

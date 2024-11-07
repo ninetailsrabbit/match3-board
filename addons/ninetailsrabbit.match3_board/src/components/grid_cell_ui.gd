@@ -11,6 +11,7 @@ const group_name: String = "grid_cell"
 @export var can_contain_piece: bool = true
 @export var cell_size: Vector2 = Vector2(48, 48)
 ## Texture default path is temporary
+@export var draw_background_texture: bool = true
 @export var odd_cell_texture: Texture2D = Match3Preloader.OddCellTexture
 @export var even_cell_texture: Texture2D = Match3Preloader.EvenCellTexture
 
@@ -37,7 +38,7 @@ var current_piece: PieceUI:
 			
 
 func _init(_row: int, _column: int, piece: PieceUI = null, _can_contain_piece: bool = true) -> void:
-	assert(row >=0 and column >=0, "GridCellUI: A grid cell cannot have a negative column %d or row %d" % [column, row])
+	assert(row >= 0 and column >= 0, "GridCellUI: A grid cell cannot have a negative column %d or row %d" % [column, row])
 	
 	row = _row
 	column = _column
@@ -72,7 +73,7 @@ func prepare_background_sprite() -> void:
 		background_sprite.z_index = -10
 		add_child(background_sprite)
 	
-	if background_sprite.texture:
+	if background_sprite.texture and draw_background_texture:
 		var texture_size = background_sprite.texture.get_size()
 		background_sprite.scale = Vector2(cell_size.x / texture_size.x, cell_size.y / texture_size.y)
 	
