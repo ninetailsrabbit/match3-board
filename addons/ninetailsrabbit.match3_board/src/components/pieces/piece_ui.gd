@@ -28,7 +28,17 @@ const GroupName: String = "piece"
 			texture_scale = value
 			_prepare_sprites()
 
-var board: Match3Board
+var board: Match3Board:
+	set(value):
+		if value != board:
+			board = value
+			
+			if board:
+				cell_size = board.cell_size
+				click_mode = board.click_mode
+				
+var click_mode: Match3Preloader.BoardClickMode = Match3Preloader.BoardClickMode.Selection
+
 var mouse_region: Button
 var piece_area: Area2D
 var detection_area: Area2D
@@ -41,10 +51,10 @@ var is_holded: bool = false:
 			
 			if is_holded:
 				holded.emit()
-				board.piece_holded.emit(self as PieceUI)
+				board.piece_holded.emit(self)
 			else:
 				released.emit()
-				board.piece_released.emit(self as PieceUI)
+				board.piece_released.emit(self)
 var is_selected: bool = false:
 	set(value):
 		if value != is_selected and not is_locked and is_inside_tree():
@@ -52,10 +62,10 @@ var is_selected: bool = false:
 			
 			if is_selected:
 				selected.emit()
-				board.piece_selected.emit(self as PieceUI)
+				board.piece_selected.emit(self)
 			else:
 				unselected.emit()
-				board.piece_unselected.emit(self as PieceUI)
+				board.piece_unselected.emit(self)
 
 
 func _enter_tree() -> void:
@@ -210,18 +220,20 @@ func prepare_area_detectors() -> void:
 
 #region Signal callbacks
 func on_mouse_region_pressed() -> void:
-	if not holded:
+	if click_mode == Match3Preloader.BoardClickMode.Selection:
 		is_selected = !is_selected
 
 
 func on_mouse_region_holded() -> void:
-	is_selected = true
-	is_holded = true
-	
+	if click_mode == Match3Preloader.BoardClickMode.Drag:
+		is_selected = true
+		is_holded = true
+		
 	
 func on_mouse_region_released() -> void:
-	is_selected = false
-	is_holded = false
+	if click_mode == Match3Preloader.BoardClickMode.Drag:
+		is_selected = false
+		is_holded = false
 #endregion
 	
 

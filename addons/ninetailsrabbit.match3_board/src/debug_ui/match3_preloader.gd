@@ -28,6 +28,11 @@ enum BoardMovements {
 	ConnectLine
 }
 
+enum BoardClickMode {
+	Selection,
+	Drag
+}
+
 enum BoardFillModes {
 	FallDown,
 	Side,

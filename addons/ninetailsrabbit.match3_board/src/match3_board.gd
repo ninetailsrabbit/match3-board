@@ -90,6 +90,9 @@ signal unlocked
 @export_range(1, 32, 1) var pieces_collision_layer: int = 8
 ## The swap mode to use on this board, each has its own particularities and can be changed at runtime.
 @export var swap_mode: Match3Preloader.BoardMovements = Match3Preloader.BoardMovements.Adjacent
+## The click mode defines if the swap is made by select & click or dragging the piece to the desired place
+@export var click_mode: Match3Preloader.BoardClickMode = Match3Preloader.BoardClickMode.Selection
+## The fill mode defines the behaviour when the pieces fall down after a consumed sequence.
 @export var fill_mode =  Match3Preloader.BoardFillModes.FallDown
 ## The available pieces this board can generate to be used by the player
 @export var available_pieces: Array[PieceWeight] = []
@@ -122,13 +125,6 @@ signal unlocked
 		max_special_match = max(min_special_match, value)
 
 
-var pieces_by_swap_mode: Dictionary = {
-	Match3Preloader.BoardMovements.Adjacent: Match3Preloader.SwapPieceScene,
-	Match3Preloader.BoardMovements.Free: Match3Preloader.SwapPieceScene,
-	Match3Preloader.BoardMovements.Cross: Match3Preloader.CrossPieceScene,
-	Match3Preloader.BoardMovements.CrossDiagonal: Match3Preloader.CrossPieceScene,
-	Match3Preloader.BoardMovements.ConnectLine: Match3Preloader.LineConnectorPieceScene
-}
 
 #region Features
 var piece_weight_generator: PieceWeightGenerator
@@ -156,7 +152,7 @@ var current_state: Match3Preloader.BoardState = Match3Preloader.BoardState.WaitF
 		if new_state != current_state:
 			state_changed.emit(current_state, new_state)
 			current_state = new_state
-			
+		
 var pending_sequences: Array[Sequence] = []
 
 
@@ -223,10 +219,6 @@ func add_pieces(new_pieces: Array[PieceWeight]) -> void:
 	piece_weight_generator.add_available_pieces(new_pieces)
 
 
-func generate_new_piece(selected_swap_mode: Match3Preloader.BoardMovements = swap_mode) -> PieceUI:
-	return pieces_by_swap_mode[selected_swap_mode].instantiate() as PieceUI
-
-
 func draw_board():
 	for grid_cell: GridCellUI in grid_cells_flattened:
 		draw_grid_cell(grid_cell)
@@ -273,7 +265,6 @@ func draw_random_piece_on_cell(grid_cell: GridCellUI, except: Array[PieceWeight]
 
 func draw_piece_on_cell(grid_cell: GridCellUI, new_piece: PieceUI) -> void:
 	if grid_cell.can_contain_piece:
-		new_piece.cell_size = cell_size
 		new_piece.board = self
 
 		add_child(new_piece)
@@ -938,7 +929,6 @@ func on_piece_selected(piece: PieceUI) -> void:
 		cell_highlighter.remove_current_highlighters()
 		return
 
-		
 	current_selected_piece = piece
 	cell_highlighter.highlight_cells(grid_cell_from_piece(current_selected_piece), swap_mode)
 
