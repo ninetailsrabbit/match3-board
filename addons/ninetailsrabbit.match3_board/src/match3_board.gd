@@ -271,9 +271,9 @@ func draw_random_piece_on_cell(grid_cell: GridCellUI, except: Array[PieceWeight]
 func draw_piece_on_cell(grid_cell: GridCellUI, new_piece: PieceUI) -> void:
 	if grid_cell.can_contain_piece:
 		new_piece.board = self
+		new_piece.position = grid_cell.position
 
 		add_child(new_piece)
-		new_piece.position = grid_cell.position
 
 		grid_cell.remove_piece()
 		grid_cell.assign_piece(new_piece)
@@ -804,6 +804,26 @@ func is_click_mode_selection() -> bool:
 
 func is_click_mode_drag() -> bool:
 	return click_mode == Match3Preloader.BoardClickMode.Drag
+	
+
+func is_swap_mode_adjacent() -> bool:
+	return swap_mode == Match3Preloader.BoardMovements.Adjacent
+	
+
+func is_swap_mode_free() -> bool:
+	return swap_mode == Match3Preloader.BoardMovements.Free
+
+
+func is_swap_mode_cross() -> bool:
+	return swap_mode == Match3Preloader.BoardMovements.Cross
+	
+	
+func is_swap_mode_cross_diagonal() -> bool:
+	return swap_mode == Match3Preloader.BoardMovements.CrossDiagonal
+	
+	
+func is_swap_mode_connect_line() -> bool:
+	return swap_mode == Match3Preloader.BoardMovements.ConnectLine
 #endregion
 
 #region Debug
@@ -948,7 +968,7 @@ func on_piece_selected(piece: PieceUI) -> void:
 func on_piece_unselected(_piece: PieceUI) -> void:
 	if is_locked:
 		return
-		
+	
 	current_selected_piece = null
 	cell_highlighter.remove_current_highlighters()
 	
@@ -965,10 +985,8 @@ func on_piece_released(piece: PieceUI) -> void:
 	if is_locked or is_click_mode_selection():
 		return
 		
-	var other_piece_detected = piece.detected_piece()
-	print("other piece detected ", other_piece_detected)
+	var other_piece = piece.detect_near_piece()
 	
-	current_selected_piece = null
-	cell_highlighter.remove_current_highlighters()
-
+	if other_piece is PieceUI:
+		swap_requested.emit(piece, other_piece)
 #endregion

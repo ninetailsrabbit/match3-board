@@ -27,6 +27,10 @@ const GroupName: String = "piece"
 		if value != texture_scale:
 			texture_scale = value
 			_prepare_sprites()
+@export_group("Drag")
+@export var reset_position_on_release: bool = true
+@export var smooth_factor: float = 20.0
+
 
 var board: Match3Board:
 	set(value):
@@ -35,14 +39,10 @@ var board: Match3Board:
 			
 			if board:
 				cell_size = board.cell_size
-				click_mode = board.click_mode
 				
-var click_mode: Match3Preloader.BoardClickMode = Match3Preloader.BoardClickMode.Selection
-
 var mouse_region: Button
 var piece_area: Area2D
 var detection_area: Area2D
-
 var is_locked: bool = false
 var is_holded: bool = false:
 	set(value):
@@ -74,7 +74,14 @@ var is_selected: bool = false:
 				if is_click_mode_drag():
 					piece_area.set_deferred("monitorable", true)
 					detection_area.set_deferred("monitoring", false)
-				
+		
+
+var original_z_index: int = 0
+var current_position: Vector2 = Vector2.ZERO
+var m_offset: Vector2 = Vector2.ZERO
+var original_global_position: Vector2 = Vector2.ZERO
+var original_position: Vector2 = Vector2.ZERO
+		
 
 func _enter_tree() -> void:
 	add_to_group(GroupName)
@@ -82,6 +89,7 @@ func _enter_tree() -> void:
 	name = "%s-%s" % [piece_definition.type, piece_definition.shape.to_pascal_case()]
 	is_selected = false
 	z_index = 20
+	original_z_index = z_index
 	
 	if board == null:
 		board = get_tree().get_first_node_in_group(Match3Preloader.BoardGroupName)
@@ -104,10 +112,20 @@ func _ready() -> void:
 		
 	assert(sprite is Sprite2D or animated_sprite is AnimatedSprite2D, "PieceUI: needs an Sprite2D or AnimatedSprite2D defined to be used %s" % name)
 	
+	set_process(false)
+	
 	_prepare_sprites()
 	prepare_area_detectors()
 	_prepare_mouse_region_button()
 
+	original_global_position = global_position
+	original_position = position
+	
+
+func _process(delta: float) -> void:
+	global_position = global_position.lerp(get_global_mouse_position(), smooth_factor * delta) if smooth_factor > 0 else get_global_mouse_position()
+	current_position = global_position + m_offset
+	
 
 #region Active methods
 func match_with(other_piece: PieceUI) -> bool:
@@ -134,12 +152,22 @@ func can_be_triggered() -> bool:
 	return piece_definition.can_be_triggered
 
 
-func detected_piece():
-	print("detection for ", name, detection_area.monitoring)
+func detect_near_piece():
 	var nearest_piece_area: Dictionary = Match3BoardPluginUtilities.get_nearest_node_by_distance(global_position, detection_area.get_overlapping_areas())
 	
-	return nearest_piece_area.get("target", null)
+	var piece_area = nearest_piece_area.get("target", null)
 	
+	if piece_area is Area2D:
+		return piece_area.get_parent() as PieceUI
+		
+	return null
+	
+	
+func reset_position() -> void:
+	if is_inside_tree() and reset_position_on_release:
+		global_position = original_global_position
+		position = original_position
+
 
 func lock() -> void:
 	is_locked = true
@@ -150,11 +178,11 @@ func unlock() -> void:
 	is_locked = false
 	
 func is_click_mode_selection() -> bool:
-	return click_mode == Match3Preloader.BoardClickMode.Selection
+	return board.is_click_mode_selection()
 	
 
 func is_click_mode_drag() -> bool:
-	return click_mode == Match3Preloader.BoardClickMode.Drag
+	return board.is_click_mode_drag()
 #endregion
 
 #region Preparation methods
@@ -250,11 +278,23 @@ func on_mouse_region_holded() -> void:
 		is_selected = true
 		is_holded = true
 		
+		if is_inside_tree():
+			z_index = original_z_index + 100
+			z_as_relative = false
+			m_offset = transform.origin - get_global_mouse_position()
+			set_process(true)
+
 	
 func on_mouse_region_released() -> void:
 	if is_click_mode_drag():
+		reset_position()
+
 		is_selected = false
 		is_holded = false
+		z_index = original_z_index
+		z_as_relative = true
+		
+		set_process(false)
 #endregion
 	
 

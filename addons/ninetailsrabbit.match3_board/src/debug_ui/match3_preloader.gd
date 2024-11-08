@@ -52,8 +52,3 @@ const EvenCellTexture: CompressedTexture2D = preload("res://addons/ninetailsrabb
 const HighlightedTexture: CompressedTexture2D = preload("res://addons/ninetailsrabbit.match3_board/src/debug_ui/preview_cells/highlighted.png")
 const OddCellTexture: CompressedTexture2D = preload("res://addons/ninetailsrabbit.match3_board/src/debug_ui/preview_cells/odd.png")
 #endregion
-#region Pieces
-const CrossPieceScene: PackedScene = preload("res://addons/ninetailsrabbit.match3_board/src/components/pieces/swap_mode/cross_piece.tscn")
-const LineConnectorPieceScene: PackedScene = preload("res://addons/ninetailsrabbit.match3_board/src/components/pieces/swap_mode/line_connector_piece.tscn")
-const SwapPieceScene: PackedScene = preload("res://addons/ninetailsrabbit.match3_board/src/components/pieces/swap_mode/swap_piece.tscn")
-#endregion
