@@ -230,10 +230,11 @@ func draw_board():
 		draw_grid_cell(grid_cell)
 		draw_random_piece_on_cell(grid_cell)
 		
-	if not allow_matches_on_start:
+	if allow_matches_on_start:
+		current_state = Match3Preloader.BoardState.Consume
+	else:
 		remove_matches_from_board()
 	
-
 	return self
 	
 
