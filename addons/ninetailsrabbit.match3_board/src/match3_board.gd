@@ -92,7 +92,7 @@ signal unlocked
 @export var swap_mode: Match3Preloader.BoardMovements = Match3Preloader.BoardMovements.Adjacent
 @export var fill_mode =  Match3Preloader.BoardFillModes.FallDown
 ## The available pieces this board can generate to be used by the player
-@export var available_pieces: Array[PieceDefinitionResource] = []
+@export var available_pieces: Array[PieceWeight] = []
 ## The available moves when the board is prepared. 
 ## This is only informative and only emits signals based on the movements used but does not block the board.
 @export var available_moves_on_start: int = 25
@@ -219,7 +219,7 @@ func prepare_board():
 	return self
 
 
-func add_pieces(new_pieces: Array[PieceDefinitionResource]) -> void:
+func add_pieces(new_pieces: Array[PieceWeight]) -> void:
 	piece_weight_generator.add_available_pieces(new_pieces)
 
 
@@ -235,6 +235,7 @@ func draw_board():
 	if not allow_matches_on_start:
 		remove_matches_from_board()
 	
+
 	return self
 	
 
@@ -244,14 +245,18 @@ func remove_matches_from_board() -> void:
 	while sequences.size() > 0:
 		for sequence: Sequence in sequences:
 			var cells_to_change = sequence.cells.slice(0, (sequence.cells.size() / min_match) + 1)
-			var piece_exceptions: Array[PieceDefinitionResource] = []
-			piece_exceptions.assign(cells_to_change.map(func(cell: GridCellUI): return cell.current_piece.piece_definition))
+			var piece_exceptions: Array[PieceWeight] = []
+			var piece_id_exceptions: Array[StringName] = []
+			piece_id_exceptions.assign(Match3BoardPluginUtilities.remove_duplicates(cells_to_change.map(func(cell: GridCellUI): return cell.current_piece.piece_definition.id)))
+			
+			for id: StringName in piece_id_exceptions:
+				piece_exceptions.append(piece_weight_generator.piece_id_mapper[id])
 			
 			for current_cell: GridCellUI in cells_to_change:
 				var removed_piece = current_cell.remove_piece()
 				removed_piece.free()
 				draw_random_piece_on_cell(current_cell, piece_exceptions)
-			
+		
 		sequences = find_board_sequences()
 	
 
@@ -261,9 +266,8 @@ func draw_grid_cell(grid_cell: GridCellUI) -> void:
 		grid_cell.position = Vector2(grid_cell.cell_size.x * grid_cell.column + cell_offset.x, grid_cell.cell_size.y * grid_cell.row + cell_offset.y)
 
 
-func draw_random_piece_on_cell(grid_cell: GridCellUI, except: Array[PieceDefinitionResource] = []) -> void:
-	var new_piece: PieceUI = generate_new_piece()
-	new_piece.piece_definition = piece_weight_generator.roll(except)
+func draw_random_piece_on_cell(grid_cell: GridCellUI, except: Array[PieceWeight] = []) -> void:
+	var new_piece: PieceUI =  piece_weight_generator.roll(except)
 	draw_piece_on_cell(grid_cell, new_piece)
 	
 

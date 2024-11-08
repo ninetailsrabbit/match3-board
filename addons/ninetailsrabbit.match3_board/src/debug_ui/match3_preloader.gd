@@ -33,7 +33,7 @@ enum BoardFillModes {
 	Side,
 	InPlace
 }
-#endregion	
+#endregion
 
 #region Textures
 const BlueGem: CompressedTexture2D = preload("res://addons/ninetailsrabbit.match3_board/src/debug_ui/preview_pieces/blue_gem.png")

@@ -9,8 +9,6 @@ enum PieceType {
 @export var id: StringName
 @export var name: String
 @export_multiline var description: String
-## The weight for probability generation
-@export var weight: float = 1.0
 ## The type of this piece, refers to behaviour
 @export var type: PieceType = PieceType.Normal
 ## A piece can share a behaviour (type) but with different shape so they are not strictly equals
@@ -25,8 +23,6 @@ enum PieceType {
 @export var match_5_piece: PieceDefinitionResource
 @export var tshape_piece: PieceDefinitionResource
 @export var lshape_piece: PieceDefinitionResource
-
-var total_accum_weight: float = 0.0
 
 
 #region Overridables
@@ -56,7 +52,3 @@ func is_special() -> bool:
 
 func is_obstacle() -> bool:
 	return type == PieceType.Obstacle
-
-
-func reset_accum_weight() -> void:
-	total_accum_weight = 0.0
