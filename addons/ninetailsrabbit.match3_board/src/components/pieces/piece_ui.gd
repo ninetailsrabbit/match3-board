@@ -63,10 +63,18 @@ var is_selected: bool = false:
 			if is_selected:
 				selected.emit()
 				board.piece_selected.emit(self)
+				
+				if is_click_mode_drag():
+					piece_area.set_deferred("monitorable", false)
+					detection_area.set_deferred("monitoring", true)
 			else:
 				unselected.emit()
 				board.piece_unselected.emit(self)
-
+				
+				if is_click_mode_drag():
+					piece_area.set_deferred("monitorable", true)
+					detection_area.set_deferred("monitoring", false)
+				
 
 func _enter_tree() -> void:
 	add_to_group(GroupName)
@@ -126,6 +134,13 @@ func can_be_triggered() -> bool:
 	return piece_definition.can_be_triggered
 
 
+func detected_piece():
+	print("detection for ", name, detection_area.monitoring)
+	var nearest_piece_area: Dictionary = Match3BoardPluginUtilities.get_nearest_node_by_distance(global_position, detection_area.get_overlapping_areas())
+	
+	return nearest_piece_area.get("target", null)
+	
+
 func lock() -> void:
 	is_locked = true
 	is_selected = false
@@ -133,6 +148,13 @@ func lock() -> void:
 
 func unlock() -> void:
 	is_locked = false
+	
+func is_click_mode_selection() -> bool:
+	return click_mode == Match3Preloader.BoardClickMode.Selection
+	
+
+func is_click_mode_drag() -> bool:
+	return click_mode == Match3Preloader.BoardClickMode.Drag
 #endregion
 
 #region Preparation methods
@@ -203,15 +225,14 @@ func prepare_area_detectors() -> void:
 	piece_area.monitorable = true
 	
 	detection_area.collision_layer = 0
-	detection_area.collision_mask = pow(2, board.pieces_collision_layer - 1)
-	detection_area.monitoring = true
+	detection_area.collision_mask = piece_area.collision_layer
+	detection_area.monitoring = false ## Deactivated on initialization, it will active when piece is selected
 	detection_area.monitorable = false
 	
 	piece_area_collision.shape.size =  board.cell_size - Vector2i.ONE * (board.cell_size.x / 2)
 	detection_area_collision.shape.size = board.cell_size / 2
 	
-	detection_area_collision.set_deferred("disabled", true)
-	
+
 	add_child(piece_area)
 	add_child(detection_area)
 
@@ -220,18 +241,18 @@ func prepare_area_detectors() -> void:
 
 #region Signal callbacks
 func on_mouse_region_pressed() -> void:
-	if click_mode == Match3Preloader.BoardClickMode.Selection:
+	if is_click_mode_selection():
 		is_selected = !is_selected
 
 
 func on_mouse_region_holded() -> void:
-	if click_mode == Match3Preloader.BoardClickMode.Drag:
+	if is_click_mode_drag():
 		is_selected = true
 		is_holded = true
 		
 	
 func on_mouse_region_released() -> void:
-	if click_mode == Match3Preloader.BoardClickMode.Drag:
+	if is_click_mode_drag():
 		is_selected = false
 		is_holded = false
 #endregion

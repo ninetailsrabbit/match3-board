@@ -162,12 +162,17 @@ func _enter_tree() -> void:
 		remove_preview_sprites()
 		
 		prepared_board.connect(on_prepared_board)
+		
 		piece_selected.connect(on_piece_selected)
 		piece_unselected.connect(on_piece_unselected)
+		piece_holded.connect(on_piece_holded)
+		piece_released.connect(on_piece_released)
+		
 		swap_requested.connect(on_swap_requested)
 		swap_failed.connect(on_swap_failed)
 		swap_rejected.connect(on_swap_rejected)
 		swapped_pieces.connect(on_swapped_pieces)
+		
 		consume_requested.connect(on_consume_requested)
 		state_changed.connect(on_state_changed)
 		
@@ -792,6 +797,13 @@ func unselect_all_pieces() -> void:
 	for piece: PieceUI in get_tree().get_nodes_in_group(PieceUI.GroupName):
 		piece.is_selected = false
 
+
+func is_click_mode_selection() -> bool:
+	return click_mode == Match3Preloader.BoardClickMode.Selection
+	
+
+func is_click_mode_drag() -> bool:
+	return click_mode == Match3Preloader.BoardClickMode.Drag
 #endregion
 
 #region Debug
@@ -920,7 +932,7 @@ func on_consume_requested(sequence: Sequence) -> void:
 	
 
 func on_piece_selected(piece: PieceUI) -> void:
-	if is_locked:
+	if is_locked or is_click_mode_drag():
 		return
 	
 	if current_selected_piece and current_selected_piece != piece:
@@ -940,4 +952,23 @@ func on_piece_unselected(_piece: PieceUI) -> void:
 	current_selected_piece = null
 	cell_highlighter.remove_current_highlighters()
 	
+	
+func on_piece_holded(piece: PieceUI) -> void:
+	if is_locked or is_click_mode_selection():
+		return
+	
+	current_selected_piece = piece
+	cell_highlighter.highlight_cells(grid_cell_from_piece(current_selected_piece), swap_mode)
+
+
+func on_piece_released(piece: PieceUI) -> void:
+	if is_locked or is_click_mode_selection():
+		return
+		
+	var other_piece_detected = piece.detected_piece()
+	print("other piece detected ", other_piece_detected)
+	
+	current_selected_piece = null
+	cell_highlighter.remove_current_highlighters()
+
 #endregion

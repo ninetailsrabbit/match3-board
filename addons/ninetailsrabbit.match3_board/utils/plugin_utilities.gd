@@ -133,7 +133,27 @@ static func first_node_of_custom_class(node: Node, class_to_find: GDScript):
 	
 	return null
 	
+	
+static func get_nearest_node_by_distance(from: Vector2, nodes: Array = [], min_distance: float = 0.0, max_range: float = 9999) -> Dictionary:
+	var result := {"target": null, "distance": null}
+	
+	for node in nodes.filter(func(node): return node is Node2D or node is Node3D): ## Only allows node that can use global_position in the world
+		var distance_to_target: float = node.global_position.distance_to(from)
+		
+		if decimal_value_is_between(distance_to_target, min_distance, max_range) and (result.target == null or (distance_to_target < result.distance)):
+			result.target = node
+			result.distance = distance_to_target
+		
+	return result
 
 static func set_owner_to_edited_scene_root(node: Node) -> void:
 	if Engine.is_editor_hint() and node.get_tree():
 		node.owner = node.get_tree().edited_scene_root
+
+
+static func decimal_value_is_between(number: float, min_value: float, max_value: float, inclusive: = true, precision: float = 0.00001) -> bool:
+	if inclusive:
+		min_value -= precision
+		max_value += precision
+
+	return number >= min(min_value, max_value) and number <= max(min_value, max_value)
