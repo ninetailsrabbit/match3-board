@@ -137,6 +137,7 @@ var debug_preview_node: Node2D
 var grid_cells: Array = [] # Multidimensional to access cells by column & row
 var grid_cells_flattened: Array[GridCellUI] = []
 var current_selected_piece: PieceUI
+var line_connector: LineConnector
 var is_locked: bool = false:
 	set(value):
 		if value != is_locked:
@@ -277,6 +278,21 @@ func draw_piece_on_cell(grid_cell: GridCellUI, new_piece: PieceUI) -> void:
 
 		grid_cell.remove_piece()
 		grid_cell.assign_piece(new_piece)
+		
+		
+func draw_line_connector(origin_piece: PieceUI) -> void:
+	if is_swap_mode_connect_line() and line_connector == null:
+		line_connector = LineConnector.new()
+		get_tree().root.add_child(line_connector)
+		line_connector.add_piece(origin_piece)
+
+
+func remove_line_connector() -> void:
+	if is_swap_mode_connect_line():
+		if line_connector and not line_connector.is_queued_for_deletion():
+			line_connector.queue_free()
+	
+		line_connector = null
 #endregion
 
 #region Cells
@@ -784,12 +800,12 @@ func fill_pieces() -> void:
 		
 
 func lock_all_pieces() -> void:
-	for piece: PieceUI in Match3BoardPluginUtilities.find_nodes_of_custom_class(self, PieceUI):
+	for piece: PieceUI in get_tree().get_nodes_in_group(PieceUI.GroupName):
 		piece.lock()
 
 
 func unlock_all_pieces() -> void:
-	for piece: PieceUI in Match3BoardPluginUtilities.find_nodes_of_custom_class(self, PieceUI):
+	for piece: PieceUI in get_tree().get_nodes_in_group(PieceUI.GroupName):
 		piece.unlock()
 
 
@@ -892,9 +908,11 @@ func on_prepared_board() -> void:
 func on_state_changed(from: Match3Preloader.BoardState, to: Match3Preloader.BoardState) -> void:
 	match to:
 		Match3Preloader.BoardState.WaitForInput:
+			await get_tree().create_timer(0.1).timeout
 			unlock()
 		Match3Preloader.BoardState.Consume:
 			lock()
+			
 			if pending_sequences.is_empty():
 				pending_sequences = find_board_sequences()
 			
@@ -904,6 +922,7 @@ func on_state_changed(from: Match3Preloader.BoardState, to: Match3Preloader.Boar
 			current_state = Match3Preloader.BoardState.Fill
 		Match3Preloader.BoardState.Fill:
 			lock()
+			
 			pending_sequences.clear()
 			await fall_pieces()
 			await get_tree().process_frame
@@ -955,6 +974,8 @@ func on_piece_selected(piece: PieceUI) -> void:
 	if is_locked or is_click_mode_drag():
 		return
 	
+	draw_line_connector(piece)
+			
 	if current_selected_piece and current_selected_piece != piece:
 		swap_requested.emit(current_selected_piece as PieceUI, piece as PieceUI)
 		current_selected_piece = null
@@ -969,6 +990,8 @@ func on_piece_unselected(_piece: PieceUI) -> void:
 	if is_locked:
 		return
 	
+	remove_line_connector()
+	
 	current_selected_piece = null
 	cell_highlighter.remove_current_highlighters()
 	
@@ -977,6 +1000,8 @@ func on_piece_holded(piece: PieceUI) -> void:
 	if is_locked or is_click_mode_selection():
 		return
 	
+	draw_line_connector(piece)
+	
 	current_selected_piece = piece
 	cell_highlighter.highlight_cells(grid_cell_from_piece(current_selected_piece), swap_mode)
 
@@ -984,9 +1009,12 @@ func on_piece_holded(piece: PieceUI) -> void:
 func on_piece_released(piece: PieceUI) -> void:
 	if is_locked or is_click_mode_selection():
 		return
-		
-	var other_piece = piece.detect_near_piece()
 	
-	if other_piece is PieceUI:
-		swap_requested.emit(piece, other_piece)
+	remove_line_connector()
+
+	if not is_swap_mode_connect_line():
+		var other_piece = piece.detect_near_piece()
+		
+		if other_piece is PieceUI:
+			swap_requested.emit(piece, other_piece)
 #endregion

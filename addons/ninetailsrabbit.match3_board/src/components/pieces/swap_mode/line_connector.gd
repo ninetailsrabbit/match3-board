@@ -1,20 +1,20 @@
 class_name LineConnector extends Line2D
 
-signal added_piece(piece: LineConnectorPiece)
-signal match_selected(selected_pieces: Array[LineConnectorPiece])
+signal added_piece(piece: PieceUI)
+signal match_selected(selected_pieces: Array[PieceUI])
 
-var pieces_connected: Array[LineConnectorPiece] = []
+var pieces_connected: Array[PieceUI] = []
 var detection_area: Area2D
-var origin_piece: LineConnectorPiece
-var previous_matches: Array[LineConnectorPiece] = []
-var possible_next_matches: Array[LineConnectorPiece] = []
+var origin_piece: PieceUI
+var previous_matches: Array[PieceUI] = []
+var possible_next_matches: Array[PieceUI] = []
 
 
 func _exit_tree() -> void:
 	match_selected.emit(pieces_connected)
 	
-	for piece: LineConnectorPiece in pieces_connected:
-		piece.piece_area.process_mode =Node.PROCESS_MODE_INHERIT
+	for piece: PieceUI in pieces_connected:
+		piece.piece_area.process_mode = Node.PROCESS_MODE_INHERIT
 		
 	previous_matches.append_array(possible_next_matches)
 	## TODO DESELECT HIGHLIGHTER ON THIS MATCHES
@@ -47,13 +47,13 @@ func _process(_delta: float) -> void:
 	detection_area.global_position = mouse_position
 	
 	
-func add_piece(new_piece: LineConnectorPiece) -> void:
+func add_piece(new_piece: PieceUI) -> void:
 	new_piece.piece_area.process_mode = Node.PROCESS_MODE_DISABLED
 	
 	pieces_connected.append(new_piece)
 	clear_points()
 	
-	for piece_connected: LineConnectorPiece in pieces_connected:
+	for piece_connected: PieceUI in pieces_connected:
 		add_point(piece_connected.global_position)
 	
 	add_point(get_global_mouse_position())
@@ -61,7 +61,7 @@ func add_piece(new_piece: LineConnectorPiece) -> void:
 	added_piece.emit(new_piece)
 
 
-func detect_new_matches_from_last_piece(last_piece: LineConnectorPiece) -> void:
+func detect_new_matches_from_last_piece(last_piece: PieceUI) -> void:
 	var origin_cell: GridCellUI = last_piece.board.grid_cell_from_piece(last_piece)
 	
 	if origin_cell is GridCellUI:
@@ -71,20 +71,25 @@ func detect_new_matches_from_last_piece(last_piece: LineConnectorPiece) -> void:
 		possible_next_matches.clear()
 		
 		for cell: GridCellUI in adjacent_cells:
-			var piece: LineConnectorPiece = cell.current_piece as LineConnectorPiece
+			var piece: PieceUI = cell.current_piece as PieceUI
 			
 			if not pieces_connected.has(piece) and piece.match_with(last_piece):
 				possible_next_matches.append(piece)
 		
 
 func prepare_detection_area(piece: PieceUI) -> void:
+	z_index = piece.z_index
+	z_as_relative = piece.z_as_relative
+	
 	detection_area = Area2D.new()
 	detection_area.collision_layer = 0
-	detection_area.collision_mask = piece.board.pieces_collision_layer
+	detection_area.collision_mask = piece.piece_area.collision_layer
 	detection_area.monitorable = false
 	detection_area.monitoring = true
 	detection_area.process_priority = 2
 	detection_area.disable_mode = CollisionObject2D.DISABLE_MODE_MAKE_STATIC
+	detection_area.z_index = piece.z_index
+	detection_area.z_as_relative = piece.z_as_relative
 	
 	var collision_shape = CollisionShape2D.new()
 	collision_shape.shape = RectangleShape2D.new()
@@ -93,7 +98,7 @@ func prepare_detection_area(piece: PieceUI) -> void:
 	detection_area.add_child(collision_shape)
 	
 	get_tree().root.add_child(detection_area)
-	
+
 	detection_area.global_position = get_global_mouse_position()
 	detection_area.area_entered.connect(on_piece_detected)
 	
@@ -103,17 +108,16 @@ func prepare_detection_area(piece: PieceUI) -> void:
 	
 #region Signal callbacks
 func on_piece_detected(other_area: Area2D) -> void:
-	var piece: LineConnectorPiece = other_area.get_parent() as LineConnectorPiece
+	var piece: PieceUI = other_area.get_parent() as PieceUI
 	
 	if possible_next_matches.has(piece):
 		add_piece(piece)
 
 
-func on_added_piece(piece: LineConnectorPiece) -> void:
+func on_added_piece(piece: PieceUI) -> void:
 	if pieces_connected.size() == 1:
 		origin_piece = piece
-		z_index = origin_piece.z_index + 25
-		z_as_relative = true
+
 		prepare_detection_area(origin_piece)
 		
 	if pieces_connected.size() < piece.board.max_match:
@@ -125,9 +129,9 @@ func on_added_piece(piece: LineConnectorPiece) -> void:
 		set_process(false)
 		remove_point(points.size() - 1)
 		detection_area.process_mode = Node.PROCESS_MODE_DISABLED
-		
+		queue_free()
 	
-func on_line_match_selected(selected_pieces: Array[LineConnectorPiece]) -> void:
+func on_line_match_selected(selected_pieces: Array[PieceUI]) -> void:
 	var cells: Array[GridCellUI] = []
 	cells.assign(selected_pieces.map(func(piece: PieceUI): return piece.board.grid_cell_from_piece(piece)))
 	

@@ -64,24 +64,28 @@ var is_selected: bool = false:
 				selected.emit()
 				board.piece_selected.emit(self)
 				
-				if is_click_mode_drag():
-					piece_area.set_deferred("monitorable", false)
+				piece_area.set_deferred("monitorable", false)
+					
+				## To not interrupt the detection area that the line connector creates
+				if is_click_mode_drag() and not board.is_swap_mode_connect_line():
 					detection_area.set_deferred("monitoring", true)
 			else:
 				unselected.emit()
 				board.piece_unselected.emit(self)
 				
-				if is_click_mode_drag():
-					piece_area.set_deferred("monitorable", true)
+				piece_area.set_deferred("monitorable", true)
+				
+				## To not interrupt the detection area that the line connector creates
+				if is_click_mode_drag() and not board.is_swap_mode_connect_line():
 					detection_area.set_deferred("monitoring", false)
-		
+	
 
 var original_z_index: int = 0
 var current_position: Vector2 = Vector2.ZERO
 var m_offset: Vector2 = Vector2.ZERO
 var original_global_position: Vector2 = Vector2.ZERO
 var original_position: Vector2 = Vector2.ZERO
-		
+
 
 func _enter_tree() -> void:
 	add_to_group(GroupName)
@@ -123,6 +127,9 @@ func _ready() -> void:
 	
 
 func _process(delta: float) -> void:
+	if is_locked:
+		return
+		
 	global_position = global_position.lerp(get_global_mouse_position(), smooth_factor * delta) if smooth_factor > 0 else get_global_mouse_position()
 	current_position = global_position + m_offset
 	
@@ -176,7 +183,8 @@ func lock() -> void:
 
 func unlock() -> void:
 	is_locked = false
-	
+
+
 func is_click_mode_selection() -> bool:
 	return board.is_click_mode_selection()
 	
@@ -189,7 +197,7 @@ func is_click_mode_drag() -> bool:
 func _prepare_mouse_region_button() -> void:
 	if mouse_region == null:
 		mouse_region = Button.new()
-		mouse_region.self_modulate.a8 = 100 ## TODO - CHANGE TO 0 WHEN FINISH DEBUG
+		mouse_region.self_modulate.a8 = 0 ## TODO - CHANGE TO 0 WHEN FINISH DEBUG
 	
 	if sprite is Sprite2D and animated_sprite == null:
 		sprite.add_child(mouse_region)
@@ -257,35 +265,44 @@ func prepare_area_detectors() -> void:
 	detection_area.monitoring = false ## Deactivated on initialization, it will active when piece is selected
 	detection_area.monitorable = false
 	
-	piece_area_collision.shape.size =  board.cell_size - Vector2i.ONE * (board.cell_size.x / 2)
-	detection_area_collision.shape.size = board.cell_size / 2
+	piece_area_collision.shape.size = board.cell_size / 1.5 
+	detection_area_collision.shape.size = board.cell_size / 1.5
 	
-
 	add_child(piece_area)
 	add_child(detection_area)
-
 #endregion
 
 
 #region Signal callbacks
 func on_mouse_region_pressed() -> void:
+	if is_locked:
+		return
+		
 	if is_click_mode_selection():
 		is_selected = !is_selected
+		
 
 
 func on_mouse_region_holded() -> void:
+	if is_locked:
+		return
+		
 	if is_click_mode_drag():
 		is_selected = true
 		is_holded = true
+		z_index = original_z_index + 100
+		z_as_relative = false
 		
-		if is_inside_tree():
-			z_index = original_z_index + 100
-			z_as_relative = false
+		## We don't want to enable drag when connecting lines as the pieces needs to be static
+		if not board.is_swap_mode_connect_line():
 			m_offset = transform.origin - get_global_mouse_position()
 			set_process(true)
 
-	
+			
 func on_mouse_region_released() -> void:
+	if is_locked:
+		return
+		
 	if is_click_mode_drag():
 		reset_position()
 
@@ -295,6 +312,7 @@ func on_mouse_region_released() -> void:
 		z_as_relative = true
 		
 		set_process(false)
+
 #endregion
 	
 
