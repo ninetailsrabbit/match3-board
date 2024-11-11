@@ -205,6 +205,7 @@ func change_piece_animator(animator: PieceAnimator) -> Match3Board:
 	
 	if piece_animator is PieceAnimator:
 		piece_animator.animation_started.connect(on_animation_started)
+		piece_animator.animation_finished.connect(on_animation_finished)
 	
 	
 	return self
@@ -805,6 +806,9 @@ func swap_pieces(from_grid_cell: GridCellUI, to_grid_cell: GridCellUI) -> void:
 
 #region Lock related
 func lock() -> void:
+	if current_selected_piece is PieceUI and current_selected_piece.is_selected:
+		current_selected_piece.reset_position()
+		
 	is_locked = true
 	current_selected_piece = null
 	
@@ -1079,5 +1083,12 @@ func on_piece_released(piece: PieceUI) -> void:
 			
 func on_animation_started() -> void:
 	lock()
+
+
+func on_animation_finished() -> void:
+	await get_tree().create_timer(0.3).timeout
+	
+	if state_is_wait_for_input() and is_locked:
+		unlock()
 	
 #endregion
