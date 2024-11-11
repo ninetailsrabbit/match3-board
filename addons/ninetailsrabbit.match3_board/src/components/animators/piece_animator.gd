@@ -1,12 +1,24 @@
 class_name PieceAnimator extends Node
 
+signal animation_started
+signal animation_finished
+
 @onready var board = get_tree().get_first_node_in_group(Match3Preloader.BoardGroupName)
+
+
+var animation_running: bool = false
+
 
 func _enter_tree() -> void:
 	name = "PieceAnimator"
+	
+	animation_started.connect(on_animation_started)
+	animation_finished.connect(on_animation_finished)
 
 
 func swap_pieces(from: PieceUI, to: PieceUI):
+		animation_started.emit()
+		
 		var from_position: Vector2 = from.position
 		var to_position: Vector2 = to.position
 		var tween: Tween = create_tween().set_parallel(true)
@@ -21,18 +33,26 @@ func swap_pieces(from: PieceUI, to: PieceUI):
 		tween.tween_property(to, "modulate:a", 1.0, 0.2).set_ease(Tween.EASE_OUT)
 		
 		await tween.finished
+		
+		animation_finished.emit()
 
 
 func fall_down(piece: PieceUI, empty_cell: GridCellUI, _is_diagonal: bool = false):
+	animation_started.emit()
+	
 	var tween: Tween = create_tween()
 	
 	tween.tween_property(piece, "position", empty_cell.position, 0.2)\
 		.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_LINEAR)
 		
 	await tween.finished
+	
+	animation_finished.emit()
 
 
 func fall_down_pieces(movements) -> void:
+	animation_started.emit()
+	
 	if movements.size() > 0:
 		var tween: Tween = create_tween().set_parallel(true)
 		
@@ -41,10 +61,14 @@ func fall_down_pieces(movements) -> void:
 			.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_LINEAR)
 			
 		await tween.finished
+		
+		animation_finished.emit()
 
 
 func spawn_pieces(new_pieces: Array[PieceUI]):
 	if new_pieces.size() > 0:
+		animation_started.emit()
+		
 		var tween: Tween = create_tween().set_parallel(true)
 		
 		for piece: PieceUI in new_pieces:
@@ -55,20 +79,28 @@ func spawn_pieces(new_pieces: Array[PieceUI]):
 				.set_trans(Tween.TRANS_QUAD).from(Vector2(piece.position.x, piece.position.y - fall_distance))
 			
 		await tween.finished
+	
+		animation_finished.emit()
 
 
 func consume_sequence(sequence: Sequence):
 	if sequence.pieces().size() > 0:
+		animation_started.emit()
+		
 		var tween: Tween = create_tween().set_parallel(true)
 		
 		for piece: PieceUI in sequence.pieces():
 			tween.tween_property(piece, "scale", Vector2.ZERO, 0.15).set_ease(Tween.EASE_OUT)
-			
+		
 		await tween.finished
+		
+		animation_finished.emit()
 		
 		
 func spawn_special_piece(sequence: Sequence, new_piece: PieceUI):
 	if sequence.pieces().size() > 0:
+		animation_started.emit()
+		
 		var middle_cell: GridCellUI = sequence.middle_cell()
 		new_piece.hide()
 		var tween: Tween = create_tween().set_parallel(true)
@@ -80,3 +112,13 @@ func spawn_special_piece(sequence: Sequence, new_piece: PieceUI):
 		tween.tween_property(new_piece, "visible", true, 0.1)
 		
 		await tween.finished
+		
+		animation_finished.emit()
+
+
+func on_animation_started() -> void:
+	animation_running = true
+	
+	
+func on_animation_finished() -> void:
+	animation_running = false

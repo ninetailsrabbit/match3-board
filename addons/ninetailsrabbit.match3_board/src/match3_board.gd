@@ -181,13 +181,13 @@ func _enter_tree() -> void:
 			piece_weight_generator = PieceWeightGenerator.new()
 			
 		if cell_highlighter == null:
-			cell_highlighter = CellHighlighter.new()
+			change_cell_highlighter(CellHighlighter.new())
 			
 		if piece_animator == null:
-			piece_animator = PieceAnimator.new()
+			change_piece_animator(PieceAnimator.new())
 			
 		if sequence_consumer == null:
-			sequence_consumer = SequenceConsumer.new()
+			change_sequence_consumer(SequenceConsumer.new())
 		
 		
 		add_child(cell_highlighter)
@@ -202,6 +202,10 @@ func _ready() -> void:
 
 func change_piece_animator(animator: PieceAnimator) -> Match3Board:
 	piece_animator = animator
+	
+	if piece_animator is PieceAnimator:
+		piece_animator.animation_started.connect(on_animation_started)
+	
 	
 	return self
 	
@@ -782,7 +786,7 @@ func swap_pieces(from_grid_cell: GridCellUI, to_grid_cell: GridCellUI) -> void:
 			find_match_from_cell(to_grid_cell)
 		]):
 			matches.append(sequence)
-
+		
 		await piece_animator.swap_pieces(from_grid_cell.current_piece, to_grid_cell.current_piece)
 		
 		if matches.size() > 0:
@@ -804,7 +808,6 @@ func lock() -> void:
 	is_locked = true
 	current_selected_piece = null
 	
-	unselect_all_pieces()
 	lock_all_pieces()
 	
 
@@ -827,6 +830,11 @@ func unlock_all_pieces() -> void:
 func unselect_all_pieces() -> void:
 	for piece: PieceUI in get_tree().get_nodes_in_group(PieceUI.GroupName):
 		piece.is_selected = false
+
+
+func reset_all_pieces_positions() -> void:
+	for piece: PieceUI in get_tree().get_nodes_in_group(PieceUI.GroupName):
+		piece.reset_position()
 
 #endregion
 
@@ -956,6 +964,7 @@ func on_prepared_board() -> void:
 func on_state_changed(from: Match3Preloader.BoardState, to: Match3Preloader.BoardState) -> void:
 	match to:
 		Match3Preloader.BoardState.WaitForInput:
+			reset_all_pieces_positions()
 			await get_tree().create_timer(0.2).timeout
 			unlock()
 		Match3Preloader.BoardState.Consume:
@@ -1066,4 +1075,9 @@ func on_piece_released(piece: PieceUI) -> void:
 		
 		if other_piece is PieceUI:
 			swap_requested.emit(piece, other_piece)
+			
+			
+func on_animation_started() -> void:
+	lock()
+	
 #endregion
