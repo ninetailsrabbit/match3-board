@@ -83,8 +83,6 @@ var is_selected: bool = false:
 var original_z_index: int = 0
 var current_position: Vector2 = Vector2.ZERO
 var m_offset: Vector2 = Vector2.ZERO
-var original_global_position: Vector2 = Vector2.ZERO
-var original_position: Vector2 = Vector2.ZERO
 
 
 func _enter_tree() -> void:
@@ -122,9 +120,6 @@ func _ready() -> void:
 	prepare_area_detectors()
 	_prepare_mouse_region_button()
 
-	original_global_position = global_position
-	original_position = position
-	
 
 func _process(delta: float) -> void:
 	if is_locked:
@@ -172,8 +167,9 @@ func detect_near_piece():
 	
 func reset_position() -> void:
 	if is_inside_tree() and reset_position_on_release:
-		global_position = original_global_position
-		position = original_position
+		var cell: GridCellUI = board.grid_cell_from_piece(self)
+		
+		position = cell.position
 
 
 func lock() -> void:
@@ -282,12 +278,11 @@ func on_mouse_region_pressed() -> void:
 		is_selected = !is_selected
 		
 
-
 func on_mouse_region_holded() -> void:
 	if is_locked:
 		return
 		
-	if is_click_mode_drag():
+	if is_click_mode_drag() and not is_selected:
 		is_selected = true
 		is_holded = true
 		z_index = original_z_index + 100
@@ -303,7 +298,7 @@ func on_mouse_region_released() -> void:
 	if is_locked:
 		return
 		
-	if is_click_mode_drag():
+	if is_click_mode_drag() and is_selected:
 		reset_position()
 
 		is_selected = false

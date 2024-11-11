@@ -293,9 +293,9 @@ func draw_piece_on_cell(grid_cell: GridCellUI, new_piece: PieceUI) -> void:
 	if grid_cell.can_contain_piece:
 		new_piece.board = self
 		new_piece.position = grid_cell.position
-
+		
 		add_child(new_piece)
-
+		
 		grid_cell.remove_piece()
 		grid_cell.assign_piece(new_piece)
 		
@@ -802,10 +802,11 @@ func swap_pieces(from_grid_cell: GridCellUI, to_grid_cell: GridCellUI) -> void:
 #region Lock related
 func lock() -> void:
 	is_locked = true
+	current_selected_piece = null
 	
-	lock_all_pieces()
 	unselect_all_pieces()
-
+	lock_all_pieces()
+	
 
 func unlock() -> void:
 	is_locked = false
@@ -849,6 +850,18 @@ func fill_pieces() -> void:
 #endregion
 
 #region Information helpers
+func state_is_wait_for_input() -> bool:
+	return current_state == Match3Preloader.BoardState.WaitForInput
+
+
+func state_is_consume() -> bool:
+	return current_state == Match3Preloader.BoardState.Consume
+
+
+func state_is_fill() -> bool:
+	return current_state == Match3Preloader.BoardState.Fill
+
+
 func is_click_mode_selection() -> bool:
 	return click_mode == Match3Preloader.BoardClickMode.Selection
 	
@@ -943,7 +956,7 @@ func on_prepared_board() -> void:
 func on_state_changed(from: Match3Preloader.BoardState, to: Match3Preloader.BoardState) -> void:
 	match to:
 		Match3Preloader.BoardState.WaitForInput:
-			await get_tree().create_timer(0.1).timeout
+			await get_tree().create_timer(0.2).timeout
 			unlock()
 		Match3Preloader.BoardState.Consume:
 			lock()
@@ -953,7 +966,7 @@ func on_state_changed(from: Match3Preloader.BoardState, to: Match3Preloader.Boar
 			
 			await sequence_consumer.consume_sequences(pending_sequences)
 			await get_tree().process_frame
-		
+			
 			current_state = Match3Preloader.BoardState.Fill
 		Match3Preloader.BoardState.Fill:
 			lock()
@@ -1031,21 +1044,23 @@ func on_piece_unselected(_piece: PieceUI) -> void:
 	
 	
 func on_piece_holded(piece: PieceUI) -> void:
-	if is_locked or is_click_mode_selection():
+	if is_locked or is_click_mode_selection() or current_selected_piece != null:
 		return
 	
 	draw_line_connector(piece)
 	
 	current_selected_piece = piece
 	cell_highlighter.highlight_cells_from_origin_cell(grid_cell_from_piece(current_selected_piece), swap_mode)
-
+	
 
 func on_piece_released(piece: PieceUI) -> void:
 	if is_locked or is_click_mode_selection():
 		return
 	
 	remove_line_connector()
-
+	
+	current_selected_piece = null
+	
 	if not is_swap_mode_connect_line():
 		var other_piece = piece.detect_near_piece()
 		

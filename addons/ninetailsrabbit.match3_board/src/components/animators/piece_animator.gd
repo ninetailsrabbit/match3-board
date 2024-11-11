@@ -7,13 +7,13 @@ func _enter_tree() -> void:
 
 
 func swap_pieces(from: PieceUI, to: PieceUI):
-		var from_global_position: Vector2 = from.global_position
-		var to_global_position: Vector2 = to.global_position
+		var from_position: Vector2 = from.position
+		var to_position: Vector2 = to.position
 		var tween: Tween = create_tween().set_parallel(true)
 		
-		tween.tween_property(from, "global_position", to_global_position, 0.2).set_ease(Tween.EASE_IN)
+		tween.tween_property(from, "position", to_position, 0.2).set_ease(Tween.EASE_IN)
 		tween.tween_property(from, "modulate:a", 0.1, 0.2).set_ease(Tween.EASE_IN)
-		tween.tween_property(to, "global_position", from_global_position, 0.2).set_ease(Tween.EASE_IN)
+		tween.tween_property(to, "position", from_position, 0.2).set_ease(Tween.EASE_IN)
 		tween.tween_property(to, "modulate:a", 0.1, 0.2).set_ease(Tween.EASE_IN)
 		tween.chain()
 		
@@ -26,7 +26,7 @@ func swap_pieces(from: PieceUI, to: PieceUI):
 func fall_down(piece: PieceUI, empty_cell: GridCellUI, _is_diagonal: bool = false):
 	var tween: Tween = create_tween()
 	
-	tween.tween_property(piece, "global_position", empty_cell.global_position, 0.2)\
+	tween.tween_property(piece, "position", empty_cell.position, 0.2)\
 		.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_LINEAR)
 		
 	await tween.finished
@@ -37,7 +37,7 @@ func fall_down_pieces(movements) -> void:
 		var tween: Tween = create_tween().set_parallel(true)
 		
 		for movement in movements:
-			tween.tween_property(movement.to_cell.current_piece, "global_position", movement.to_cell.global_position, 0.2)\
+			tween.tween_property(movement.to_cell.current_piece, "position", movement.to_cell.position, 0.2)\
 			.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_LINEAR)
 			
 		await tween.finished
@@ -51,8 +51,8 @@ func spawn_pieces(new_pieces: Array[PieceUI]):
 			var fall_distance = piece.cell_size.y * board.grid_height
 			piece.hide()
 			tween.tween_property(piece, "visible", true, 0.1)
-			tween.tween_property(piece, "global_position", piece.global_position, 0.25)\
-				.set_trans(Tween.TRANS_QUAD).from(Vector2(piece.global_position.x, piece.global_position.y - fall_distance))
+			tween.tween_property(piece, "position", piece.position, 0.25)\
+				.set_trans(Tween.TRANS_QUAD).from(Vector2(piece.position.x, piece.position.y - fall_distance))
 			
 		await tween.finished
 
@@ -74,7 +74,7 @@ func spawn_special_piece(sequence: Sequence, new_piece: PieceUI):
 		var tween: Tween = create_tween().set_parallel(true)
 		
 		for cell in sequence.cells.filter(func(grid_cell: GridCellUI): return grid_cell.has_piece() and grid_cell != middle_cell):
-			tween.tween_property(cell.current_piece, "global_position", middle_cell.global_position, 0.15)\
+			tween.tween_property(cell.current_piece, "position", middle_cell.position, 0.15)\
 				.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
 		tween.chain()
 		tween.tween_property(new_piece, "visible", true, 0.1)
