@@ -6,7 +6,6 @@ func _enter_tree() -> void:
 	name = "SequenceConsumer"
 
 #region Overridables
-
 func consume_sequence(sequence: Sequence) -> void:
 	var new_piece = detect_new_combined_piece(sequence)
 	
@@ -26,27 +25,27 @@ func consume_sequences(sequences: Array[Sequence]) -> void:
 		
 
 func detect_new_combined_piece(sequence: Sequence):
-	if sequence.all_pieces_are_of_type(PieceDefinitionResource.PieceType.Normal):
-		var piece: PieceUI = sequence.pieces().front()
-		
-		if sequence.is_horizontal_or_vertical_shape():
-			match sequence.size():
-				4:
-					var new_piece_definition = piece.piece_definition.match_4_piece
-					
-					if new_piece_definition:
-						var special_piece: PieceUI = board.generate_new_piece()
-						special_piece.piece_definition = new_piece_definition
-					
-						return special_piece
-				5:
-					var new_piece_definition = piece.piece_definition.match_5_piece
-					
-					if new_piece_definition:
-						var special_piece: PieceUI = board.generate_new_piece()
-						special_piece.piece_definition = new_piece_definition
-					
-						return special_piece
-					
+	#if sequence.all_pieces_are_of_type(PieceDefinitionResource.PieceType.Normal):
+		#var piece: PieceUI = sequence.pieces().front()
+		#
+		#if sequence.is_horizontal_or_vertical_shape():
+			#match sequence.size():
+				#4:
+					#var new_piece_definition = piece.piece_definition.match_4_piece
+					#
+					#if new_piece_definition:
+						#var special_piece: PieceUI = board.generate_new_piece()
+						#special_piece.piece_definition = new_piece_definition
+					#
+						#return special_piece
+				#5:
+					#var new_piece_definition = piece.piece_definition.match_5_piece
+					#
+					#if new_piece_definition:
+						#var special_piece: PieceUI = board.generate_new_piece()
+						#special_piece.piece_definition = new_piece_definition
+					#
+						#return special_piece
+					#
 		
 	return null 

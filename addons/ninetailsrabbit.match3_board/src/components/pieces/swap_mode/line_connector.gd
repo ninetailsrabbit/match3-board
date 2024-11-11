@@ -3,6 +3,7 @@ class_name LineConnector extends Line2D
 signal added_piece(piece: PieceUI)
 signal match_selected(selected_pieces: Array[PieceUI])
 
+var board: Match3Board
 var pieces_connected: Array[PieceUI] = []
 var detection_area: Area2D
 var origin_piece: PieceUI
@@ -17,6 +18,7 @@ func _exit_tree() -> void:
 		piece.piece_area.process_mode = Node.PROCESS_MODE_INHERIT
 		
 	previous_matches.append_array(possible_next_matches)
+	board.cell_highlighter.remove_current_highlighters()
 	## TODO DESELECT HIGHLIGHTER ON THIS MATCHES
 	
 	if detection_area and not detection_area.is_queued_for_deletion():
@@ -32,6 +34,9 @@ func _enter_tree() -> void:
 	
 	
 func _ready() -> void:
+	if board == null:
+		get_tree().get_first_node_in_group(Match3Preloader.BoardGroupName)
+		
 	set_process(false)
 	
 	
@@ -122,7 +127,7 @@ func on_added_piece(piece: PieceUI) -> void:
 		
 	if pieces_connected.size() < piece.board.max_match:
 		detect_new_matches_from_last_piece(piece)
-	
+		#board.cell_highlighter.highlight_cells(possible_next_matches)
 		## TODO - CELL HIGHLIGHTERS HERE
 		
 	else:

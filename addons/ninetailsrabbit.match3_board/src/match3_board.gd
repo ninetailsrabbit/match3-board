@@ -284,6 +284,7 @@ func draw_piece_on_cell(grid_cell: GridCellUI, new_piece: PieceUI) -> void:
 func draw_line_connector(origin_piece: PieceUI) -> void:
 	if is_swap_mode_connect_line() and line_connector == null:
 		line_connector = LineConnector.new()
+		line_connector.board = self
 		get_tree().root.add_child(line_connector)
 		line_connector.add_piece(origin_piece)
 
@@ -984,7 +985,7 @@ func on_piece_selected(piece: PieceUI) -> void:
 		return
 
 	current_selected_piece = piece
-	cell_highlighter.highlight_cells(grid_cell_from_piece(current_selected_piece), swap_mode)
+	cell_highlighter.highlight_cells_from_origin_cell(grid_cell_from_piece(current_selected_piece), swap_mode)
 
 
 func on_piece_unselected(_piece: PieceUI) -> void:
@@ -1004,7 +1005,7 @@ func on_piece_holded(piece: PieceUI) -> void:
 	draw_line_connector(piece)
 	
 	current_selected_piece = piece
-	cell_highlighter.highlight_cells(grid_cell_from_piece(current_selected_piece), swap_mode)
+	cell_highlighter.highlight_cells_from_origin_cell(grid_cell_from_piece(current_selected_piece), swap_mode)
 
 
 func on_piece_released(piece: PieceUI) -> void:

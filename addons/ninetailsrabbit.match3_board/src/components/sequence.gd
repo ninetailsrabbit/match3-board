@@ -44,10 +44,6 @@ func consume_cell(cell: GridCellUI) -> void:
 			removed_piece.queue_free()
 
 
-func contain_special_piece() -> bool:
-	return pieces().filter(func(piece: PieceUI): return piece.piece_definition.is_special()).size() > 0
-
-
 func pieces() -> Array[PieceUI]:
 	var current_pieces: Array[PieceUI] = []
 	
@@ -56,11 +52,30 @@ func pieces() -> Array[PieceUI]:
 	return current_pieces
 	
 
+func contains_special_piece() -> bool:
+	return pieces().any(func(piece: PieceUI): return piece.piece_definition.is_special())
+
+
+
+func all_pieces_are_special(type: PieceDefinitionResource.PieceType) -> bool:
+	if pieces().is_empty():
+		return false
+	else:
+		return pieces().all(func(piece: PieceUI): return piece.piece_definition.is_special())
+
+
 func all_pieces_are_of_type(type: PieceDefinitionResource.PieceType) -> bool:
 	if pieces().is_empty():
 		return false
 	else:
 		return pieces().all(func(piece: PieceUI): return piece.piece_definition.type == type)
+
+
+func all_pieces_are_of_shape(shape: String) -> bool:
+	if pieces().is_empty():
+		return false
+	else:
+		return pieces().all(func(piece: PieceUI): return piece.piece_definition.shape.to_lower() == shape.strip_edges().to_lower())
 
 
 #region Cell position in sequence
