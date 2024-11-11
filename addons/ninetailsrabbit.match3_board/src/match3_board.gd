@@ -431,6 +431,8 @@ func grid_cells_from_pieces(pieces: Array[PieceUI]) -> Array[GridCellUI]:
 	
 	return cells
 	
+	
+	
 
 func grid_cells_from_row(row: int) -> Array[GridCellUI]:
 	var cells: Array[GridCellUI] = []
@@ -822,27 +824,34 @@ func unlock() -> void:
 	
 
 func lock_all_pieces() -> void:
-	for piece: PieceUI in get_tree().get_nodes_in_group(PieceUI.GroupName):
+	for piece: PieceUI in pieces():
 		piece.lock()
 
 
 func unlock_all_pieces() -> void:
-	for piece: PieceUI in get_tree().get_nodes_in_group(PieceUI.GroupName):
+	for piece: PieceUI in pieces():
 		piece.unlock()
 
 
 func unselect_all_pieces() -> void:
-	for piece: PieceUI in get_tree().get_nodes_in_group(PieceUI.GroupName):
+	for piece: PieceUI in pieces():
 		piece.is_selected = false
 
 
 func reset_all_pieces_positions() -> void:
-	for piece: PieceUI in get_tree().get_nodes_in_group(PieceUI.GroupName):
+	for piece: PieceUI in pieces():
 		piece.reset_position()
 
 #endregion
 
 #region Pieces
+func pieces() -> Array[PieceUI]:
+	var pieces: Array[PieceUI] = []
+	pieces.assign(get_tree().get_nodes_in_group(PieceUI.GroupName))
+	
+	return pieces
+	
+	
 func fall_pieces() -> void:
 	await piece_animator.fall_down_pieces(calculate_all_fall_movements())
 
@@ -858,6 +867,20 @@ func fill_pieces() -> void:
 		new_pieces.assign(empty_cells.map(func(cell: GridCellUI): return cell.current_piece))
 		
 		await piece_animator.spawn_pieces(new_pieces)
+
+
+func all_pieces_of_type(type: PieceDefinitionResource.PieceType) -> Array[PieceUI]:
+	var pieces: Array[PieceUI] = []
+	pieces.assign(pieces().filter(func(piece: PieceUI): return piece.piece_definition.type == type))
+	
+	return pieces
+
+
+func all_pieces_of_shape(shape: String) -> Array[PieceUI]:
+	var pieces: Array[PieceUI] = []
+	pieces.assign(pieces().filter(func(piece: PieceUI): return piece.piece_definition.shape == shape))
+	
+	return pieces
 
 #endregion
 

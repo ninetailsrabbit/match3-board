@@ -205,7 +205,8 @@ func remove_piece():
 		return previous_piece
 	
 	return null
-	
+
+
 func swap_piece_with(other_cell: GridCellUI) -> bool:
 	if can_swap_piece_with(other_cell):
 		var previous_piece: PieceUI = current_piece

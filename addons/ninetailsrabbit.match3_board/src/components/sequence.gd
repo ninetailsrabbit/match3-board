@@ -56,7 +56,6 @@ func contains_special_piece() -> bool:
 	return pieces().any(func(piece: PieceUI): return piece.piece_definition.is_special())
 
 
-
 func all_pieces_are_special(type: PieceDefinitionResource.PieceType) -> bool:
 	if pieces().is_empty():
 		return false
