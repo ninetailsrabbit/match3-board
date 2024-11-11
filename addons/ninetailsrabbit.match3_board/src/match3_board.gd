@@ -388,7 +388,8 @@ func update_grid_cells_neighbours() -> void:
 			grid_cell.diagonal_neighbour_top_left = get_cell_or_null(grid_cell.column - 1, grid_cell.row - 1)
 			grid_cell.diagonal_neighbour_bottom_right = get_cell_or_null(grid_cell.column + 1, grid_cell.row + 1)
 			grid_cell.diagonal_neighbour_bottom_left = get_cell_or_null(grid_cell.column - 1, grid_cell.row + 1)
-		
+
+
 func grid_cell_from_piece(piece: PieceUI):
 	var found_pieces = grid_cells_flattened.filter(
 		func(cell: GridCellUI): return cell.has_piece() and cell.current_piece == piece
@@ -396,7 +397,16 @@ func grid_cell_from_piece(piece: PieceUI):
 	
 	if found_pieces.size() == 1:
 		return found_pieces.front()
+	
+	return null
+	
 
+func grid_cells_from_pieces(pieces: Array[PieceUI]) -> Array[GridCellUI]:
+	var cells: Array[GridCellUI] = []
+	cells.assign(Match3BoardPluginUtilities.remove_falsy_values(pieces.map(func(piece: PieceUI): return grid_cell_from_piece(piece))))
+	
+	return cells
+	
 
 func grid_cells_from_row(row: int) -> Array[GridCellUI]:
 	var cells: Array[GridCellUI] = []

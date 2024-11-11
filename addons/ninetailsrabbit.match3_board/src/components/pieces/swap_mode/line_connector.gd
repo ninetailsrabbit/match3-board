@@ -19,7 +19,6 @@ func _exit_tree() -> void:
 		
 	previous_matches.append_array(possible_next_matches)
 	board.cell_highlighter.remove_current_highlighters()
-	## TODO DESELECT HIGHLIGHTER ON THIS MATCHES
 	
 	if detection_area and not detection_area.is_queued_for_deletion():
 		detection_area.queue_free()
@@ -127,8 +126,8 @@ func on_added_piece(piece: PieceUI) -> void:
 		
 	if pieces_connected.size() < piece.board.max_match:
 		detect_new_matches_from_last_piece(piece)
-		#board.cell_highlighter.highlight_cells(possible_next_matches)
-		## TODO - CELL HIGHLIGHTERS HERE
+		board.cell_highlighter.remove_current_highlighters()
+		board.cell_highlighter.highlight_cells(board.grid_cells_from_pieces(possible_next_matches))
 		
 	else:
 		set_process(false)
