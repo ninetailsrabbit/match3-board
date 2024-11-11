@@ -9,6 +9,7 @@ signal swap_requested(from: PieceUI, to: PieceUI)
 signal swap_failed(from: GridCellUI, to: GridCellUI)
 signal swap_rejected(from: PieceUI, to: PieceUI)
 signal consume_requested(sequence: Sequence)
+signal consumed_sequence(sequence: Sequence)
 signal piece_selected(piece: PieceUI)
 signal piece_unselected(piece: PieceUI)
 signal piece_holded(piece: PieceUI)
@@ -125,7 +126,6 @@ signal unlocked
 		max_special_match = max(min_special_match, value)
 
 
-
 #region Features
 var piece_weight_generator: PieceWeightGenerator
 var piece_animator: PieceAnimator
@@ -189,6 +189,7 @@ func _enter_tree() -> void:
 		if sequence_consumer == null:
 			sequence_consumer = SequenceConsumer.new()
 		
+		
 		add_child(cell_highlighter)
 		add_child(piece_animator)
 		add_child(sequence_consumer)
@@ -197,6 +198,24 @@ func _enter_tree() -> void:
 func _ready() -> void:
 	if not Engine.is_editor_hint():
 		prepare_board()
+
+
+func change_piece_animator(animator: PieceAnimator) -> Match3Board:
+	piece_animator = animator
+	
+	return self
+	
+
+func change_cell_highlighter(highlighter: CellHighlighter) -> Match3Board:
+	cell_highlighter = highlighter
+	
+	return self
+	
+
+func change_sequence_consumer(consumer: SequenceConsumer) -> Match3Board:
+	sequence_consumer = consumer
+	
+	return self
 
 #region Board
 ## Only prepares the grid cells based on width and height
@@ -792,24 +811,7 @@ func unlock() -> void:
 	is_locked = false
 	
 	unlock_all_pieces()
-
-
-func fall_pieces() -> void:
-	await piece_animator.fall_down_pieces(calculate_all_fall_movements())
-
 	
-func fill_pieces() -> void:
-	var empty_cells = pending_empty_cells_to_fill()
-	
-	if empty_cells.size() > 0:
-		for empty_cell: GridCellUI in empty_cells:
-			draw_random_piece_on_cell(empty_cell)
-			
-		var new_pieces: Array[PieceUI] = []
-		new_pieces.assign(empty_cells.map(func(cell: GridCellUI): return cell.current_piece))
-		
-		await piece_animator.spawn_pieces(new_pieces)
-		
 
 func lock_all_pieces() -> void:
 	for piece: PieceUI in get_tree().get_nodes_in_group(PieceUI.GroupName):
@@ -825,7 +827,28 @@ func unselect_all_pieces() -> void:
 	for piece: PieceUI in get_tree().get_nodes_in_group(PieceUI.GroupName):
 		piece.is_selected = false
 
+#endregion
 
+#region Pieces
+func fall_pieces() -> void:
+	await piece_animator.fall_down_pieces(calculate_all_fall_movements())
+
+	
+func fill_pieces() -> void:
+	var empty_cells = pending_empty_cells_to_fill()
+	
+	if empty_cells.size() > 0:
+		for empty_cell: GridCellUI in empty_cells:
+			draw_random_piece_on_cell(empty_cell)
+			
+		var new_pieces: Array[PieceUI] = []
+		new_pieces.assign(empty_cells.map(func(cell: GridCellUI): return cell.current_piece))
+		
+		await piece_animator.spawn_pieces(new_pieces)
+
+#endregion
+
+#region Information helpers
 func is_click_mode_selection() -> bool:
 	return click_mode == Match3Preloader.BoardClickMode.Selection
 	
@@ -976,7 +999,6 @@ func on_consume_requested(sequence: Sequence) -> void:
 		return
 		
 	if swap_mode == Match3Preloader.BoardMovements.ConnectLine:
-		
 		if sequence.size() >= min_match:
 			pending_sequences = [sequence] as Array[Sequence]
 			current_state = Match3Preloader.BoardState.Consume

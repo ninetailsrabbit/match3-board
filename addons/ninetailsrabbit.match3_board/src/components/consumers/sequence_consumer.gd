@@ -1,5 +1,7 @@
 class_name SequenceConsumer extends Node
 
+signal consumed_sequence(sequence: Sequence)
+
 @onready var board: Match3Board = get_tree().get_first_node_in_group(Match3Preloader.BoardGroupName)
 
 func _enter_tree() -> void:
@@ -7,6 +9,8 @@ func _enter_tree() -> void:
 
 #region Overridables
 func consume_sequence(sequence: Sequence) -> void:
+	consumed_sequence.emit(sequence)
+	
 	var new_piece = detect_new_combined_piece(sequence)
 	
 	if new_piece is PieceUI:
