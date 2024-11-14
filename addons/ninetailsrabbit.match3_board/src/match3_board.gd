@@ -18,6 +18,8 @@ signal added_piece_to_line_connector(piece: PieceUI)
 signal canceled_line_connector_match(selected_pieces: Array[PieceUI])
 signal state_changed(from: Match3Preloader.BoardState, to: Match3Preloader.BoardState)
 signal prepared_board
+signal changed_swap_mode(from: Match3Preloader.BoardMovements, to: Match3Preloader.BoardMovements)
+signal changed_click_mode(from: Match3Preloader.BoardClickMode, to: Match3Preloader.BoardClickMode)
 signal movement_consumed
 signal finished_available_movements
 signal locked
@@ -94,9 +96,17 @@ signal unlocked
 ## The layer value from 1 to 32 that is the amount Godot supports. The inside areas will have this layer value to detect other pieces or be detected.
 @export_range(1, 32, 1) var pieces_collision_layer: int = 8
 ## The swap mode to use on this board, each has its own particularities and can be changed at runtime.
-@export var swap_mode: Match3Preloader.BoardMovements = Match3Preloader.BoardMovements.Adjacent
+@export var swap_mode: Match3Preloader.BoardMovements = Match3Preloader.BoardMovements.Adjacent:
+	set(value):
+		if value != swap_mode:
+			changed_swap_mode.emit(swap_mode, value)
+			swap_mode = value
 ## The click mode defines if the swap is made by select & click or dragging the piece to the desired place
-@export var click_mode: Match3Preloader.BoardClickMode = Match3Preloader.BoardClickMode.Selection
+@export var click_mode: Match3Preloader.BoardClickMode = Match3Preloader.BoardClickMode.Selection:
+	set(value):
+		if value != click_mode:
+			changed_click_mode.emit(click_mode, value)
+			click_mode = value
 ## The fill mode defines the behaviour when the pieces fall down after a consumed sequence.
 @export var input_action_cancel_line_connector: StringName = &"cancel_line_connector"
 @export var input_action_consume_line_connector: StringName = &"consume_line_connector"

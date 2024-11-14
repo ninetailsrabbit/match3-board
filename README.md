@@ -126,7 +126,9 @@ The collision layer where the pieces are set. Its values are from `1 to 32` and 
 
 ### Swap mode
 
-This is the `swap_mode` to find matches on the pieces. **They can be changed at runtime** and you have the next ones availables:
+This is the `swap_mode` to find matches on the pieces. **They can be changed at runtime** and the board emit the signal `changed_swap_mode(previous, new)` when this value it's changed
+
+You have the next ones availables:
 
 #### Adjacent
 
@@ -184,7 +186,9 @@ Connect the adjacent pieces from a line that originates from the selected cell u
 
 ### Click mode
 
-This is the `click_mode` to manipulate pieces in the board with the current swap mode. **They can be changed at runtime** and you have the next ones availables:
+This is the `click_mode` to manipulate pieces in the board with the current swap mode. **They can be changed at runtime** and the board emit the signal `changed_click_mode(previous, new)` when this value it's changed
+
+You have available the following ones:
 
 - **Selection:** You click on the piece to select and another click in the target piece to swap.
 - **Drag:** You hold the mouse and drag the piece into the target piece to swap. When the `swap_mode` is `ConnectLine` the piece is not dragged but instead you need to hold the mouse to keep connecting lines.
