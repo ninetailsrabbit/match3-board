@@ -156,15 +156,23 @@ var pending_sequences: Array[Sequence] = []
 
 
 func _input(event: InputEvent) -> void:
-	if is_swap_mode_connect_line() and is_click_mode_selection() and line_connector != null:
-		if InputMap.has_action(input_action_consume_line_connector) and Input.is_action_just_pressed(input_action_consume_line_connector):
-			line_connector.consume_matches()
-	
-		elif InputMap.has_action(input_action_cancel_line_connector) and Input.is_action_just_pressed(input_action_cancel_line_connector):
-			line_connector.cancel()
-	
+	if is_locked:
+		return
+		
+	handle_line_connector_input(event)
 	
 
+func handle_line_connector_input(event: InputEvent) -> void:
+	if is_swap_mode_connect_line() and is_click_mode_selection() and line_connector != null:
+		if InputMap.has_action(input_action_consume_line_connector) \
+			or event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+			line_connector.consume_matches()
+	
+		elif InputMap.has_action(input_action_cancel_line_connector) and Input.is_action_just_pressed(input_action_cancel_line_connector) \
+			or event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
+			line_connector.cancel()
+				
+	
 func _enter_tree() -> void:
 	if not Engine.is_editor_hint():
 		add_to_group(Match3Preloader.BoardGroupName)

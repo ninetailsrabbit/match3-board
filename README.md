@@ -35,6 +35,8 @@
       - [Cross Diagonals](#cross-diagonals)
       - [Connect Line](#connect-line)
     - [Click mode](#click-mode)
+    - [Customizable Input actions](#customizable-input-actions)
+    - [Fill modes](#fill-modes)
 - [Add spawn pieces to the board](#add-spawn-pieces-to-the-board)
 - [GridCellUI](#gridcellui)
   - [Position](#position)
@@ -182,8 +184,26 @@ Connect the adjacent pieces from a line that originates from the selected cell u
 
 This is the `click_mode` to manipulate pieces in the board with the current swap mode. **They can be changed at runtime** and you have the next ones availables:
 
-- **Selection:** You click on the piece to select and another click in the target piece to swap
-- **Drag:** You hold the mouse and drag the piece with the mouse into the target piece to swap. When the `swap_mode` is `ConnectLine` the piece is not dragged but instead you need to hold the mouse to keep connecting lines.
+- **Selection:** You click on the piece to select and another click in the target piece to swap.
+- **Drag:** You hold the mouse and drag the piece into the target piece to swap. When the `swap_mode` is `ConnectLine` the piece is not dragged but instead you need to hold the mouse to keep connecting lines.
+
+### Customizable Input actions
+
+When you're using the `click_mode` **Selection** and the `swap_mode` **ConnectLine**, there is two input actions you can define to `consume` or `cancel` the line connector matches.
+
+⚠️ If this action does not exists, by default the `consume` is triggered with `MOUSE_BUTTON_LEFT` and the `cancel` with `MOUSE_BUTTON_RIGHT` ⚠️
+
+---
+
+### Fill modes
+
+This option defines the behaviour when the board is filling the empty gaps after consuming previous sequences of pieces.
+
+You have available the following ones:
+
+- **Fall down:** The pieces fall down into the deepest empty column cell as they are drawn into the board
+- **Side**: Same behaviour as **Fall down** but if there is no empty space in the column and there is an empty space in the adjacent diagonal, the piece will move there.
+- **In place:** The pieces spawn in the same cell without gravity effects
 
 # Add spawn pieces to the board
 
