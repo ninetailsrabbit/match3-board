@@ -37,6 +37,7 @@
     - [Click mode](#click-mode)
     - [Customizable Input actions](#customizable-input-actions)
     - [Fill modes](#fill-modes)
+    - [Available pieces](#available-pieces)
 - [Add spawn pieces to the board](#add-spawn-pieces-to-the-board)
 - [GridCellUI](#gridcellui)
   - [Position](#position)
@@ -204,6 +205,49 @@ You have available the following ones:
 - **Fall down:** The pieces fall down into the deepest empty column cell as they are drawn into the board
 - **Side**: Same behaviour as **Fall down** but if there is no empty space in the column and there is an empty space in the adjacent diagonal, the piece will move there.
 - **In place:** The pieces spawn in the same cell without gravity effects
+
+### Available pieces
+
+This is an array of `PieceWeight` that will use the board to draw new pieces. A weight-based decision algorithm is used, i.e. the higher the value of the weight, the more likely it is to come out.
+
+There is more extensive documentation in section [How to create new pieces](#how-to-create-new-pieces) that explains in detail how to create the pieces scenes and add them to the board.
+
+Note that the pieces you add here will be drawn on the board, i.e. the ones that can spawn when the board is in fill mode, this can be done as long as the `is_disabled` property is set to false
+
+Drawing special pieces is the responsibility of the `SequenceConsumer` but nothing prevents you from placing them here and being part of the normal flow of the board.
+
+```swift
+class_name PieceWeight extends Resource
+
+@export var weight: float = 1.0
+@export var piece_scene: PackedScene
+
+
+var is_disabled: bool =  false
+
+var current_weight: float = weight
+var total_accum_weight: float = 0.0
+
+
+func reset_accum_weight() -> void:
+	total_accum_weight = 0.0
+
+
+func change_weight(new_value: float) -> void:
+	current_weight = new_value
+
+
+func change_to_original_weight() -> void:
+	current_weight = weight
+
+
+func enable() -> void:
+	is_disabled = false
+
+
+func disable() -> void:
+	is_disabled = true
+```
 
 # Add spawn pieces to the board
 

@@ -53,7 +53,7 @@ func _prepare_weight(pieces: Array[PieceWeight]) -> float:
 	for piece_weight: PieceWeight in pieces:
 		piece_weight.reset_accum_weight()
 		
-		total_weight += piece_weight.weight
+		total_weight += piece_weight.current_weight
 		piece_weight.total_accum_weight = total_weight
 	
 	return total_weight

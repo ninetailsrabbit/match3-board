@@ -164,7 +164,7 @@ func _input(event: InputEvent) -> void:
 
 func handle_line_connector_input(event: InputEvent) -> void:
 	if is_swap_mode_connect_line() and is_click_mode_selection() and line_connector != null:
-		if InputMap.has_action(input_action_consume_line_connector) \
+		if InputMap.has_action(input_action_consume_line_connector) and Input.is_action_just_pressed(input_action_consume_line_connector) \
 			or event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 			line_connector.consume_matches()
 	
@@ -311,7 +311,10 @@ func draw_grid_cell(grid_cell: GridCellUI) -> void:
 
 
 func draw_random_piece_on_cell(grid_cell: GridCellUI, except: Array[PieceWeight] = []) -> void:
-	var new_piece: PieceUI =  piece_weight_generator.roll(except)
+	var new_piece: PieceUI =  piece_weight_generator.roll(
+		available_pieces.filter(func(piece_weight: PieceWeight): return piece_weight.is_disabled)
+		)
+		
 	draw_piece_on_cell(grid_cell, new_piece)
 	
 
