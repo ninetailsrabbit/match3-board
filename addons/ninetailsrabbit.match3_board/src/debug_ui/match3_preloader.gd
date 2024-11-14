@@ -22,7 +22,11 @@ enum BoardState {
 
 enum BoardMovements {
 	Adjacent,
+	AdjacentWithDiagonals,
+	AdjacentOnlyDiagonals,
 	Free,
+	Row,
+	Column,
 	Cross,
 	CrossDiagonal,
 	ConnectLine

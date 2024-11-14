@@ -118,12 +118,6 @@ signal unlocked
 @export var max_match: int  = 5:
 	set(value):
 		max_match = max(min_match, value)
-@export var min_special_match: int = 2:
-	set(value):
-		min_special_match = max(2, value)
-@export var max_special_match: int = 2:
-	set(value):
-		max_special_match = max(min_special_match, value)
 
 
 #region Features
@@ -742,8 +736,16 @@ func swap_pieces_request(from_grid_cell: GridCellUI, to_grid_cell: GridCellUI) -
 	match swap_mode:
 		Match3Preloader.BoardMovements.Adjacent:
 			swap_adjacent(from_grid_cell, to_grid_cell)
+		Match3Preloader.BoardMovements.AdjacentWithDiagonals:
+			swap_adjacent_with_diagonals(from_grid_cell, to_grid_cell)
+		Match3Preloader.BoardMovements.AdjacentOnlyDiagonals:
+			swap_adjacent_only_diagonals(from_grid_cell, to_grid_cell)
 		Match3Preloader.BoardMovements.Free:
 			swap_free(from_grid_cell, to_grid_cell)
+		Match3Preloader.BoardMovements.Row:
+			swap_row(from_grid_cell, to_grid_cell)
+		Match3Preloader.BoardMovements.Column:
+			swap_column(from_grid_cell, to_grid_cell)
 		Match3Preloader.BoardMovements.Cross:
 			swap_cross(from_grid_cell, to_grid_cell)
 		Match3Preloader.BoardMovements.CrossDiagonal:
@@ -758,9 +760,37 @@ func swap_adjacent(from_grid_cell: GridCellUI, to_grid_cell: GridCellUI) -> void
 	else:
 		swap_rejected.emit(from_grid_cell.current_piece as PieceUI, to_grid_cell.current_piece as PieceUI)
 	
+
+func swap_adjacent_with_diagonals(from_grid_cell: GridCellUI, to_grid_cell: GridCellUI) -> void:
+	if from_grid_cell.is_adjacent_to(to_grid_cell, true) && from_grid_cell.swap_piece_with(to_grid_cell):
+		swap_pieces(from_grid_cell, to_grid_cell)
+	else:
+		swap_rejected.emit(from_grid_cell.current_piece as PieceUI, to_grid_cell.current_piece as PieceUI)
 	
+	
+func swap_adjacent_only_diagonals(from_grid_cell: GridCellUI, to_grid_cell: GridCellUI) -> void:
+	if from_grid_cell.in_diagonal_with(to_grid_cell) && from_grid_cell.swap_piece_with(to_grid_cell):
+		swap_pieces(from_grid_cell, to_grid_cell)
+	else:
+		swap_rejected.emit(from_grid_cell.current_piece as PieceUI, to_grid_cell.current_piece as PieceUI)
+	
+
 func swap_free(from_grid_cell: GridCellUI, to_grid_cell: GridCellUI) -> void:
 	if from_grid_cell.swap_piece_with(to_grid_cell):
+		swap_pieces(from_grid_cell, to_grid_cell)
+	else:
+		swap_rejected.emit(from_grid_cell.current_piece as PieceUI, to_grid_cell.current_piece as PieceUI)
+
+
+func swap_row(from_grid_cell: GridCellUI, to_grid_cell: GridCellUI) -> void:
+	if from_grid_cell.in_same_row_as(to_grid_cell) and from_grid_cell.swap_piece_with(to_grid_cell):
+		swap_pieces(from_grid_cell, to_grid_cell)
+	else:
+		swap_rejected.emit(from_grid_cell.current_piece as PieceUI, to_grid_cell.current_piece as PieceUI)
+		
+
+func swap_column(from_grid_cell: GridCellUI, to_grid_cell: GridCellUI) -> void:
+	if from_grid_cell.in_same_column_as(to_grid_cell) and from_grid_cell.swap_piece_with(to_grid_cell):
 		swap_pieces(from_grid_cell, to_grid_cell)
 	else:
 		swap_rejected.emit(from_grid_cell.current_piece as PieceUI, to_grid_cell.current_piece as PieceUI)
@@ -907,6 +937,14 @@ func is_click_mode_drag() -> bool:
 
 func is_swap_mode_adjacent() -> bool:
 	return swap_mode == Match3Preloader.BoardMovements.Adjacent
+	
+	
+func is_swap_mode_adjacent_with_diagonals() -> bool:
+	return swap_mode == Match3Preloader.BoardMovements.AdjacentWithDiagonals
+	
+	
+func is_swap_mode_adjacent_only_diagonals() -> bool:
+	return swap_mode == Match3Preloader.BoardMovements.AdjacentOnlyDiagonals
 	
 
 func is_swap_mode_free() -> bool:

@@ -4,7 +4,7 @@ signal swapped_piece(from: GridCellUI, to: GridCellUI)
 signal swap_rejected(from: GridCellUI, to: GridCellUI)
 signal removed_piece(piece: PieceUI)
 
-const group_name: String = "grid_cell"
+const GroupName: String = "grid_cells"
 
 @export var column: int
 @export var row: int
@@ -47,7 +47,7 @@ func _init(_row: int, _column: int, piece: PieceUI = null, _can_contain_piece: b
 
 
 func _enter_tree() -> void:
-	add_to_group(group_name)
+	add_to_group(GroupName)
 	
 	name = "Cell_Column%d_Row%d" % [column, row]
 	z_index = 20
@@ -115,8 +115,10 @@ func is_column_neighbour_of(other_cell: GridCellUI) -> bool:
 		and [upper_row, bottom_row].any(func(near_row: int): return other_cell.row == near_row)
 
 
-func is_adjacent_to(other_cell: GridCellUI) -> bool:
-	return is_row_neighbour_of(other_cell) or is_column_neighbour_of(other_cell)
+func is_adjacent_to(other_cell: GridCellUI, check_diagonal: bool = false) -> bool:
+	return is_row_neighbour_of(other_cell) \
+		or is_column_neighbour_of(other_cell) \
+		or (check_diagonal and in_diagonal_with(other_cell))
 	
 
 func in_diagonal_with(other_cell: GridCellUI) -> bool:
@@ -242,12 +244,24 @@ func available_neighbours(include_diagonals: bool = false) -> Array[GridCellUI]:
 			diagonal_neighbour_bottom_left
 		]))
 	else:
-		
 		neighbours.assign(Match3BoardPluginUtilities.remove_falsy_values([
 			neighbour_up,
 			neighbour_bottom,
 			neighbour_right,
 			neighbour_left,
+		]))
+	
+	return neighbours
+
+
+func diagonal_neighbours() -> Array[GridCellUI]:
+	var neighbours: Array[GridCellUI] = []
+	
+	neighbours.assign(Match3BoardPluginUtilities.remove_falsy_values([
+			diagonal_neighbour_top_right,
+			diagonal_neighbour_top_left,
+			diagonal_neighbour_bottom_right,
+			diagonal_neighbour_bottom_left
 		]))
 	
 	return neighbours

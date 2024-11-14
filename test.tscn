@@ -39,4 +39,5 @@ script = ExtResource("1_ykx7g")
 script = ExtResource("1_h78ih")
 preview_grid_in_editor = true
 preview_pieces = Array[Texture2D]([ExtResource("7_ojgnw"), ExtResource("5_yrfys"), ExtResource("6_vr5ix"), ExtResource("3_s6l8d")])
+swap_mode = 8
 available_pieces = Array[ExtResource("7_45v8r")]([SubResource("Resource_hnijy"), SubResource("Resource_3rj48"), SubResource("Resource_jou6o"), SubResource("Resource_5mhmg")])

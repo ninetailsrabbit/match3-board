@@ -134,7 +134,8 @@ func on_added_piece(piece: PieceUI) -> void:
 		remove_point(points.size() - 1)
 		detection_area.process_mode = Node.PROCESS_MODE_DISABLED
 		queue_free()
-	
+
+
 func on_line_match_selected(selected_pieces: Array[PieceUI]) -> void:
 	var cells: Array[GridCellUI] = []
 	cells.assign(selected_pieces.map(func(piece: PieceUI): return piece.board.grid_cell_from_piece(piece)))

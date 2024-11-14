@@ -20,12 +20,29 @@
 - [Getting started 🚀](#getting-started-)
 - [Editor preview 🪲](#editor-preview-)
   - [Parameters](#parameters)
-- [Board size](#board-size)
-  - [Parameters](#parameters-1)
-- [Match configuration](#match-configuration)
+- [Board Parameters](#board-parameters)
+  - [Size](#size)
+  - [Match configuration](#match-configuration)
+    - [Pieces collision layer](#pieces-collision-layer)
+    - [Swap mode](#swap-mode)
+      - [Adjacent](#adjacent)
+      - [Adjacent with diagonals](#adjacent-with-diagonals)
+      - [Adjacent only diagonals](#adjacent-only-diagonals)
+      - [Free](#free)
+      - [Row](#row)
+      - [Column](#column)
+      - [Cross](#cross)
+      - [Cross Diagonals](#cross-diagonals)
+      - [Connect Line](#connect-line)
+- [Add spawn pieces to the board](#add-spawn-pieces-to-the-board)
 - [GridCellUI](#gridcellui)
   - [Position](#position)
   - [Empty cell](#empty-cell)
+  - [Get neighbour cells](#get-neighbour-cells)
+  - [Piece](#piece)
+    - [Information](#information)
+    - [Add or remove](#add-or-remove)
+    - [Swap (internal use, not recommended for manual use )](#swap-internal-use-not-recommended-for-manual-use-)
 
 # 📦 Installation
 
@@ -73,7 +90,7 @@ You have available default textures on this plugin to visualize a preview in the
 - **Even cell texture:** The texture to place in even cell positions in the board
 - **Empty cells:** Set empty cells where a piece shall not be drawn in the shape of Vector2i(row, column)
 
-# Board size
+# Board Parameters
 
 ---
 
@@ -81,18 +98,86 @@ You have available default textures on this plugin to visualize a preview in the
 
 ---
 
-## Parameters
+## Size
 
 - **Grid width:** The row width of the grid, a width of 7 means that 7 pieces will be drawed by row
 - **Grid height:** The column height of the grid, a height o 8 means that 8 pieces will be drawed by column
 - **Cell size:** The size of the cell in the world in the shape of Vector2(x, y). It's recommended to keep this values equals for better display
 - **Cell offset:** The offset from the corner if you want to create more space.
 
-ℹ️ _\_With the `preview enabled`, any changes you make to the board's parameters _(like grid size or piece definitions)\_ will be instantly reflected in the preview window. This allows you to quickly iterate and experiment with different configurations\_\_ ℹ️
+ℹ️ **_With the `preview enabled`, any changes you make to the board's parameters \_(like grid size or piece definitions)\_ will be instantly reflected in the preview window. This allows you to quickly iterate and experiment with different configurations_** ℹ️
 
-# Match configuration
+## Match configuration
 
-WIP
+---
+
+![board_match_parameters](images/board_match_parameters.png)
+
+---
+
+### Pieces collision layer
+
+The collision layer where the pieces are set. Its values are from `1 to 32` and this allows you to not override existing layers in your Godot project
+
+### Swap mode
+
+This is the `swap_mode` to find matches on the pieces. **They can be changed at runtime** and you have the next ones availables:
+
+#### Adjacent
+
+An individual piece can swap with adjacent pieces but diagonal neighbours are not included.
+
+![swap_adjacent](images/swap_adjacent.png)
+
+#### Adjacent with diagonals
+
+Same as adjacent mode but this time diagonal neighbours are included
+
+![swap_adjacent](images/swap_diagonal_diagonal.png)
+
+#### Adjacent only diagonals
+
+Same as adjacent mode but this time only diagonal neighbours are included
+
+![swap_adjacent](images/swap_diagonal.png)
+
+#### Free
+
+The piece can be swapped with any other
+
+![swap_free](images/swap_free.png)
+
+#### Row
+
+The piece can be swapped in the entire row it belongs
+
+![swap_adjacent](images/swap_row.png)
+
+#### Column
+
+The piece can be swapped in the entire column it belongs
+
+![swap_adjacent](images/swap_column.png)
+
+#### Cross
+
+The piece can be swapped on a cross that is a mix of `Row & Column`
+
+![swap_adjacent](images/swap_cross.png)
+
+#### Cross Diagonals
+
+The piece can be swapped on cross but using diagonals instead
+
+![swap_adjacent](images/swap_cross_diagonal.png)
+
+#### Connect Line
+
+Connect the adjacent pieces from a line that originates from the selected cell until the maximum match of pieces or triggered manually.
+
+![swap_adjacent](images/swap_connect_line.png)
+
+# Add spawn pieces to the board
 
 # GridCellUI
 
@@ -102,8 +187,114 @@ The Swaps between pieces are done via this `GridCellUI` node so **_the pieces ar
 
 ## Position
 
-To obtain the position of a cell you have access to variables `row`, `column` and method `board_position()`. This method returns a `Vector2i(row, column)`
+To obtain the position of a cell you have access to variables `row`, `column` and method `board_position()`. This method returns a `Vector2i(row, column)`.
+
+In addition, there are methods to check for more advanced cases with other cells to know the relative position in the board
+
+```swift
+func in_same_row_as(other_cell: GridCellUI) -> bool
+
+func in_same_column_as(other_cell: GridCellUI) -> bool
+
+func in_same_position_as(other_cell: GridCellUI) -> bool
+
+func in_same_grid_position_as(grid_position: Vector2) -> bool
+
+func is_row_neighbour_of(other_cell: GridCellUI) -> bool
+
+func is_column_neighbour_of(other_cell: GridCellUI) -> bool
+
+func is_adjacent_to(other_cell: GridCellUI) -> bool
+
+func in_diagonal_with(other_cell: GridCellUI) -> bool:
+```
+
+---
+
+There are more methods available to determine if it is a corner or a border
+
+```swift
+
+func is_top_left_corner() -> bool:
+
+func is_top_right_corner() -> bool
+
+func is_bottom_left_corner() -> bool
+
+func is_bottom_right_corner() -> bool
+
+func is_top_border() -> bool
+
+func is_bottom_border() -> bool
+
+func is_right_border() -> bool
+
+func is_left_border() -> bool:
+```
 
 ## Empty cell
 
 If the position of this cell match with any of the `empty_cells` vectors from the `Match3Board`, this cell will change the variable `can_contain_piece` to false and you can choose if draw the background texture or not with the variable `draw_background_texture`.
+
+## Get neighbour cells
+
+When the board is drawed and cells initialized, each one has access to the adjacent neighbours, you can access them with the variables:
+
+```swift
+neighbour_up,
+neighbour_bottom,
+neighbour_right,
+neighbour_left,
+diagonal_neighbour_top_right,
+diagonal_neighbour_top_left,
+diagonal_neighbour_bottom_right,
+diagonal_neighbour_bottom_left
+```
+
+In addition you can access the neighbour cells that are available through the methods:
+
+```swift
+func available_neighbours(include_diagonals: bool = false) -> Array[GridCellUI]
+
+func diagonal_neighbours() -> Array[GridCellUI]:
+```
+
+## Piece
+
+The cell has direct access to the related piece on variable `current_piece`, this `GridCellUI` class provides useful methods to manipulate them:
+
+### Information
+
+Available methods to know if the cell has a piece or not
+
+```swift
+func is_empty() -> bool
+
+func has_piece() -> bool
+```
+
+### Add or remove
+
+Methods to assign or remove a piece. This methods does not remove the piece from the board UI, only from the cell.
+
+```swift
+// Assign a piece only if the cell is empty unless "overwrite" is true
+func assign_piece(new_piece: PieceUI, overwrite: bool = false) -> void
+
+// Replace the current piece to the new one even if the cell is empty
+func replace_piece(new_piece: PieceUI) -> PieceUI
+
+// Remove the current piece and return it if the cell was not empty.
+func remove_piece() -> PieceUI?
+```
+
+### Swap (internal use, not recommended for manual use )
+
+All the swap are dones through the cells, although **it is not recommended to use these methods directly.** Rather, set up the pieces and their rules individually and consume them with a `SequenceConsumer`.
+
+```swift
+func swap_piece_with(other_cell: GridCellUI) -> bool
+
+func can_swap_piece_with(other_cell: GridCellUI) -> bool
+
+```
