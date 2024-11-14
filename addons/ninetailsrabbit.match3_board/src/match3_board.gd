@@ -14,6 +14,8 @@ signal piece_selected(piece: PieceUI)
 signal piece_unselected(piece: PieceUI)
 signal piece_holded(piece: PieceUI)
 signal piece_released(piece: PieceUI)
+signal added_piece_to_line_connector(piece: PieceUI)
+signal canceled_line_connector_match(selected_pieces: Array[PieceUI])
 signal state_changed(from: Match3Preloader.BoardState, to: Match3Preloader.BoardState)
 signal prepared_board
 signal locked
@@ -1104,7 +1106,7 @@ func on_consume_requested(sequence: Sequence) -> void:
 			pending_sequences = [sequence] as Array[Sequence]
 			current_state = Match3Preloader.BoardState.Consume
 	
-
+	
 func on_piece_selected(piece: PieceUI) -> void:
 	if is_locked or is_click_mode_drag():
 		return

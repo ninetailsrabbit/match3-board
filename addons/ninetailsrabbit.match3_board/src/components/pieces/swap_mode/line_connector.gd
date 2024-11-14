@@ -95,6 +95,8 @@ func cancel() -> void:
 	remove_point(points.size() - 1)
 	detection_area.process_mode = Node.PROCESS_MODE_DISABLED
 	canceled_match.emit(pieces_connected)
+	board.canceled_line_connector_match.emit(pieces_connected)
+	
 	queue_free()
 
 
@@ -137,7 +139,9 @@ func on_piece_detected(other_area: Area2D) -> void:
 
 func on_added_piece(piece: PieceUI) -> void:
 	piece.disable_piece_area()
-		
+	
+	board.added_piece_to_line_connector.emit(piece)
+	
 	if pieces_connected.size() == 1:
 		origin_piece = piece
 
