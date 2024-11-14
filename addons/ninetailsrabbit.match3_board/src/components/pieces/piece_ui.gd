@@ -57,28 +57,27 @@ var is_holded: bool = false:
 				board.piece_released.emit(self)
 var is_selected: bool = false:
 	set(value):
-		if value != is_selected and not is_locked and is_inside_tree():
+		if  value != is_selected and _can_be_selected():
 			is_selected = value
 			
 			if is_selected:
+				disable_piece_area()
+				
+				if is_click_mode_drag() and not board.is_swap_mode_connect_line():
+					enable_detection_area()
+
 				selected.emit()
 				board.piece_selected.emit(self)
 				
-				piece_area.set_deferred("monitorable", false)
-					
-				## To not interrupt the detection area that the line connector creates
-				if is_click_mode_drag() and not board.is_swap_mode_connect_line():
-					detection_area.set_deferred("monitoring", true)
 			else:
+				enable_piece_area()
+				
+				if is_click_mode_drag() and not board.is_swap_mode_connect_line():
+					disable_detection_area()
+					
 				unselected.emit()
 				board.piece_unselected.emit(self)
 				
-				piece_area.set_deferred("monitorable", true)
-				
-				## To not interrupt the detection area that the line connector creates
-				if is_click_mode_drag() and not board.is_swap_mode_connect_line():
-					detection_area.set_deferred("monitoring", false)
-	
 
 var original_z_index: int = 0
 var current_position: Vector2 = Vector2.ZERO
@@ -117,7 +116,7 @@ func _ready() -> void:
 	set_process(false)
 	
 	_prepare_sprites()
-	prepare_area_detectors()
+	_prepare_area_detectors()
 	_prepare_mouse_region_button()
 
 
@@ -189,6 +188,39 @@ func is_click_mode_drag() -> bool:
 	return board.is_click_mode_drag()
 #endregion
 
+
+func enable_piece_area() -> void:
+	piece_area.set_deferred("monitorable", true)
+
+	
+func disable_piece_area() -> void:
+	piece_area.set_deferred("monitorable", false)
+
+
+func enable_detection_area() -> void:
+	detection_area.set_deferred("monitoring", true)
+
+	
+func disable_detection_area() -> void:
+	detection_area.set_deferred("monitoring", false)
+
+
+func enable_interaction_areas() -> void:
+					
+	## To not interrupt the detection area that the line connector creates
+	if is_click_mode_drag() and not board.is_swap_mode_connect_line():
+		detection_area.set_deferred("monitoring", true)
+
+
+func disable_interaction_areas() -> void:
+	piece_area.set_deferred("monitorable", true)
+			
+	## To not interrupt the detection area that the line connector creates
+	if is_click_mode_drag() and not board.is_swap_mode_connect_line():
+		detection_area.set_deferred("monitoring", false)
+
+
+
 #region Preparation methods
 func _prepare_mouse_region_button() -> void:
 	if mouse_region == null:
@@ -232,7 +264,7 @@ func _prepare_animated_sprite() -> void:
 		animated_sprite.scale = Vector2(cell_size.x / texture_size.x, cell_size.y / texture_size.y) * texture_scale
 
 
-func prepare_area_detectors() -> void:
+func _prepare_area_detectors() -> void:
 	piece_area = Area2D.new()
 	piece_area.name = "PieceArea"
 	var piece_area_collision = CollisionShape2D.new()
@@ -268,6 +300,11 @@ func prepare_area_detectors() -> void:
 	add_child(detection_area)
 #endregion
 
+
+#region Internals
+func _can_be_selected() -> bool:
+	return is_inside_tree() and not board.is_locked and not is_locked
+#endregion
 
 #region Signal callbacks
 func on_mouse_region_pressed() -> void:

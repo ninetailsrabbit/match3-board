@@ -94,6 +94,8 @@ signal unlocked
 ## The click mode defines if the swap is made by select & click or dragging the piece to the desired place
 @export var click_mode: Match3Preloader.BoardClickMode = Match3Preloader.BoardClickMode.Selection
 ## The fill mode defines the behaviour when the pieces fall down after a consumed sequence.
+@export var input_action_cancel_line_connector: StringName = &"cancel_line_connector"
+@export var input_action_consume_line_connector: StringName = &"consume_line_connector"
 @export var fill_mode =  Match3Preloader.BoardFillModes.FallDown
 ## The available pieces this board can generate to be used by the player
 @export var available_pieces: Array[PieceWeight] = []
@@ -151,6 +153,16 @@ var current_state: Match3Preloader.BoardState = Match3Preloader.BoardState.WaitF
 var pending_sequences: Array[Sequence] = []
 
 
+func _input(event: InputEvent) -> void:
+	if is_swap_mode_connect_line() and is_click_mode_selection() and line_connector != null:
+		if InputMap.has_action(input_action_consume_line_connector) and Input.is_action_just_pressed(input_action_consume_line_connector):
+			line_connector.consume_matches()
+	
+		elif InputMap.has_action(input_action_cancel_line_connector) and Input.is_action_just_pressed(input_action_cancel_line_connector):
+			line_connector.cancel()
+	
+	
+
 func _enter_tree() -> void:
 	if not Engine.is_editor_hint():
 		add_to_group(Match3Preloader.BoardGroupName)
@@ -192,6 +204,12 @@ func _enter_tree() -> void:
 func _ready() -> void:
 	if not Engine.is_editor_hint():
 		prepare_board()
+	
+	if not InputMap.has_action(input_action_consume_line_connector):
+		push_warning("Match3Board: The input action %s to consume a line connection does not exist, it will not be possible to consume a line connector manually" % input_action_consume_line_connector)
+
+	if not InputMap.has_action(input_action_cancel_line_connector):
+		push_warning("Match3Board: The input action %s to cancel a line connection does not exist, it will not be possible to cancel a line connector manually" % input_action_cancel_line_connector)
 
 
 func change_piece_animator(animator: PieceAnimator) -> Match3Board:
@@ -200,7 +218,6 @@ func change_piece_animator(animator: PieceAnimator) -> Match3Board:
 	if piece_animator is PieceAnimator:
 		piece_animator.animation_started.connect(on_animation_started)
 		piece_animator.animation_finished.connect(on_animation_finished)
-	
 	
 	return self
 	
@@ -304,15 +321,12 @@ func draw_line_connector(origin_piece: PieceUI) -> void:
 		line_connector = LineConnector.new()
 		line_connector.board = self
 		get_tree().root.add_child(line_connector)
+		line_connector.tree_exited.connect(remove_line_connector)
 		line_connector.add_piece(origin_piece)
-
+		
 
 func remove_line_connector() -> void:
-	if is_swap_mode_connect_line():
-		if line_connector and not line_connector.is_queued_for_deletion():
-			line_connector.queue_free()
-	
-		line_connector = null
+	line_connector = null
 #endregion
 
 #region Cells
@@ -1085,7 +1099,7 @@ func on_consume_requested(sequence: Sequence) -> void:
 	if is_locked:
 		return
 		
-	if swap_mode == Match3Preloader.BoardMovements.ConnectLine:
+	if is_swap_mode_connect_line():
 		if sequence.size() >= min_match:
 			pending_sequences = [sequence] as Array[Sequence]
 			current_state = Match3Preloader.BoardState.Consume
@@ -1111,7 +1125,6 @@ func on_piece_unselected(_piece: PieceUI) -> void:
 	if is_locked:
 		return
 	
-	remove_line_connector()
 	
 	current_selected_piece = null
 	cell_highlighter.remove_current_highlighters()
@@ -1131,11 +1144,12 @@ func on_piece_released(piece: PieceUI) -> void:
 	if is_locked or is_click_mode_selection():
 		return
 	
-	remove_line_connector()
-	
 	current_selected_piece = null
 	
-	if not is_swap_mode_connect_line():
+	if is_swap_mode_connect_line():
+		if line_connector != null:
+			line_connector.consume_matches()
+	else:
 		var other_piece = piece.detect_near_piece()
 		
 		if other_piece is PieceUI:

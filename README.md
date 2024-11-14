@@ -34,6 +34,7 @@
       - [Cross](#cross)
       - [Cross Diagonals](#cross-diagonals)
       - [Connect Line](#connect-line)
+    - [Click mode](#click-mode)
 - [Add spawn pieces to the board](#add-spawn-pieces-to-the-board)
 - [GridCellUI](#gridcellui)
   - [Position](#position)
@@ -176,6 +177,13 @@ The piece can be swapped on cross but using diagonals instead
 Connect the adjacent pieces from a line that originates from the selected cell until the maximum match of pieces or triggered manually.
 
 ![swap_adjacent](images/swap_connect_line.png)
+
+### Click mode
+
+This is the `click_mode` to manipulate pieces in the board with the current swap mode. **They can be changed at runtime** and you have the next ones availables:
+
+- **Selection:** You click on the piece to select and another click in the target piece to swap
+- **Drag:** You hold the mouse and drag the piece with the mouse into the target piece to swap. When the `swap_mode` is `ConnectLine` the piece is not dragged but instead you need to hold the mouse to keep connecting lines.
 
 # Add spawn pieces to the board
 
