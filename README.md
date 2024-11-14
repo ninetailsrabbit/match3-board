@@ -38,6 +38,7 @@
     - [Customizable Input actions](#customizable-input-actions)
     - [Fill modes](#fill-modes)
     - [Available pieces](#available-pieces)
+    - [Available moves on start](#available-moves-on-start)
 - [Add spawn pieces to the board](#add-spawn-pieces-to-the-board)
 - [GridCellUI](#gridcellui)
   - [Position](#position)
@@ -248,6 +249,13 @@ func enable() -> void:
 func disable() -> void:
 	is_disabled = true
 ```
+
+### Available moves on start
+
+This parameter acts as information that can be accessed on the variable `current_available_moves` about the moves this board can make. Each time the board returns to the initial state after consuming sequences, `current_available_moves -= 1` it's triggered.
+
+- When a move it's consumed the board emits the signal `movement_consumed`
+- When no remaining moves are available the board emits the signal `finished_available_movements`
 
 # Add spawn pieces to the board
 

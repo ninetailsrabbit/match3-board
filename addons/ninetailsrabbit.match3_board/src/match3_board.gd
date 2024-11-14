@@ -18,6 +18,8 @@ signal added_piece_to_line_connector(piece: PieceUI)
 signal canceled_line_connector_match(selected_pieces: Array[PieceUI])
 signal state_changed(from: Match3Preloader.BoardState, to: Match3Preloader.BoardState)
 signal prepared_board
+signal movement_consumed
+signal finished_available_movements
 signal locked
 signal unlocked
 
@@ -153,6 +155,16 @@ var current_state: Match3Preloader.BoardState = Match3Preloader.BoardState.WaitF
 			current_state = new_state
 		
 var pending_sequences: Array[Sequence] = []
+var current_available_moves: int = available_moves_on_start:
+	set(value):
+		if value != current_available_moves:
+			if value < current_available_moves:
+				movement_consumed.emit()
+			
+			elif value == 0:
+				finished_available_movements.emit()
+				
+			current_available_moves = clamp(value, 0, available_moves_on_start)
 
 
 func _input(event: InputEvent) -> void:
@@ -1056,8 +1068,9 @@ func on_prepared_board() -> void:
 func on_state_changed(from: Match3Preloader.BoardState, to: Match3Preloader.BoardState) -> void:
 	match to:
 		Match3Preloader.BoardState.WaitForInput:
+			current_available_moves -= 1
 			reset_all_pieces_positions()
-			await get_tree().create_timer(0.2).timeout
+			await get_tree().create_timer(0.15).timeout
 			unlock()
 		Match3Preloader.BoardState.Consume:
 			lock()
