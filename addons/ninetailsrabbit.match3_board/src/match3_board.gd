@@ -63,11 +63,6 @@ signal unlocked
 		if even_cell_texture != value:
 			even_cell_texture = value
 			draw_preview_grid()
-@export var empty_cells: Array[Vector2] = []:
-	set(value):
-		if empty_cells != value:
-			empty_cells = value
-			draw_preview_grid()
 			
 @export_group("Size 🔲")
 @export var grid_width: int = 8:
@@ -80,7 +75,6 @@ signal unlocked
 		if grid_height != value:
 			grid_height = max(MinGridHeight, value)
 			draw_preview_grid()
-			
 @export var cell_size: Vector2i = Vector2i(48, 48):
 	set(value):
 		if value != cell_size:
@@ -90,6 +84,11 @@ signal unlocked
 	set(value):
 		if value != cell_offset:
 			cell_offset = value
+			draw_preview_grid()
+@export var empty_cells: Array[Vector2] = []:
+	set(value):
+		if empty_cells != value:
+			empty_cells = value
 			draw_preview_grid()
 
 @export_group("Configuration 💎")
@@ -1044,7 +1043,12 @@ func draw_preview_grid() -> void:
 					
 				var current_cell_sprite: Sprite2D = Sprite2D.new()
 				current_cell_sprite.name = "Cell_Column%d_Row%d" % [column, row]
-				current_cell_sprite.texture = even_cell_texture if (column + row) % 2 == 0 else odd_cell_texture
+				
+				if even_cell_texture and odd_cell_texture:
+					current_cell_sprite.texture = even_cell_texture if (column + row) % 2 == 0 else odd_cell_texture
+				else:
+					current_cell_sprite.texture = even_cell_texture if even_cell_texture else odd_cell_texture
+					
 				current_cell_sprite.position = Vector2(cell_size.x * column + cell_offset.x, cell_size.y * row + cell_offset.y)
 				
 				debug_preview_node.add_child(current_cell_sprite)

@@ -24,10 +24,10 @@ func detect_new_combined_piece(sequence: Sequence):
 		
 		if sequence.is_horizontal_or_vertical_shape():
 			match sequence.size():
-				5:
+				4:
 					var new_special_piece: SpecialCrossPiece = SpecialCrossPieceScene.instantiate() as SpecialCrossPiece
 					return new_special_piece
-				4:
+				5:
 					var new_special_piece: SpecialShapeConsumerPiece = SpecialShapeConsumerPieceScene.instantiate() as SpecialShapeConsumerPiece
 					new_special_piece.shape_to_consume = piece.piece_definition.shape
 					return new_special_piece
