@@ -5,6 +5,10 @@ signal unselected
 signal holded
 signal released
 signal consumed
+signal mouse_entered
+signal mouse_exited
+signal focus_entered
+signal focus_exited
 
 const GroupName: String = "pieces"
 const SpecialGroupName: StringName = "special-pieces"
@@ -112,7 +116,11 @@ func _enter_tree() -> void:
 	holded.connect(on_piece_holded)
 	released.connect(on_piece_released)
 	consumed.connect(on_piece_consumed)
-	
+	mouse_entered.connect(on_piece_mouse_entered)
+	mouse_exited.connect(on_piece_mouse_exited)
+	focus_entered.connect(on_piece_focus_entered)
+	focus_exited.connect(on_piece_focus_exited)
+
 
 func _ready() -> void:
 	if sprite == null:
@@ -263,6 +271,10 @@ func _prepare_mouse_region_button() -> void:
 	mouse_region.pressed.connect(on_mouse_region_pressed)
 	mouse_region.button_down.connect(on_mouse_region_holded)
 	mouse_region.button_up.connect(on_mouse_region_released)
+	mouse_region.mouse_entered.connect(on_mouse_region_mouse_entered)
+	mouse_region.mouse_exited.connect(on_mouse_region_mouse_exited)
+	mouse_region.focus_entered.connect(on_mouse_region_focus_entered)
+	mouse_region.focus_exited.connect(on_mouse_region_focus_exited)
 
 
 func _prepare_sprites() -> void:
@@ -368,6 +380,21 @@ func on_mouse_region_released() -> void:
 		
 		set_process(false)
 
+
+func on_mouse_region_mouse_entered() -> void:
+	mouse_entered.emit()
+	
+	
+func on_mouse_region_mouse_exited() -> void:
+	mouse_exited.emit()
+	
+
+func on_mouse_region_focus_entered() -> void:
+	focus_entered.emit()
+	
+	
+func on_mouse_region_focus_exited() -> void:
+	focus_exited.emit()
 #endregion
 	
 
@@ -389,5 +416,20 @@ func on_piece_released() -> void:
 	
 	
 func on_piece_consumed() -> void:
+	pass
+	
+
+func on_piece_mouse_entered() -> void:
+	pass
+	
+	
+func on_piece_mouse_exited() -> void:
+	pass
+	
+func on_piece_focus_entered() -> void:
+	pass
+	
+	
+func on_piece_focus_exited() -> void:
 	pass
 #endregion

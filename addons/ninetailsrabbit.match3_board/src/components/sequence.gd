@@ -41,6 +41,7 @@ func consume_cell(cell: GridCellUI) -> void:
 		var removed_piece = cell.remove_piece()
 		
 		if removed_piece is PieceUI:
+			removed_piece.consumed.emit()
 			removed_piece.queue_free()
 
 
