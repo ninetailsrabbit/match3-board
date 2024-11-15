@@ -10,7 +10,7 @@ func _ready() -> void:
 
 
 func on_requested_piece_special_trigger() -> void:
-	var sequence: Sequence = Sequence.new(board.cross_cells_from(board.grid_cell_from_piece(self)))
+	var sequence: Sequence = Sequence.new(board.cross_cells_from(board.grid_cell_from_piece(self)), Sequence.Shapes.Cross)
 	board.lock()
 	
 	animation_player.play("explode")

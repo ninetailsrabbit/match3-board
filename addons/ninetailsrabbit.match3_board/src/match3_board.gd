@@ -43,12 +43,7 @@ signal unlocked
 	set(value):
 		remove_preview_sprites()
 
-@export var preview_pieces: Array[Texture2D] = [
-	Match3Preloader.BlueGem,
-	Match3Preloader.GreenGem,
-	Match3Preloader.YellowGem,
-	Match3Preloader.PurpleGem
-]:
+@export var preview_pieces: Array[Texture2D]:
 	set(value):
 		if preview_pieces != value:
 			preview_pieces = value
@@ -63,7 +58,11 @@ signal unlocked
 		if even_cell_texture != value:
 			even_cell_texture = value
 			draw_preview_grid()
-			
+@export var empty_cell_texture: Texture2D:
+	set(value):
+		if empty_cell_texture != value:
+			empty_cell_texture = value
+			draw_preview_grid()
 @export_group("Size 🔲")
 @export var grid_width: int = 8:
 	set(value):
@@ -90,6 +89,7 @@ signal unlocked
 		if empty_cells != value:
 			empty_cells = value
 			draw_preview_grid()
+@export var draw_background_texture_on_empty_cells: bool = true
 
 @export_group("Configuration 💎")
 ## When enabled, the board prepare itself automatically when it's ready on the scene tree
@@ -340,15 +340,17 @@ func draw_grid_cell(grid_cell: GridCellUI) -> void:
 	if not grid_cell.is_inside_tree():
 		add_child(grid_cell)
 		grid_cell.position = Vector2(grid_cell.cell_size.x * grid_cell.column + cell_offset.x, grid_cell.cell_size.y * grid_cell.row + cell_offset.y)
-
+		grid_cell.can_contain_piece = not grid_cell.board_position() in empty_cells
+		
 
 func draw_random_piece_on_cell(grid_cell: GridCellUI, except: Array[PieceWeight] = []) -> void:
-	var new_piece: PieceUI =  piece_weight_generator.roll(
-		available_pieces.filter(func(piece_weight: PieceWeight): return piece_weight.is_disabled)
-		)
+	if grid_cell.can_contain_piece:
+		var new_piece: PieceUI =  piece_weight_generator.roll(
+			available_pieces.filter(func(piece_weight: PieceWeight): return piece_weight.is_disabled)
+			)
+			
+		draw_piece_on_cell(grid_cell, new_piece)
 		
-	draw_piece_on_cell(grid_cell, new_piece)
-	
 
 func draw_piece_on_cell(grid_cell: GridCellUI, new_piece: PieceUI) -> void:
 	if grid_cell.can_contain_piece:
@@ -1038,13 +1040,12 @@ func draw_preview_grid() -> void:
 		for column in grid_width:
 			for row in grid_height:
 				
-				if empty_cells.has(Vector2(row, column)):
-					continue
-					
 				var current_cell_sprite: Sprite2D = Sprite2D.new()
 				current_cell_sprite.name = "Cell_Column%d_Row%d" % [column, row]
 				
-				if even_cell_texture and odd_cell_texture:
+				if empty_cells.has(Vector2(row, column)):
+					current_cell_sprite.texture = empty_cell_texture
+				elif even_cell_texture and odd_cell_texture:
 					current_cell_sprite.texture = even_cell_texture if (column + row) % 2 == 0 else odd_cell_texture
 				else:
 					current_cell_sprite.texture = even_cell_texture if even_cell_texture else odd_cell_texture

@@ -14,6 +14,7 @@ const GroupName: String = "grid_cells"
 @export var draw_background_texture: bool = true
 @export var odd_cell_texture: Texture2D = Match3Preloader.OddCellTexture
 @export var even_cell_texture: Texture2D = Match3Preloader.EvenCellTexture
+@export var empty_cell_texture: Texture2D
 
 #region Neighbours
 var neighbour_up: GridCellUI
@@ -64,8 +65,11 @@ func change_background_image(new_image: Texture2D) -> void:
 	
 	
 func prepare_background_sprite() -> void:
-	selected_background_image = even_cell_texture if (column + row) % 2 == 0 else odd_cell_texture
-	
+	if can_contain_piece:
+		selected_background_image = even_cell_texture if (column + row) % 2 == 0 else odd_cell_texture
+	else:
+		selected_background_image = empty_cell_texture
+		
 	if background_sprite == null:
 		background_sprite = Sprite2D.new()
 		background_sprite.name = "BackgroundSprite"

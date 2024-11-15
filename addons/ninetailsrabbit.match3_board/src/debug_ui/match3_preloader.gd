@@ -44,12 +44,6 @@ enum BoardFillModes {
 }
 #endregion
 
-#region Textures
-const BlueGem: CompressedTexture2D = preload("res://addons/ninetailsrabbit.match3_board/src/debug_ui/preview_pieces/blue_gem.png")
-const GreenGem: CompressedTexture2D = preload("res://addons/ninetailsrabbit.match3_board/src/debug_ui/preview_pieces/green_gem.png")
-const PurpleGem: CompressedTexture2D = preload("res://addons/ninetailsrabbit.match3_board/src/debug_ui/preview_pieces/purple_gem.png")
-const YellowGem: CompressedTexture2D = preload("res://addons/ninetailsrabbit.match3_board/src/debug_ui/preview_pieces/yellow_gem.png")
-#endregion
 
 #region Cell textures
 const EvenCellTexture: CompressedTexture2D = preload("res://addons/ninetailsrabbit.match3_board/src/debug_ui/preview_cells/even.png")

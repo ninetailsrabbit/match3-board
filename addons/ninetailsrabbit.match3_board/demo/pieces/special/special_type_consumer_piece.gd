@@ -18,7 +18,7 @@ func on_requested_piece_special_trigger() -> void:
 	if not shape_to_consume.is_empty():
 		var target_pieces: Array[PieceUI] = board.all_pieces_of_shape(shape_to_consume)
 		target_pieces.append(self)
-		var sequence: Sequence = Sequence.new(board.grid_cells_from_pieces(target_pieces))
+		var sequence: Sequence = Sequence.new(board.grid_cells_from_pieces(target_pieces), Sequence.Shapes.Irregular)
 		
 		board.lock()
 		

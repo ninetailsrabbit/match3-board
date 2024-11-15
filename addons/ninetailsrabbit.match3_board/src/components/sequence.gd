@@ -9,6 +9,8 @@ enum Shapes {
 	LShape,
 	Diagonal,
 	LineConnected,
+	Cross,
+	CrossDiagonal,
 	Irregular
 }
 
@@ -18,7 +20,7 @@ var shape: Shapes = Shapes.Irregular
 
 
 func _init(_cells: Array[GridCellUI], _shape: Shapes = Shapes.Irregular) -> void:
-	cells = _cells.filter(func(grid_cell: GridCellUI): return grid_cell.has_piece())
+	cells = _cells.filter(func(grid_cell: GridCellUI): return grid_cell.can_contain_piece and grid_cell.has_piece())
 	shape = _detect_shape() if _shape == Shapes.Irregular else _shape
 
 

@@ -54,6 +54,7 @@ script = ExtResource("1_dqalp")
 script = ExtResource("2_38jho")
 preview_grid_in_editor = true
 preview_pieces = Array[Texture2D]([SubResource("AtlasTexture_gxa2c"), SubResource("AtlasTexture_26je2"), SubResource("AtlasTexture_qymik"), SubResource("AtlasTexture_4xnmi")])
+draw_background_texture_on_empty_cells = null
 available_pieces = Array[ExtResource("4_5umn3")]([SubResource("Resource_euify"), SubResource("Resource_mrl46"), SubResource("Resource_pbsls"), SubResource("Resource_tncf8")])
 
 [node name="BoardEditorPreview" type="Node2D" parent="Match3Board"]
@@ -65,8 +66,8 @@ texture = ExtResource("4_blyn0")
 
 [node name="Piece_Column0_Row0" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(25, 25)
-scale = Vector2(2.26667, 1.51111)
-texture = SubResource("AtlasTexture_4xnmi")
+scale = Vector2(1.36, 1.85455)
+texture = SubResource("AtlasTexture_gxa2c")
 
 [node name="Cell_Column0_Row1" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(25, 73)
@@ -75,8 +76,8 @@ texture = ExtResource("5_yf3v1")
 
 [node name="Piece_Column0_Row1" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(25, 73)
-scale = Vector2(2.04, 1.56923)
-texture = SubResource("AtlasTexture_qymik")
+scale = Vector2(1.85455, 1.56923)
+texture = SubResource("AtlasTexture_26je2")
 
 [node name="Cell_Column0_Row2" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(25, 121)
@@ -85,8 +86,8 @@ texture = ExtResource("4_blyn0")
 
 [node name="Piece_Column0_Row2" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(25, 121)
-scale = Vector2(1.85455, 1.56923)
-texture = SubResource("AtlasTexture_26je2")
+scale = Vector2(2.26667, 1.51111)
+texture = SubResource("AtlasTexture_4xnmi")
 
 [node name="Cell_Column0_Row3" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(25, 169)
@@ -95,8 +96,8 @@ texture = ExtResource("5_yf3v1")
 
 [node name="Piece_Column0_Row3" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(25, 169)
-scale = Vector2(2.04, 1.56923)
-texture = SubResource("AtlasTexture_qymik")
+scale = Vector2(2.26667, 1.51111)
+texture = SubResource("AtlasTexture_4xnmi")
 
 [node name="Cell_Column0_Row4" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(25, 217)
@@ -105,8 +106,8 @@ texture = ExtResource("4_blyn0")
 
 [node name="Piece_Column0_Row4" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(25, 217)
-scale = Vector2(2.04, 1.56923)
-texture = SubResource("AtlasTexture_qymik")
+scale = Vector2(2.26667, 1.51111)
+texture = SubResource("AtlasTexture_4xnmi")
 
 [node name="Cell_Column0_Row5" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(25, 265)
@@ -115,8 +116,8 @@ texture = ExtResource("5_yf3v1")
 
 [node name="Piece_Column0_Row5" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(25, 265)
-scale = Vector2(2.04, 1.56923)
-texture = SubResource("AtlasTexture_qymik")
+scale = Vector2(1.36, 1.85455)
+texture = SubResource("AtlasTexture_gxa2c")
 
 [node name="Cell_Column0_Row6" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(25, 313)
@@ -135,8 +136,8 @@ texture = ExtResource("5_yf3v1")
 
 [node name="Piece_Column1_Row0" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(73, 25)
-scale = Vector2(1.36, 1.85455)
-texture = SubResource("AtlasTexture_gxa2c")
+scale = Vector2(2.26667, 1.51111)
+texture = SubResource("AtlasTexture_4xnmi")
 
 [node name="Cell_Column1_Row1" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(73, 73)
@@ -155,8 +156,8 @@ texture = ExtResource("5_yf3v1")
 
 [node name="Piece_Column1_Row2" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(73, 121)
-scale = Vector2(2.26667, 1.51111)
-texture = SubResource("AtlasTexture_4xnmi")
+scale = Vector2(1.85455, 1.56923)
+texture = SubResource("AtlasTexture_26je2")
 
 [node name="Cell_Column1_Row3" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(73, 169)
@@ -195,8 +196,8 @@ texture = ExtResource("5_yf3v1")
 
 [node name="Piece_Column1_Row6" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(73, 313)
-scale = Vector2(1.36, 1.85455)
-texture = SubResource("AtlasTexture_gxa2c")
+scale = Vector2(2.26667, 1.51111)
+texture = SubResource("AtlasTexture_4xnmi")
 
 [node name="Cell_Column2_Row0" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(121, 25)
@@ -205,8 +206,8 @@ texture = ExtResource("4_blyn0")
 
 [node name="Piece_Column2_Row0" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(121, 25)
-scale = Vector2(2.04, 1.56923)
-texture = SubResource("AtlasTexture_qymik")
+scale = Vector2(1.85455, 1.56923)
+texture = SubResource("AtlasTexture_26je2")
 
 [node name="Cell_Column2_Row1" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(121, 73)
@@ -215,8 +216,8 @@ texture = ExtResource("5_yf3v1")
 
 [node name="Piece_Column2_Row1" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(121, 73)
-scale = Vector2(1.85455, 1.56923)
-texture = SubResource("AtlasTexture_26je2")
+scale = Vector2(2.04, 1.56923)
+texture = SubResource("AtlasTexture_qymik")
 
 [node name="Cell_Column2_Row2" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(121, 121)
@@ -225,8 +226,8 @@ texture = ExtResource("4_blyn0")
 
 [node name="Piece_Column2_Row2" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(121, 121)
-scale = Vector2(2.26667, 1.51111)
-texture = SubResource("AtlasTexture_4xnmi")
+scale = Vector2(1.85455, 1.56923)
+texture = SubResource("AtlasTexture_26je2")
 
 [node name="Cell_Column2_Row3" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(121, 169)
@@ -235,8 +236,8 @@ texture = ExtResource("5_yf3v1")
 
 [node name="Piece_Column2_Row3" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(121, 169)
-scale = Vector2(2.04, 1.56923)
-texture = SubResource("AtlasTexture_qymik")
+scale = Vector2(2.26667, 1.51111)
+texture = SubResource("AtlasTexture_4xnmi")
 
 [node name="Cell_Column2_Row4" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(121, 217)
@@ -255,8 +256,8 @@ texture = ExtResource("5_yf3v1")
 
 [node name="Piece_Column2_Row5" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(121, 265)
-scale = Vector2(1.85455, 1.56923)
-texture = SubResource("AtlasTexture_26je2")
+scale = Vector2(2.04, 1.56923)
+texture = SubResource("AtlasTexture_qymik")
 
 [node name="Cell_Column2_Row6" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(121, 313)
@@ -275,8 +276,8 @@ texture = ExtResource("5_yf3v1")
 
 [node name="Piece_Column3_Row0" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(169, 25)
-scale = Vector2(2.04, 1.56923)
-texture = SubResource("AtlasTexture_qymik")
+scale = Vector2(1.85455, 1.56923)
+texture = SubResource("AtlasTexture_26je2")
 
 [node name="Cell_Column3_Row1" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(169, 73)
@@ -285,8 +286,8 @@ texture = ExtResource("4_blyn0")
 
 [node name="Piece_Column3_Row1" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(169, 73)
-scale = Vector2(2.04, 1.56923)
-texture = SubResource("AtlasTexture_qymik")
+scale = Vector2(2.26667, 1.51111)
+texture = SubResource("AtlasTexture_4xnmi")
 
 [node name="Cell_Column3_Row2" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(169, 121)
@@ -295,8 +296,8 @@ texture = ExtResource("5_yf3v1")
 
 [node name="Piece_Column3_Row2" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(169, 121)
-scale = Vector2(2.04, 1.56923)
-texture = SubResource("AtlasTexture_qymik")
+scale = Vector2(1.36, 1.85455)
+texture = SubResource("AtlasTexture_gxa2c")
 
 [node name="Cell_Column3_Row3" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(169, 169)
@@ -305,8 +306,8 @@ texture = ExtResource("4_blyn0")
 
 [node name="Piece_Column3_Row3" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(169, 169)
-scale = Vector2(2.04, 1.56923)
-texture = SubResource("AtlasTexture_qymik")
+scale = Vector2(1.85455, 1.56923)
+texture = SubResource("AtlasTexture_26je2")
 
 [node name="Cell_Column3_Row4" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(169, 217)
@@ -315,8 +316,8 @@ texture = ExtResource("5_yf3v1")
 
 [node name="Piece_Column3_Row4" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(169, 217)
-scale = Vector2(2.04, 1.56923)
-texture = SubResource("AtlasTexture_qymik")
+scale = Vector2(1.85455, 1.56923)
+texture = SubResource("AtlasTexture_26je2")
 
 [node name="Cell_Column3_Row5" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(169, 265)
@@ -325,8 +326,8 @@ texture = ExtResource("4_blyn0")
 
 [node name="Piece_Column3_Row5" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(169, 265)
-scale = Vector2(1.85455, 1.56923)
-texture = SubResource("AtlasTexture_26je2")
+scale = Vector2(1.36, 1.85455)
+texture = SubResource("AtlasTexture_gxa2c")
 
 [node name="Cell_Column3_Row6" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(169, 313)
@@ -355,8 +356,8 @@ texture = ExtResource("5_yf3v1")
 
 [node name="Piece_Column4_Row1" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(217, 73)
-scale = Vector2(1.36, 1.85455)
-texture = SubResource("AtlasTexture_gxa2c")
+scale = Vector2(2.26667, 1.51111)
+texture = SubResource("AtlasTexture_4xnmi")
 
 [node name="Cell_Column4_Row2" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(217, 121)
@@ -365,8 +366,8 @@ texture = ExtResource("4_blyn0")
 
 [node name="Piece_Column4_Row2" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(217, 121)
-scale = Vector2(2.26667, 1.51111)
-texture = SubResource("AtlasTexture_4xnmi")
+scale = Vector2(2.04, 1.56923)
+texture = SubResource("AtlasTexture_qymik")
 
 [node name="Cell_Column4_Row3" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(217, 169)
@@ -375,8 +376,8 @@ texture = ExtResource("5_yf3v1")
 
 [node name="Piece_Column4_Row3" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(217, 169)
-scale = Vector2(2.26667, 1.51111)
-texture = SubResource("AtlasTexture_4xnmi")
+scale = Vector2(2.04, 1.56923)
+texture = SubResource("AtlasTexture_qymik")
 
 [node name="Cell_Column4_Row4" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(217, 217)
@@ -385,8 +386,8 @@ texture = ExtResource("4_blyn0")
 
 [node name="Piece_Column4_Row4" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(217, 217)
-scale = Vector2(2.26667, 1.51111)
-texture = SubResource("AtlasTexture_4xnmi")
+scale = Vector2(2.04, 1.56923)
+texture = SubResource("AtlasTexture_qymik")
 
 [node name="Cell_Column4_Row5" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(217, 265)
@@ -395,8 +396,8 @@ texture = ExtResource("5_yf3v1")
 
 [node name="Piece_Column4_Row5" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(217, 265)
-scale = Vector2(2.26667, 1.51111)
-texture = SubResource("AtlasTexture_4xnmi")
+scale = Vector2(1.36, 1.85455)
+texture = SubResource("AtlasTexture_gxa2c")
 
 [node name="Cell_Column4_Row6" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(217, 313)
@@ -405,8 +406,8 @@ texture = ExtResource("4_blyn0")
 
 [node name="Piece_Column4_Row6" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(217, 313)
-scale = Vector2(2.04, 1.56923)
-texture = SubResource("AtlasTexture_qymik")
+scale = Vector2(2.26667, 1.51111)
+texture = SubResource("AtlasTexture_4xnmi")
 
 [node name="Cell_Column5_Row0" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(265, 25)
@@ -415,8 +416,8 @@ texture = ExtResource("5_yf3v1")
 
 [node name="Piece_Column5_Row0" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(265, 25)
-scale = Vector2(2.26667, 1.51111)
-texture = SubResource("AtlasTexture_4xnmi")
+scale = Vector2(1.36, 1.85455)
+texture = SubResource("AtlasTexture_gxa2c")
 
 [node name="Cell_Column5_Row1" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(265, 73)
@@ -425,8 +426,8 @@ texture = ExtResource("4_blyn0")
 
 [node name="Piece_Column5_Row1" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(265, 73)
-scale = Vector2(1.85455, 1.56923)
-texture = SubResource("AtlasTexture_26je2")
+scale = Vector2(1.36, 1.85455)
+texture = SubResource("AtlasTexture_gxa2c")
 
 [node name="Cell_Column5_Row2" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(265, 121)
@@ -435,8 +436,8 @@ texture = ExtResource("5_yf3v1")
 
 [node name="Piece_Column5_Row2" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(265, 121)
-scale = Vector2(2.26667, 1.51111)
-texture = SubResource("AtlasTexture_4xnmi")
+scale = Vector2(2.04, 1.56923)
+texture = SubResource("AtlasTexture_qymik")
 
 [node name="Cell_Column5_Row3" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(265, 169)
@@ -455,8 +456,8 @@ texture = ExtResource("5_yf3v1")
 
 [node name="Piece_Column5_Row4" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(265, 217)
-scale = Vector2(2.04, 1.56923)
-texture = SubResource("AtlasTexture_qymik")
+scale = Vector2(1.85455, 1.56923)
+texture = SubResource("AtlasTexture_26je2")
 
 [node name="Cell_Column5_Row5" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(265, 265)
@@ -465,8 +466,8 @@ texture = ExtResource("4_blyn0")
 
 [node name="Piece_Column5_Row5" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(265, 265)
-scale = Vector2(2.04, 1.56923)
-texture = SubResource("AtlasTexture_qymik")
+scale = Vector2(1.85455, 1.56923)
+texture = SubResource("AtlasTexture_26je2")
 
 [node name="Cell_Column5_Row6" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(265, 313)
@@ -475,8 +476,8 @@ texture = ExtResource("5_yf3v1")
 
 [node name="Piece_Column5_Row6" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(265, 313)
-scale = Vector2(1.85455, 1.56923)
-texture = SubResource("AtlasTexture_26je2")
+scale = Vector2(2.04, 1.56923)
+texture = SubResource("AtlasTexture_qymik")
 
 [node name="Cell_Column6_Row0" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(313, 25)
@@ -485,8 +486,8 @@ texture = ExtResource("4_blyn0")
 
 [node name="Piece_Column6_Row0" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(313, 25)
-scale = Vector2(2.04, 1.56923)
-texture = SubResource("AtlasTexture_qymik")
+scale = Vector2(1.85455, 1.56923)
+texture = SubResource("AtlasTexture_26je2")
 
 [node name="Cell_Column6_Row1" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(313, 73)
@@ -495,8 +496,8 @@ texture = ExtResource("5_yf3v1")
 
 [node name="Piece_Column6_Row1" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(313, 73)
-scale = Vector2(1.85455, 1.56923)
-texture = SubResource("AtlasTexture_26je2")
+scale = Vector2(1.36, 1.85455)
+texture = SubResource("AtlasTexture_gxa2c")
 
 [node name="Cell_Column6_Row2" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(313, 121)
@@ -515,8 +516,8 @@ texture = ExtResource("5_yf3v1")
 
 [node name="Piece_Column6_Row3" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(313, 169)
-scale = Vector2(2.04, 1.56923)
-texture = SubResource("AtlasTexture_qymik")
+scale = Vector2(1.85455, 1.56923)
+texture = SubResource("AtlasTexture_26je2")
 
 [node name="Cell_Column6_Row4" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(313, 217)
@@ -525,8 +526,8 @@ texture = ExtResource("4_blyn0")
 
 [node name="Piece_Column6_Row4" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(313, 217)
-scale = Vector2(2.26667, 1.51111)
-texture = SubResource("AtlasTexture_4xnmi")
+scale = Vector2(1.36, 1.85455)
+texture = SubResource("AtlasTexture_gxa2c")
 
 [node name="Cell_Column6_Row5" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(313, 265)
@@ -535,8 +536,8 @@ texture = ExtResource("5_yf3v1")
 
 [node name="Piece_Column6_Row5" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(313, 265)
-scale = Vector2(2.04, 1.56923)
-texture = SubResource("AtlasTexture_qymik")
+scale = Vector2(1.36, 1.85455)
+texture = SubResource("AtlasTexture_gxa2c")
 
 [node name="Cell_Column6_Row6" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(313, 313)
@@ -545,8 +546,8 @@ texture = ExtResource("4_blyn0")
 
 [node name="Piece_Column6_Row6" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(313, 313)
-scale = Vector2(2.04, 1.56923)
-texture = SubResource("AtlasTexture_qymik")
+scale = Vector2(2.26667, 1.51111)
+texture = SubResource("AtlasTexture_4xnmi")
 
 [node name="Cell_Column7_Row0" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(361, 25)
@@ -565,8 +566,8 @@ texture = ExtResource("4_blyn0")
 
 [node name="Piece_Column7_Row1" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(361, 73)
-scale = Vector2(1.85455, 1.56923)
-texture = SubResource("AtlasTexture_26je2")
+scale = Vector2(2.04, 1.56923)
+texture = SubResource("AtlasTexture_qymik")
 
 [node name="Cell_Column7_Row2" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(361, 121)
@@ -575,8 +576,8 @@ texture = ExtResource("5_yf3v1")
 
 [node name="Piece_Column7_Row2" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(361, 121)
-scale = Vector2(1.85455, 1.56923)
-texture = SubResource("AtlasTexture_26je2")
+scale = Vector2(2.26667, 1.51111)
+texture = SubResource("AtlasTexture_4xnmi")
 
 [node name="Cell_Column7_Row3" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(361, 169)
@@ -585,8 +586,8 @@ texture = ExtResource("4_blyn0")
 
 [node name="Piece_Column7_Row3" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(361, 169)
-scale = Vector2(2.26667, 1.51111)
-texture = SubResource("AtlasTexture_4xnmi")
+scale = Vector2(2.04, 1.56923)
+texture = SubResource("AtlasTexture_qymik")
 
 [node name="Cell_Column7_Row4" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(361, 217)
@@ -605,8 +606,8 @@ texture = ExtResource("4_blyn0")
 
 [node name="Piece_Column7_Row5" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(361, 265)
-scale = Vector2(2.04, 1.56923)
-texture = SubResource("AtlasTexture_qymik")
+scale = Vector2(1.36, 1.85455)
+texture = SubResource("AtlasTexture_gxa2c")
 
 [node name="Cell_Column7_Row6" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(361, 313)
@@ -615,5 +616,5 @@ texture = ExtResource("5_yf3v1")
 
 [node name="Piece_Column7_Row6" type="Sprite2D" parent="Match3Board/BoardEditorPreview"]
 position = Vector2(361, 313)
-scale = Vector2(1.36, 1.85455)
-texture = SubResource("AtlasTexture_gxa2c")
+scale = Vector2(2.26667, 1.51111)
+texture = SubResource("AtlasTexture_4xnmi")
