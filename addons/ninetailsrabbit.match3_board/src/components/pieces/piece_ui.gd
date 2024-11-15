@@ -6,7 +6,9 @@ signal holded
 signal released
 signal consumed
 
-const GroupName: String = "piece"
+const GroupName: String = "pieces"
+const SpecialGroupName: StringName = "special-pieces"
+const ObstacleGroupName: StringName = "obstacle-pieces"
 
 ## The sprite that represents a texture piece
 @export var sprite: Sprite2D
@@ -87,6 +89,12 @@ var m_offset: Vector2 = Vector2.ZERO
 func _enter_tree() -> void:
 	add_to_group(GroupName)
 	
+	if is_special():
+		add_to_group(SpecialGroupName)
+		
+	if is_obstacle():
+		add_to_group(ObstacleGroupName)
+	
 	name = "%s-%s" % [piece_definition.type, piece_definition.shape.to_pascal_case()]
 	is_selected = false
 	z_index = 20
@@ -96,6 +104,8 @@ func _enter_tree() -> void:
 		board = get_tree().get_first_node_in_group(Match3Preloader.BoardGroupName)
 	
 	assert(board is Match3Board, "PieceUI: The piece ui needs a linked Match3Board to be functional. ")
+	
+	cell_size = board.cell_size
 	
 	selected.connect(on_piece_selected)
 	unselected.connect(on_piece_unselected)
@@ -124,9 +134,10 @@ func _process(delta: float) -> void:
 	if is_locked:
 		return
 		
-	global_position = global_position.lerp(get_global_mouse_position(), smooth_factor * delta) if smooth_factor > 0 else get_global_mouse_position()
-	current_position = global_position + m_offset
-	
+	if is_click_mode_drag():
+		global_position = global_position.lerp(get_global_mouse_position(), smooth_factor * delta) if smooth_factor > 0 else get_global_mouse_position()
+		current_position = global_position + m_offset
+		
 
 #region Active methods
 func match_with(other_piece: PieceUI) -> bool:

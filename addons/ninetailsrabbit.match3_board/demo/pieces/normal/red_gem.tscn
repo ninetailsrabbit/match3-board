@@ -22,7 +22,7 @@ can_be_consumed = true
 atlas = ExtResource("3_cdwmh")
 region = Rect2(87, 35, 18, 27)
 
-[node name="YellowGem" type="Node2D" node_paths=PackedStringArray("sprite")]
+[node name="RedGem" type="Node2D" node_paths=PackedStringArray("sprite")]
 script = ExtResource("1_nmdtw")
 sprite = NodePath("Sprite2D")
 piece_definition = SubResource("Resource_u5xla")

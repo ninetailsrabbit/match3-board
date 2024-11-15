@@ -5,4 +5,5 @@ class_name SpecialCrossPiece extends PieceUI
 
 
 func _ready() -> void:
+	super._ready()
 	animation_player.play("idle")
