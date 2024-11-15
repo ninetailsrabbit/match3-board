@@ -10,7 +10,7 @@ func _ready() -> void:
 	
 	
 func _process(delta: float) -> void:
-	rotation_degrees += 1000 * delta
+	rotation += 25 * delta
 	scale += scale * delta
 
 
