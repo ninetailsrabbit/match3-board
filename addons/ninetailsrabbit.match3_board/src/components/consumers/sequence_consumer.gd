@@ -9,7 +9,10 @@ func _enter_tree() -> void:
 
 #region Overridables
 func consume_sequence(sequence: Sequence) -> void:
-	pass
+	consumed_sequence.emit(sequence)
+	
+	await board.piece_animator.consume_sequence(sequence)
+	sequence.consume()
 	
 
 func consume_sequences(sequences: Array[Sequence]) -> void:

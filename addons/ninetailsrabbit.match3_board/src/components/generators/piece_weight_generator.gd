@@ -1,7 +1,7 @@
 class_name PieceWeightGenerator
 
 
-var random: RandomNumberGenerator = RandomNumberGenerator.new()
+var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var available_pieces: Array[PieceWeight] = []
 
 ## This dictionary is to map the piece weight that holds a scene with the corresponding id.
@@ -11,7 +11,7 @@ var piece_id_mapper: Dictionary = {}
 
 
 func _init() -> void:
-	random.randomize()
+	rng.randomize()
 
 
 func add_available_pieces(new_pieces: Array[PieceWeight]) -> void:
@@ -60,7 +60,7 @@ func _prepare_weight(pieces: Array[PieceWeight]) -> float:
 
 
 func _roll_piece(pieces: Array[PieceWeight], total_weight: float):
-	var roll_result: float = randf_range(0.0, total_weight)
+	var roll_result: float = rng.randf_range(0.0, total_weight)
 	var selected_piece: PieceUI
 	
 	for piece_weight: PieceWeight in pieces:
