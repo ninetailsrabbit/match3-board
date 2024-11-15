@@ -92,7 +92,9 @@ signal unlocked
 			cell_offset = value
 			draw_preview_grid()
 
-@export_group("Matches 💎")
+@export_group("Configuration 💎")
+## When enabled, the board prepare itself automatically when it's ready on the scene tree
+@export var auto_start: bool = true
 ## The layer value from 1 to 32 that is the amount Godot supports. The inside areas will have this layer value to detect other pieces or be detected.
 @export_range(1, 32, 1) var pieces_collision_layer: int = 8
 ## The swap mode to use on this board, each has its own particularities and can be changed at runtime.
@@ -226,15 +228,10 @@ func _enter_tree() -> void:
 			
 		if sequence_consumer == null:
 			change_sequence_consumer(SequenceConsumer.new())
-		
-		
-		add_child(cell_highlighter)
-		add_child(piece_animator)
-		add_child(sequence_consumer)
-			
+	
 
 func _ready() -> void:
-	if not Engine.is_editor_hint():
+	if not Engine.is_editor_hint() and auto_start:
 		prepare_board()
 	
 	if not InputMap.has_action(input_action_consume_line_connector):
@@ -245,23 +242,38 @@ func _ready() -> void:
 
 
 func change_piece_animator(animator: PieceAnimator) -> Match3Board:
+	if piece_animator != null and piece_animator.is_inside_tree():
+		piece_animator.free()
+		
 	piece_animator = animator
 	
 	if piece_animator is PieceAnimator:
 		piece_animator.animation_started.connect(on_animation_started)
 		piece_animator.animation_finished.connect(on_animation_finished)
 	
+	add_child(piece_animator)
+	
 	return self
 	
 
 func change_cell_highlighter(highlighter: CellHighlighter) -> Match3Board:
+	if cell_highlighter != null and cell_highlighter.is_inside_tree():
+		cell_highlighter.free()
+		
 	cell_highlighter = highlighter
+	
+	add_child(cell_highlighter)
 	
 	return self
 	
 
 func change_sequence_consumer(consumer: SequenceConsumer) -> Match3Board:
+	if sequence_consumer != null and sequence_consumer.is_inside_tree():
+		sequence_consumer.free()
+		
 	sequence_consumer = consumer
+	
+	add_child(sequence_consumer)
 	
 	return self
 
@@ -269,7 +281,6 @@ func change_sequence_consumer(consumer: SequenceConsumer) -> Match3Board:
 ## Only prepares the grid cells based on width and height
 func prepare_board():
 	if not Engine.is_editor_hint() and grid_cells.is_empty():
-		
 		for column in grid_width:
 			grid_cells.append([])
 			

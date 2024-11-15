@@ -19,10 +19,6 @@ enum PieceType {
 @export var can_be_triggered: bool = false
 @export var can_be_replaced: bool = true
 @export var can_be_consumed: bool = true
-@export var match_4_piece: PieceDefinitionResource
-@export var match_5_piece: PieceDefinitionResource
-@export var tshape_piece: PieceDefinitionResource
-@export var lshape_piece: PieceDefinitionResource
 
 
 #region Overridables

@@ -153,6 +153,18 @@ func can_be_triggered() -> bool:
 	return piece_definition.can_be_triggered
 
 
+func is_normal() -> bool:
+	return piece_definition.is_normal()
+
+
+func is_special() -> bool:
+	return piece_definition.is_special()
+
+
+func is_obstacle() -> bool:
+	return piece_definition.is_obstacle()
+
+
 func detect_near_piece():
 	var nearest_piece_area: Dictionary = Match3BoardPluginUtilities.get_nearest_node_by_distance(global_position, detection_area.get_overlapping_areas())
 	

@@ -23,6 +23,7 @@
 - [Board Parameters](#board-parameters)
   - [Size](#size)
   - [Match configuration](#match-configuration)
+    - [Auto start](#auto-start)
     - [Pieces collision layer](#pieces-collision-layer)
     - [Swap mode](#swap-mode)
       - [Adjacent](#adjacent)
@@ -119,6 +120,10 @@ You have available default textures on this plugin to visualize a preview in the
 ![board_match_parameters](images/board_match_parameters.png)
 
 ---
+
+### Auto start
+
+When enabled, the board prepare itself automatically when it's ready on the scene tree. If you disable it, you need to manually call the function `prepare_board()` on your script.
 
 ### Pieces collision layer
 

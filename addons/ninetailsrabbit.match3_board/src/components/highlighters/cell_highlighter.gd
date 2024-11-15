@@ -7,7 +7,7 @@ const GroupName: String = "cell-highlighter"
 @onready var board: Match3Board = get_tree().get_first_node_in_group(Match3Preloader.BoardGroupName)
 
 func _enter_tree() -> void:
-	name = GroupName
+	name = "CellHighlighter"
 
 
 func highlight_cell(grid_cell: GridCellUI) -> void:

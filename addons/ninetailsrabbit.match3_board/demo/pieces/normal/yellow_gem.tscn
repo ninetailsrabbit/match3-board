@@ -1,16 +1,16 @@
-[gd_scene load_steps=5 format=3 uid="uid://cdy53ddoxxy6n"]
+[gd_scene load_steps=6 format=3 uid="uid://cdy53ddoxxy6n"]
 
 [ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/components/pieces/piece_ui.gd" id="1_nmdtw"]
 [ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/components/pieces/piece_definition.gd" id="2_0p804"]
-[ext_resource type="Texture2D" uid="uid://bxh84kxgxf2df" path="res://addons/ninetailsrabbit.match3_board/src/debug_ui/preview_pieces/yellow_gem.png" id="3_ftptq"]
+[ext_resource type="Texture2D" uid="uid://ct0v34xosfrrt" path="res://addons/ninetailsrabbit.match3_board/demo/assets/pixel_art_gems.png" id="3_cdwmh"]
 
 [sub_resource type="Resource" id="Resource_u5xla"]
 script = ExtResource("2_0p804")
-id = &"yellow_gem"
-name = "Yellow gem"
+id = &"red_gem"
+name = "Red gem"
 description = ""
 type = 0
-shape = "yellow"
+shape = "red"
 can_be_swapped = true
 can_be_moved = true
 can_be_shuffled = true
@@ -18,10 +18,14 @@ can_be_triggered = false
 can_be_replaced = true
 can_be_consumed = true
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_q2tim"]
+atlas = ExtResource("3_cdwmh")
+region = Rect2(87, 35, 18, 27)
+
 [node name="YellowGem" type="Node2D" node_paths=PackedStringArray("sprite")]
 script = ExtResource("1_nmdtw")
 sprite = NodePath("Sprite2D")
 piece_definition = SubResource("Resource_u5xla")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-texture = ExtResource("3_ftptq")
+texture = SubResource("AtlasTexture_q2tim")
