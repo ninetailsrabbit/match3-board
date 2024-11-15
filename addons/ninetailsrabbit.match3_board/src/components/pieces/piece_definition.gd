@@ -28,9 +28,9 @@ func match_with(other_piece: PieceDefinitionResource) -> bool:
 		
 	match type:
 		PieceType.Normal:
-			return (type == other_piece.type and shape == other_piece.shape) or (other_piece.is_special() and shape == other_piece.shape)
+			return (type == other_piece.type and shape == other_piece.shape) or other_piece.is_special()
 		PieceType.Special:
-			return shape == other_piece.shape
+			return other_piece.is_special() or other_piece.is_normal()
 		PieceType.Obstacle:
 			return false
 		_:

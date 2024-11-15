@@ -5,6 +5,7 @@ signal unselected
 signal holded
 signal released
 signal consumed
+signal requested_piece_special_trigger
 signal mouse_entered
 signal mouse_exited
 signal focus_entered
@@ -275,6 +276,7 @@ func _prepare_mouse_region_button() -> void:
 	mouse_region.mouse_exited.connect(on_mouse_region_mouse_exited)
 	mouse_region.focus_entered.connect(on_mouse_region_focus_entered)
 	mouse_region.focus_exited.connect(on_mouse_region_focus_exited)
+	requested_piece_special_trigger.connect(on_requested_piece_special_trigger)
 
 
 func _prepare_sprites() -> void:
@@ -345,9 +347,12 @@ func _can_be_selected() -> bool:
 func on_mouse_region_pressed() -> void:
 	if is_locked:
 		return
-		
-	if is_click_mode_selection():
-		is_selected = !is_selected
+	
+	if piece_definition.can_be_triggered:
+		requested_piece_special_trigger.emit()
+	else:
+		if is_click_mode_selection():
+			is_selected = !is_selected
 		
 
 func on_mouse_region_holded() -> void:
@@ -431,5 +436,9 @@ func on_piece_focus_entered() -> void:
 	
 	
 func on_piece_focus_exited() -> void:
+	pass
+
+
+func on_requested_piece_special_trigger() -> void:
 	pass
 #endregion

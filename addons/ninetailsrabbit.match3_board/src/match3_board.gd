@@ -723,8 +723,10 @@ func find_board_sequences() -> Array[Sequence]:
 			if add_horizontal_sequence:
 				valid_horizontal_sequences.append(horizontal_sequence)
 			
-	return valid_horizontal_sequences + valid_vertical_sequences + tshape_sequences + lshape_sequences
+	var result: Array[Sequence] = valid_horizontal_sequences + valid_vertical_sequences + tshape_sequences + lshape_sequences
 	
+	return result.filter(func(sequence: Sequence): return not sequence.contains_special_piece())
+
 
 func find_match_from_cell(cell: GridCellUI):
 	if cell.has_piece():
@@ -1145,12 +1147,11 @@ func on_swap_rejected(_from: PieceUI, _to: PieceUI) -> void:
 func on_consume_requested(sequence: Sequence) -> void:
 	if is_locked:
 		return
-		
-	if is_swap_mode_connect_line():
-		if sequence.size() >= min_match:
-			pending_sequences = [sequence] as Array[Sequence]
-			current_state = Match3Preloader.BoardState.Consume
 	
+	if sequence.size() >= min_match or sequence.contains_special_piece():
+		pending_sequences = [sequence] as Array[Sequence]
+		current_state = Match3Preloader.BoardState.Consume
+		
 	
 func on_piece_selected(piece: PieceUI) -> void:
 	if is_locked or is_click_mode_drag():
