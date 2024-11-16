@@ -458,12 +458,32 @@ func pending_empty_cells_to_fill() -> Array[GridCellUI]:
 #endregion
 
 #region Sequence finder
-func consume_pending_sequences() -> void:
+func start_consume_sequence_pipeline() -> void:
+	# 1 - Make sure the pending sequences has valid sequences even when if it's empty when calling
+	# this function
 	if pending_sequences.is_empty():
 		pending_sequences = find_board_sequences()
 	
-	await sequence_consumer.consume_sequences(pending_sequences)
+		if pending_sequences.is_empty():
+			current_state = BoardState.Fill
+			return
+	
+	# 2- We gather all the cells to do a final validation on them at once when the sequence animations are finished
+	# to avoid cells being left with orphaned pieces that should have been deleted.
+	var cells_to_consume: Array[GridCellUI] = []
+	cells_to_consume.assign(Match3BoardPluginUtilities.remove_duplicates(
+		Match3BoardPluginUtilities.flatten(pending_sequences.map(func(sequence: Sequence): return sequence.cells)))
+	)
+
+	# 3- We run the SequenceConsumer on the gathered sequences to manage them individually
+	# the creation of pieces is handled here
+	sequence_consumer.consume_sequences(pending_sequences)
+	await sequence_consumer.consumed_sequences
 	await get_tree().process_frame
+	
+	# 4 - Remove pieces on orphan pieces after the sequence consumer ends (this should not happen but just in case)
+	for orphan_cell: GridCellUI in cells_to_consume.filter(func(cell: GridCellUI): return cell.has_piece() and cell.current_piece.is_normal()):
+		orphan_cell.remove_piece()
 	
 	current_state = BoardState.Fill
 	
@@ -1021,7 +1041,7 @@ func on_state_changed(from: BoardState, to: BoardState) -> void:
 			unlock()
 		BoardState.Consume:
 			lock()
-			consume_pending_sequences()
+			start_consume_sequence_pipeline()
 		BoardState.Fill:
 			lock()
 			
@@ -1054,7 +1074,7 @@ func on_swapped_pieces(from: PieceUI, to: PieceUI, matches: Array[Sequence] = []
 	if matches.is_empty():
 		matches = find_matches_from_swapped_pieces(from, to)
 	
-	pending_sequences += matches
+	pending_sequences = matches
 	
 	for sequence: Sequence in pending_sequences:
 		sequence.generated_from_swap = true
@@ -1078,7 +1098,7 @@ func on_consume_requested(sequence: Sequence) -> void:
 		pending_sequences.append(sequence)
 		
 		if state_is_consume():
-			consume_pending_sequences()
+			start_consume_sequence_pipeline()
 		else:
 			current_state = BoardState.Consume
 

@@ -20,8 +20,8 @@ var shape: Shapes = Shapes.Irregular
 var generated_from_swap: bool = false
 
 
-func _init(_cells: Array[GridCellUI], _shape: Shapes = Shapes.Irregular) -> void:
-	cells = _cells.filter(func(grid_cell: GridCellUI): return grid_cell.can_contain_piece and grid_cell.has_piece())
+func _init(sequence_cells: Array[GridCellUI], _shape: Shapes = Shapes.Irregular) -> void:
+	cells.assign(Match3BoardPluginUtilities.remove_duplicates(sequence_cells.filter(func(grid_cell: GridCellUI): return grid_cell.can_contain_piece and grid_cell.has_piece())))
 	shape = _detect_shape() if _shape == Shapes.Irregular else _shape
 
 

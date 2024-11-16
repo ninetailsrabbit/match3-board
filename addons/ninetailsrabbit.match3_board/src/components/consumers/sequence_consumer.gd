@@ -1,6 +1,8 @@
 class_name SequenceConsumer extends Node
 
 signal consumed_sequence(sequence: Sequence)
+signal consumed_sequences(sequences: Array[Sequence])
+
 
 @onready var board: Match3Board = get_tree().get_first_node_in_group(Match3Board.BoardGroupName)
 
@@ -18,4 +20,6 @@ func consume_sequence(sequence: Sequence) -> void:
 func consume_sequences(sequences: Array[Sequence]) -> void:
 	for sequence: Sequence in sequences:
 		await consume_sequence(sequence)
+		
+	consumed_sequences.emit(sequences)
 #endregion

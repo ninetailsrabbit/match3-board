@@ -2,7 +2,7 @@ class_name Match3BoardPluginUtilities
 
 
 ## Flatten any array with n dimensions recursively
-static func flatten(array: Array):
+static func flatten(array: Array[Variant]):
 	var result := []
 	
 	for i in array.size():
@@ -31,7 +31,7 @@ static func pick_random_values(array: Array, items_to_pick: int = 1, duplicates:
 	return result
 	
 
-static func remove_duplicates(array: Array) -> Array:
+static func remove_duplicates(array: Array[Variant]) -> Array[Variant]:
 	var cleaned_array := []
 	
 	for element in array:
@@ -41,7 +41,7 @@ static func remove_duplicates(array: Array) -> Array:
 	return cleaned_array
 	
 	
-static func remove_falsy_values(array: Array) -> Array:
+static func remove_falsy_values(array: Array[Variant]) -> Array[Variant]:
 	var cleaned_array := []
 	
 	for element in array:
