@@ -62,7 +62,7 @@ func add_piece(new_piece: PieceUI) -> void:
 
 
 func detect_new_matches_from_last_piece(last_piece: PieceUI) -> void:
-	var origin_cell: GridCellUI = last_piece.board.grid_cell_from_piece(last_piece)
+	var origin_cell: GridCellUI = last_piece.cell()
 	
 	if origin_cell is GridCellUI:
 		var adjacent_cells: Array[GridCellUI] = origin_cell.available_neighbours(true)
@@ -80,7 +80,7 @@ func detect_new_matches_from_last_piece(last_piece: PieceUI) -> void:
 func consume_matches() -> void:
 	if pieces_connected.size() >= origin_piece.board.min_match:
 		var cells: Array[GridCellUI] = []
-		cells.assign(pieces_connected.map(func(piece: PieceUI): return piece.board.grid_cell_from_piece(piece)))
+		cells.assign(pieces_connected.map(func(piece: PieceUI): return piece.cell()))
 		
 		origin_piece.board.consume_requested.emit(Sequence.new(cells, Sequence.Shapes.LineConnected))
 		match_selected.emit(pieces_connected)

@@ -151,6 +151,10 @@ func _process(delta: float) -> void:
 		
 
 #region Active methods
+func cell() -> GridCellUI:
+	return board.grid_cell_from_piece(self)
+	
+	
 func match_with(other_piece: PieceUI) -> bool:
 	return piece_definition.match_with(other_piece.piece_definition)
 
@@ -200,9 +204,9 @@ func detect_near_piece():
 	
 func reset_position() -> void:
 	if is_inside_tree() and reset_position_on_release:
-		var cell: GridCellUI = board.grid_cell_from_piece(self)
+		var cell: GridCellUI = cell()
 		
-		if cell:
+		if is_instance_valid(cell):
 			position = cell.position
 
 
