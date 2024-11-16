@@ -51,6 +51,7 @@ var board: Match3Board:
 var mouse_region: Button
 var piece_area: Area2D
 var detection_area: Area2D
+var triggered: bool = false
 var is_locked: bool = false
 var is_holded: bool = false:
 	set(value):
@@ -201,7 +202,8 @@ func reset_position() -> void:
 	if is_inside_tree() and reset_position_on_release:
 		var cell: GridCellUI = board.grid_cell_from_piece(self)
 		
-		position = cell.position
+		if cell:
+			position = cell.position
 
 
 func lock() -> void:
@@ -278,6 +280,7 @@ func _prepare_mouse_region_button() -> void:
 	mouse_region.focus_entered.connect(on_mouse_region_focus_entered)
 	mouse_region.focus_exited.connect(on_mouse_region_focus_exited)
 	requested_piece_special_trigger.connect(on_requested_piece_special_trigger)
+	finished_piece_special_trigger.connect(on_finished_piece_special_trigger)
 
 
 func _prepare_sprites() -> void:
@@ -441,5 +444,8 @@ func on_piece_focus_exited() -> void:
 
 
 func on_requested_piece_special_trigger() -> void:
+	pass
+	
+func on_finished_piece_special_trigger() -> void:
 	pass
 #endregion

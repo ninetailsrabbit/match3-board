@@ -11,13 +11,15 @@ enum Shapes {
 	LineConnected,
 	Cross,
 	CrossDiagonal,
-	Irregular
+	Irregular,
+	Special
 }
 
 
 var cells: Array[GridCellUI] = []
 var shape: Shapes = Shapes.Irregular
 var generated_from_swap: bool = false
+var generated_from_special: bool = false
 
 
 func _init(sequence_cells: Array[GridCellUI], _shape: Shapes = Shapes.Irregular) -> void:
@@ -36,13 +38,16 @@ func consume(except: Array[GridCellUI] = []) -> void:
 		consume_cell(cell)
 
 
-func consume_cell(cell: GridCellUI) -> void:
+func consume_cell(cell: GridCellUI, remove_from_sequence: bool = false) -> void:
 	if cells.has(cell):
 		var removed_piece = cell.remove_piece()
 		
 		if removed_piece is PieceUI:
 			removed_piece.consumed.emit()
 			removed_piece.queue_free()
+		
+			if remove_from_sequence:
+				cells.erase(cell)
 
 
 func pieces() -> Array[PieceUI]:
@@ -161,8 +166,15 @@ func is_diagonal_shape() -> bool:
 func is_line_connected_shape() -> bool:
 	return shape == Shapes.LineConnected
 	
-	
+
+func is_special_shape() -> bool:
+	return shape == Shapes.Special
+
+
 func _detect_shape() -> Shapes:
+	if contains_special_piece():
+		return Shapes.Special
+		
 	var is_horizontal: bool = false
 	var is_vertical: bool = false
 	var is_diagonal: bool = false

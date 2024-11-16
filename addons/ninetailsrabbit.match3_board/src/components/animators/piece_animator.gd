@@ -97,17 +97,14 @@ func consume_sequence(sequence: Sequence):
 		animation_finished.emit()
 		
 		
-func spawn_special_piece(sequence: Sequence, new_piece: PieceUI):
-	if sequence.pieces().size() > 0:
+func spawn_special_piece(target_cell: GridCellUI, new_piece: PieceUI):
 		animation_started.emit()
 		
-		var middle_cell: GridCellUI = sequence.middle_cell()
 		new_piece.hide()
 		var tween: Tween = create_tween().set_parallel(true)
 		
-		for cell in sequence.cells.filter(func(grid_cell: GridCellUI): return grid_cell.has_piece() and grid_cell != middle_cell):
-			tween.tween_property(cell.current_piece, "position", middle_cell.position, 0.15)\
-				.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
+		tween.tween_property(target_cell.current_piece, "position", target_cell.position, 0.15)\
+			.set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_QUAD)
 		tween.chain()
 		tween.tween_property(new_piece, "visible", true, 0.1)
 		

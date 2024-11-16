@@ -15,13 +15,14 @@ func _process(delta: float) -> void:
 
 
 func on_requested_piece_special_trigger() -> void:
-	if not shape_to_consume.is_empty():
+	if not triggered and not shape_to_consume.is_empty():
+		triggered = true
+		
 		var target_pieces: Array[PieceUI] = board.pieces_of_shape(shape_to_consume)
 		target_pieces.append(self)
-		var sequence: Sequence = Sequence.new(board.grid_cells_from_pieces(target_pieces), Sequence.Shapes.Irregular)
 		
-		board.lock()
-		
+		var sequence: Sequence = Sequence.new(board.grid_cells_from_pieces(target_pieces), Sequence.Shapes.Special)
+
 		set_process(true)
 		
 		var tween: Tween = create_tween().set_parallel(true)
@@ -32,8 +33,6 @@ func on_requested_piece_special_trigger() -> void:
 					.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO)
 		
 		await get_tree().create_timer(0.7).timeout
-		
-		board.unlock()
 		
 		finished_piece_special_trigger.emit()
 		board.consume_requested.emit(sequence)

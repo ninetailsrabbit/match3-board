@@ -17,9 +17,14 @@ func consume_sequence(sequence: Sequence) -> void:
 	sequence.consume()
 	
 
-func consume_sequences(sequences: Array[Sequence]) -> void:
+func consume_sequences(sequences: Array[Sequence], callback: Callable) -> void:
 	for sequence: Sequence in sequences:
 		await consume_sequence(sequence)
 		
 	consumed_sequences.emit(sequences)
+	callback.call()
+	
+	
+func detect_new_combined_piece(sequence: Sequence):
+	pass
 #endregion

@@ -183,7 +183,7 @@ func is_empty() -> bool:
 	
 
 func has_piece() -> bool:
-	return current_piece is PieceUI
+	return is_instance_valid(current_piece) and current_piece is PieceUI
 	
 
 func assign_piece(new_piece: PieceUI, overwrite: bool = false) -> void:

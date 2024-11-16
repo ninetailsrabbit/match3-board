@@ -384,6 +384,15 @@ func update_grid_cells_neighbours() -> void:
 			grid_cell.diagonal_neighbour_bottom_left = get_cell_or_null(grid_cell.column - 1, grid_cell.row + 1)
 
 
+func grid_cells_from_sequences(sequences: Array[Sequence]) -> Array[GridCellUI]:
+	var cells: Array[GridCellUI] = []
+	cells.assign(Match3BoardPluginUtilities.remove_duplicates(
+		Match3BoardPluginUtilities.flatten(pending_sequences.map(func(sequence: Sequence): return sequence.cells)))
+	)
+	
+	return cells
+	
+	
 func grid_cell_from_piece(piece: PieceUI):
 	var found_pieces = grid_cells_flattened.filter(
 		func(cell: GridCellUI): return cell.has_piece() and cell.current_piece == piece
@@ -406,7 +415,7 @@ func grid_cells_from_row(row: int) -> Array[GridCellUI]:
 	var cells: Array[GridCellUI] = []
 	
 	if grid_cells.size() > 0 and Match3BoardPluginUtilities.value_is_between(row, 0, configuration.grid_height - 1):
-		for column in configuration.grid_width:
+		for column: int in configuration.grid_width:
 			cells.append(grid_cells[column][row])
 	
 	return cells
@@ -416,7 +425,7 @@ func grid_cells_from_column(column: int) -> Array[GridCellUI]:
 	var cells: Array[GridCellUI] = []
 		
 	if grid_cells.size() > 0 and Match3BoardPluginUtilities.value_is_between(column, 0, configuration.grid_width - 1):
-		for row in configuration.grid_height:
+		for row: int in configuration.grid_height:
 			cells.append(grid_cells[column][row])
 	
 	return cells
@@ -459,7 +468,7 @@ func pending_empty_cells_to_fill() -> Array[GridCellUI]:
 
 #region Sequence finder
 func start_consume_sequence_pipeline() -> void:
-	# 1 - Make sure the pending sequences has valid sequences even when if it's empty when calling
+	# 1- Make sure the pending sequences has valid sequences even when if it's empty when calling
 	# this function
 	if pending_sequences.is_empty():
 		pending_sequences = find_board_sequences()
@@ -467,26 +476,11 @@ func start_consume_sequence_pipeline() -> void:
 		if pending_sequences.is_empty():
 			current_state = BoardState.Fill
 			return
-	
-	# 2- We gather all the cells to do a final validation on them at once when the sequence animations are finished
-	# to avoid cells being left with orphaned pieces that should have been deleted.
-	var cells_to_consume: Array[GridCellUI] = []
-	cells_to_consume.assign(Match3BoardPluginUtilities.remove_duplicates(
-		Match3BoardPluginUtilities.flatten(pending_sequences.map(func(sequence: Sequence): return sequence.cells)))
-	)
 
-	# 3- We run the SequenceConsumer on the gathered sequences to manage them individually
+	# 2- We run the SequenceConsumer on the gathered sequences to manage them individually
 	# the creation of pieces is handled here
-	sequence_consumer.consume_sequences(pending_sequences)
-	await sequence_consumer.consumed_sequences
-	await get_tree().process_frame
-	
-	# 4 - Remove pieces on orphan pieces after the sequence consumer ends (this should not happen but just in case)
-	for orphan_cell: GridCellUI in cells_to_consume.filter(func(cell: GridCellUI): return cell.has_piece() and cell.current_piece.is_normal()):
-		orphan_cell.remove_piece()
-	
-	current_state = BoardState.Fill
-	
+	sequence_consumer.consume_sequences(pending_sequences, func(): current_state = BoardState.Fill)
+
 
 @warning_ignore("unassigned_variable")
 func find_horizontal_sequences(cells: Array[GridCellUI]) -> Array[Sequence]:
@@ -669,7 +663,7 @@ func find_board_sequences() -> Array[Sequence]:
 			
 	var result: Array[Sequence] = valid_horizontal_sequences + valid_vertical_sequences + tshape_sequences + lshape_sequences
 	
-	return result
+	return result.filter(func(sequence: Sequence): return not sequence.contains_special_piece())
 
 
 func find_matches_from_swap(from_cell: GridCellUI, to_cell: GridCellUI) -> Array[Sequence]:
@@ -679,7 +673,6 @@ func find_matches_from_swap(from_cell: GridCellUI, to_cell: GridCellUI) -> Array
 	var sequence_to: Sequence = find_match_from_cell(to_cell)
 
 	matches.assign(Match3BoardPluginUtilities.remove_falsy_values([sequence_from, sequence_to]))
-	
 	
 	return matches
 
@@ -829,8 +822,8 @@ func swap_cross(from_grid_cell: GridCellUI, to_grid_cell: GridCellUI) -> void:
 		swap_rejected.emit(from_grid_cell.current_piece as PieceUI, to_grid_cell.current_piece as PieceUI)
 		
 		
-func swap_cross_diagonal(from_grid_cell: GridCellUI, to_grid_cell: GridCellUI) -> void:	
-	if cross_diagonal_cells_from(from_grid_cell).has(to_grid_cell):
+func swap_cross_diagonal(from_grid_cell: GridCellUI, to_grid_cell: GridCellUI) -> void:
+	if cross_diagonal_cells_from(from_grid_cell).has(to_grid_cell) and from_grid_cell.swap_piece_with(to_grid_cell):
 		swap_pieces(from_grid_cell, to_grid_cell)
 	else:
 		swap_rejected.emit(from_grid_cell.current_piece as PieceUI, to_grid_cell.current_piece as PieceUI)
@@ -838,8 +831,16 @@ func swap_cross_diagonal(from_grid_cell: GridCellUI, to_grid_cell: GridCellUI) -
 	
 func swap_pieces(from_grid_cell: GridCellUI, to_grid_cell: GridCellUI) -> void:
 	if from_grid_cell.can_swap_piece_with(to_grid_cell):
-		var matches: Array[Sequence] = find_matches_from_swap(from_grid_cell, to_grid_cell)
+		var matches: Array[Sequence] = []
 		
+		## When a special it's detected on any of the swapped cells 
+		## It creates a sequence with only both to trigger the special piece and consume the target
+		if from_grid_cell.current_piece.is_special() or to_grid_cell.current_piece.is_special():
+			matches.append(Sequence.new([from_grid_cell, to_grid_cell], Sequence.Shapes.Special))
+		else:
+			matches = find_matches_from_swap(from_grid_cell, to_grid_cell)\
+				.filter(func(sequence: Sequence): return not sequence.contains_special_piece())
+			
 		await piece_animator.swap_pieces(from_grid_cell.current_piece, to_grid_cell.current_piece)
 		
 		if matches.size() > 0:
@@ -977,7 +978,7 @@ func fill_pieces() -> void:
 
 #endregion
 
-#region Information
+#region Information & States
 func state_is_wait_for_input() -> bool:
 	return current_state == BoardState.WaitForInput
 
@@ -1036,6 +1037,7 @@ func on_state_changed(from: BoardState, to: BoardState) -> void:
 	match to:
 		BoardState.WaitForInput:
 			current_available_moves -= 1
+			unselect_all_pieces()
 			reset_all_pieces_positions()
 			await get_tree().create_timer(0.15).timeout
 			unlock()
@@ -1045,7 +1047,15 @@ func on_state_changed(from: BoardState, to: BoardState) -> void:
 		BoardState.Fill:
 			lock()
 			
+			var cells_to_consume: Array[GridCellUI] = grid_cells_from_sequences(pending_sequences)
+	
+			for orphan_cell: GridCellUI in cells_to_consume.filter(func(cell: GridCellUI): return cell.has_piece() and cell.current_piece.is_normal()):
+				orphan_cell.remove_piece()
+					
+			await get_tree().process_frame
+			
 			pending_sequences.clear()
+			
 			await fall_pieces()
 			await get_tree().process_frame
 			await fill_pieces()
@@ -1060,15 +1070,17 @@ func on_swap_requested(from_piece: PieceUI, to_piece: PieceUI) -> void:
 		current_selected_piece.is_selected = false
 		current_selected_piece = null
 	
-	#unselect_all_pieces()
+	unselect_all_pieces()
 	
-	if not is_locked:
-		var from_grid_cell: GridCellUI = grid_cell_from_piece(from_piece)
-		var to_grid_cell: GridCellUI = grid_cell_from_piece(to_piece)
-	
-		if from_grid_cell and to_grid_cell and from_grid_cell.can_swap_piece_with(to_grid_cell):
-			swap_pieces_request(from_grid_cell, to_grid_cell)
-	
+	if is_locked:
+		return
+		
+	var from_grid_cell: GridCellUI = grid_cell_from_piece(from_piece)
+	var to_grid_cell: GridCellUI = grid_cell_from_piece(to_piece)
+
+	if from_grid_cell and to_grid_cell and from_grid_cell.can_swap_piece_with(to_grid_cell):
+		swap_pieces_request(from_grid_cell, to_grid_cell)
+
 	
 func on_swapped_pieces(from: PieceUI, to: PieceUI, matches: Array[Sequence] = []) -> void:
 	if matches.is_empty():
@@ -1091,16 +1103,12 @@ func on_swap_rejected(_from: PieceUI, _to: PieceUI) -> void:
 
 
 func on_consume_requested(sequence: Sequence) -> void:
-	if is_locked:
-		return
+	pending_sequences = [sequence]
 	
-	if sequence.size() >= configuration.min_match or (not sequence.generated_from_swap and sequence.contains_special_piece()):
-		pending_sequences.append(sequence)
-		
-		if state_is_consume():
-			start_consume_sequence_pipeline()
-		else:
-			current_state = BoardState.Consume
+	if state_is_consume():
+		start_consume_sequence_pipeline()
+	else:
+		current_state = BoardState.Consume
 
 
 func on_piece_selected(piece: PieceUI) -> void:
