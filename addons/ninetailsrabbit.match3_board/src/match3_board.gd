@@ -70,8 +70,6 @@ var current_state: BoardState = BoardState.WaitForInput:
 			state_changed.emit(current_state, new_state)
 			current_state = new_state
 		
-var pending_sequences: Array[Sequence] = []
-
 var current_available_moves: int = 0:
 	set(value):
 		if value != current_available_moves:
@@ -83,7 +81,8 @@ var current_available_moves: int = 0:
 				
 			current_available_moves = clamp(value, 0, configuration.available_moves_on_start)
 
-	
+
+var pending_sequences: Array[Sequence] = []
 var prepared: bool = false
 var drawed: bool = false
 
@@ -112,7 +111,6 @@ func _enter_tree() -> void:
 	if sequence_consumer == null:
 		change_sequence_consumer(SequenceConsumer.new())
 		
-		
 	prepared_board.connect(on_prepared_board)
 	
 	piece_selected.connect(on_piece_selected)
@@ -132,15 +130,15 @@ func _enter_tree() -> void:
 func _ready() -> void:
 	assert(configuration is Match3Configuration, "Match3Board: This board needs a valid Match3Configuration resource to be drawed in the scene")
 	
-	if configuration.auto_start:
-		prepare_board()
-	
 	if not InputMap.has_action(configuration.input_action_consume_line_connector):
 		push_warning("Match3Board: The input action %s to consume a line connection does not exist, it will not be possible to consume a line connector manually" % configuration.input_action_consume_line_connector)
 
 	if not InputMap.has_action(configuration.input_action_cancel_line_connector):
 		push_warning("Match3Board: The input action %s to cancel a line connection does not exist, it will not be possible to cancel a line connector manually" % configuration.input_action_cancel_line_connector)
 
+	if configuration.auto_start:
+		prepare_board()
+	
 
 #region Component setters
 func change_piece_animator(animator: PieceAnimator) -> Match3Board:
@@ -830,8 +828,10 @@ func swap_pieces(from_grid_cell: GridCellUI, to_grid_cell: GridCellUI) -> void:
 #region Lock related
 func lock() -> void:
 	if current_selected_piece is PieceUI and current_selected_piece.is_selected:
+		current_selected_piece.is_selected = false
 		current_selected_piece.reset_position()
-		
+	
+	
 	is_locked = true
 	current_selected_piece = null
 	
@@ -871,6 +871,62 @@ func pieces() -> Array[PieceUI]:
 	pieces.assign(get_tree().get_nodes_in_group(PieceUI.GroupName))
 	
 	return pieces
+
+
+func pieces_of_type(type: PieceDefinitionResource.PieceType) -> Array[PieceUI]:
+	var pieces: Array[PieceUI] = []
+	pieces.assign(pieces().filter(func(piece: PieceUI): return piece.piece_definition.type == type))
+	
+	return pieces
+
+
+func pieces_of_shape(shape: String) -> Array[PieceUI]:
+	var pieces: Array[PieceUI] = []
+	pieces.assign(pieces().filter(func(piece: PieceUI): return piece.piece_definition.shape == shape))
+	
+	return pieces
+
+
+func special_pieces() -> Array[PieceUI]:
+	var pieces: Array[PieceUI] = []
+	pieces.assign(pieces().filter(func(piece: PieceUI): return piece.is_special()))
+	
+	return pieces
+
+
+func special_pieces_of_type(type: PieceDefinitionResource.PieceType) -> Array[PieceUI]:
+	var pieces: Array[PieceUI] = []
+	pieces.assign(pieces().filter(func(piece: PieceUI): return piece.is_special() and piece.piece_definition.type == type))
+	
+	return pieces
+
+
+func special_pieces_of_shape(shape: String) -> Array[PieceUI]:
+	var pieces: Array[PieceUI] = []
+	pieces.assign(pieces().filter(func(piece: PieceUI): return piece.is_special() and piece.piece_definition.shape == shape))
+	
+	return pieces
+
+
+func obstacle_pieces() -> Array[PieceUI]:
+	var pieces: Array[PieceUI] = []
+	pieces.assign(pieces().filter(func(piece: PieceUI): return piece.is_obstacle()))
+	
+	return pieces
+
+
+func obstacle_pieces_of_type(type: PieceDefinitionResource.PieceType) -> Array[PieceUI]:
+	var pieces: Array[PieceUI] = []
+	pieces.assign(pieces().filter(func(piece: PieceUI): return piece.is_obstacle() and piece.piece_definition.type == type))
+	
+	return pieces
+
+
+func obstacle_pieces_of_shape(shape: String) -> Array[PieceUI]:
+	var pieces: Array[PieceUI] = []
+	pieces.assign(pieces().filter(func(piece: PieceUI): return piece.is_obstacle() and piece.piece_definition.shape == shape))
+	
+	return pieces
 	
 	
 func fall_pieces() -> void:
@@ -890,22 +946,9 @@ func fill_pieces() -> void:
 		await piece_animator.spawn_pieces(new_pieces)
 
 
-func all_pieces_of_type(type: PieceDefinitionResource.PieceType) -> Array[PieceUI]:
-	var pieces: Array[PieceUI] = []
-	pieces.assign(pieces().filter(func(piece: PieceUI): return piece.piece_definition.type == type))
-	
-	return pieces
-
-
-func all_pieces_of_shape(shape: String) -> Array[PieceUI]:
-	var pieces: Array[PieceUI] = []
-	pieces.assign(pieces().filter(func(piece: PieceUI): return piece.piece_definition.shape == shape))
-	
-	return pieces
-
 #endregion
 
-#region Information helpers
+#region Information
 func state_is_wait_for_input() -> bool:
 	return current_state == BoardState.WaitForInput
 
@@ -984,9 +1027,11 @@ func on_state_changed(from: BoardState, to: BoardState) -> void:
 		
 
 func on_swap_requested(from_piece: PieceUI, to_piece: PieceUI) -> void:
-	current_selected_piece = null
+	if current_selected_piece is PieceUI:
+		current_selected_piece.is_selected = false
+		current_selected_piece = null
 	
-	unselect_all_pieces()
+	#unselect_all_pieces()
 	
 	if not is_locked:
 		var from_grid_cell: GridCellUI = grid_cell_from_piece(from_piece)
@@ -1017,7 +1062,7 @@ func on_consume_requested(sequence: Sequence) -> void:
 	if is_locked:
 		return
 	
-	if sequence.size() >=configuration.min_match or (not sequence.generated_from_swap and sequence.contains_special_piece()):
+	if sequence.size() >= configuration.min_match or (not sequence.generated_from_swap and sequence.contains_special_piece()):
 		pending_sequences.append(sequence)
 		
 		if state_is_consume():
@@ -1045,7 +1090,6 @@ func on_piece_selected(piece: PieceUI) -> void:
 func on_piece_unselected(_piece: PieceUI) -> void:
 	if is_locked:
 		return
-	
 	
 	current_selected_piece = null
 	cell_highlighter.remove_current_highlighters()
@@ -1082,7 +1126,7 @@ func on_animation_started() -> void:
 
 
 func on_animation_finished() -> void:
-	await get_tree().create_timer(0.3).timeout
+	await get_tree().create_timer(0.15).timeout
 	
 	if state_is_wait_for_input() and is_locked:
 		unlock()
