@@ -2,7 +2,7 @@ class_name SequenceConsumer extends Node
 
 signal consumed_sequence(sequence: Sequence)
 
-@onready var board: Match3Board = get_tree().get_first_node_in_group(Match3Preloader.BoardGroupName)
+@onready var board: Match3Board = get_tree().get_first_node_in_group(Match3Board.BoardGroupName)
 
 func _enter_tree() -> void:
 	name = "SequenceConsumer"

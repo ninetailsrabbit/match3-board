@@ -35,4 +35,5 @@ func on_requested_piece_special_trigger() -> void:
 		
 		board.unlock()
 		
+		finished_piece_special_trigger.emit()
 		board.consume_requested.emit(sequence)

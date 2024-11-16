@@ -6,6 +6,7 @@ signal holded
 signal released
 signal consumed
 signal requested_piece_special_trigger
+signal finished_piece_special_trigger
 signal mouse_entered
 signal mouse_exited
 signal focus_entered
@@ -45,7 +46,7 @@ var board: Match3Board:
 			board = value
 			
 			if board:
-				cell_size = board.cell_size
+				cell_size = board.configuration.cell_size
 				
 var mouse_region: Button
 var piece_area: Area2D
@@ -106,11 +107,11 @@ func _enter_tree() -> void:
 	original_z_index = z_index
 	
 	if board == null:
-		board = get_tree().get_first_node_in_group(Match3Preloader.BoardGroupName)
+		board = get_tree().get_first_node_in_group(Match3Board.BoardGroupName)
 	
 	assert(board is Match3Board, "PieceUI: The piece ui needs a linked Match3Board to be functional. ")
 	
-	cell_size = board.cell_size
+	cell_size = board.configuration.cell_size
 	
 	selected.connect(on_piece_selected)
 	unselected.connect(on_piece_unselected)
@@ -320,7 +321,7 @@ func _prepare_area_detectors() -> void:
 	
 	detection_area.add_child(detection_area_collision)
 	
-	piece_area.collision_layer = pow(2, board.pieces_collision_layer - 1)
+	piece_area.collision_layer = pow(2, board.configuration.pieces_collision_layer - 1)
 	piece_area.collision_mask = 0
 	piece_area.monitoring = false
 	piece_area.monitorable = true
@@ -330,8 +331,8 @@ func _prepare_area_detectors() -> void:
 	detection_area.monitoring = false ## Deactivated on initialization, it will active when piece is selected
 	detection_area.monitorable = false
 	
-	piece_area_collision.shape.size = board.cell_size / 1.5 
-	detection_area_collision.shape.size = board.cell_size / 1.5
+	piece_area_collision.shape.size = board.configuration.cell_size / 1.5 
+	detection_area_collision.shape.size = board.configuration.cell_size / 1.5
 	
 	add_child(piece_area)
 	add_child(detection_area)
@@ -348,7 +349,7 @@ func on_mouse_region_pressed() -> void:
 	if is_locked:
 		return
 	
-	if piece_definition.can_be_triggered:
+	if piece_definition.can_be_triggered and not piece_definition.can_be_swapped:
 		requested_piece_special_trigger.emit()
 	else:
 		if is_click_mode_selection():

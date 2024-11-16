@@ -17,6 +17,7 @@ enum Shapes {
 
 var cells: Array[GridCellUI] = []
 var shape: Shapes = Shapes.Irregular
+var generated_from_swap: bool = false
 
 
 func _init(_cells: Array[GridCellUI], _shape: Shapes = Shapes.Irregular) -> void:
@@ -29,10 +30,7 @@ func size() -> int:
 	
 	
 func consume(except: Array[GridCellUI] = []) -> void:
-	var pieces_consumed: Array[PieceDefinitionResource] = []
-	pieces_consumed.assign(self.pieces().map(func(piece: PieceUI): return piece.piece_definition))
-	
-	consumed.emit(pieces_consumed)
+	consumed.emit(pieces())
 	
 	for cell: GridCellUI in cells.filter(func(grid_cell: GridCellUI): return not except.has(grid_cell)):
 		consume_cell(cell)
@@ -56,14 +54,34 @@ func pieces() -> Array[PieceUI]:
 	
 
 func contains_special_piece() -> bool:
-	return pieces().any(func(piece: PieceUI): return piece.piece_definition.is_special())
+	return pieces().any(func(piece: PieceUI): return piece.is_special())
+
+
+func get_special_piece():
+	if contains_special_piece():
+		return pieces().filter(func(piece: PieceUI): return piece.is_special()).front()
+	
+	return null
+
+
+func add_cell(new_cell: GridCellUI) -> void:
+	if not cells.has(new_cell):
+		cells.append(new_cell)
+
+
+func remove_cell(grid_cell: GridCellUI) -> void:
+	cells.erase(grid_cell)
+
+
+func remove_cell_with_piece(piece: PieceUI) -> void:
+	cells = cells.filter(func(cell: GridCellUI): return cell.current_piece != piece)
 
 
 func all_pieces_are_special(type: PieceDefinitionResource.PieceType) -> bool:
 	if pieces().is_empty():
 		return false
 	else:
-		return pieces().all(func(piece: PieceUI): return piece.piece_definition.is_special())
+		return pieces().all(func(piece: PieceUI): return piece.is_special())
 
 
 func all_pieces_are_of_type(type: PieceDefinitionResource.PieceType) -> bool:

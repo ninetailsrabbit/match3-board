@@ -4,7 +4,7 @@ const GroupName: String = "cell-highlighter"
 
 @export var highlight_texture: Texture2D = Match3Preloader.HighlightedTexture
 
-@onready var board: Match3Board = get_tree().get_first_node_in_group(Match3Preloader.BoardGroupName)
+@onready var board: Match3Board = get_tree().get_first_node_in_group(Match3Board.BoardGroupName)
 
 func _enter_tree() -> void:
 	name = "CellHighlighter"
@@ -23,23 +23,23 @@ func remove_highlight(grid_cell: GridCellUI) -> void:
 	grid_cell.change_to_original_background_image()
 	
 
-func highlight_cells_from_origin_cell(origin_cell: GridCellUI, swap_mode: Match3Preloader.BoardMovements = board.swap_mode) -> void:
+func highlight_cells_from_origin_cell(origin_cell: GridCellUI, swap_mode: Match3Configuration.BoardMovements = board.configuration.swap_mode) -> void:
 	match swap_mode:
-		Match3Preloader.BoardMovements.Adjacent:
+		Match3Configuration.BoardMovements.Adjacent:
 			highlight_cells(origin_cell.available_neighbours(false))
-		Match3Preloader.BoardMovements.AdjacentWithDiagonals:
+		Match3Configuration.BoardMovements.AdjacentWithDiagonals:
 			highlight_cells(origin_cell.available_neighbours(true))
-		Match3Preloader.BoardMovements.AdjacentOnlyDiagonals:
+		Match3Configuration.BoardMovements.AdjacentOnlyDiagonals:
 			highlight_cells(origin_cell.diagonal_neighbours())
-		Match3Preloader.BoardMovements.Free:
+		Match3Configuration.BoardMovements.Free:
 			highlight_cell(origin_cell)
-		Match3Preloader.BoardMovements.Row:
+		Match3Configuration.BoardMovements.Row:
 			highlight_cells(board.grid_cells_from_row(origin_cell.row))
-		Match3Preloader.BoardMovements.Column:
+		Match3Configuration.BoardMovements.Column:
 			highlight_cells(board.grid_cells_from_column(origin_cell.column))
-		Match3Preloader.BoardMovements.Cross:
+		Match3Configuration.BoardMovements.Cross:
 			highlight_cells(board.cross_cells_from(origin_cell))
-		Match3Preloader.BoardMovements.CrossDiagonal:
+		Match3Configuration.BoardMovements.CrossDiagonal:
 			highlight_cells(board.cross_diagonal_cells_from(origin_cell))
 				
 

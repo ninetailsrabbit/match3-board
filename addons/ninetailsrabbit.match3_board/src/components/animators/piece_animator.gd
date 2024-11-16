@@ -3,7 +3,7 @@ class_name PieceAnimator extends Node
 signal animation_started
 signal animation_finished
 
-@onready var board = get_tree().get_first_node_in_group(Match3Preloader.BoardGroupName)
+@onready var board = get_tree().get_first_node_in_group(Match3Board.BoardGroupName)
 
 
 var animation_running: bool = false
@@ -72,7 +72,7 @@ func spawn_pieces(new_pieces: Array[PieceUI]):
 		var tween: Tween = create_tween().set_parallel(true)
 		
 		for piece: PieceUI in new_pieces:
-			var fall_distance = piece.cell_size.y * board.grid_height
+			var fall_distance = piece.cell_size.y * board.configuration.grid_height
 			piece.hide()
 			tween.tween_property(piece, "visible", true, 0.1)
 			tween.tween_property(piece, "position", piece.position, 0.25)\

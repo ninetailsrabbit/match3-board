@@ -6,4 +6,3 @@ extends Node2D
 
 func _ready() -> void:
 	match_3_board.change_sequence_consumer(DemoSequenceConsumer.new())
-	

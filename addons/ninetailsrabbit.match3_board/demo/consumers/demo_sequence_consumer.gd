@@ -14,9 +14,16 @@ func consume_sequence(sequence: Sequence) -> void:
 		await board.piece_animator.spawn_special_piece(sequence, new_piece)
 		sequence.consume([sequence.middle_cell()])
 	else:
+		var special_piece = sequence.get_special_piece()
+		sequence.remove_cell_with_piece(special_piece)
+		
+		if special_piece is PieceUI:
+			special_piece.requested_piece_special_trigger.emit()
+			await special_piece.finished_piece_special_trigger
+		
 		await board.piece_animator.consume_sequence(sequence)
 		sequence.consume()
-		
+			
 
 func detect_new_combined_piece(sequence: Sequence):
 	if sequence.all_pieces_are_of_type(PieceDefinitionResource.PieceType.Normal):

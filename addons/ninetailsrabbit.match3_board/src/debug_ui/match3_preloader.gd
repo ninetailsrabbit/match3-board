@@ -1,7 +1,6 @@
 class_name Match3Preloader
 
 #region Shared
-const BoardGroupName: String = "match3-board"
 
 class FallMovement:
 	var from_cell: GridCellUI
@@ -14,34 +13,6 @@ class FallMovement:
 		is_diagonal = _is_diagonal
 
 
-enum BoardState {
-	WaitForInput,
-	Fill,
-	Consume
-}
-
-enum BoardMovements {
-	Adjacent,
-	AdjacentWithDiagonals,
-	AdjacentOnlyDiagonals,
-	Free,
-	Row,
-	Column,
-	Cross,
-	CrossDiagonal,
-	ConnectLine
-}
-
-enum BoardClickMode {
-	Selection,
-	Drag
-}
-
-enum BoardFillModes {
-	FallDown,
-	Side,
-	InPlace
-}
 #endregion
 
 

@@ -3,6 +3,7 @@ class_name Match3Board extends Node2D
 
 const MinGridWidth: int = 3
 const MinGridHeight: int = 3
+const BoardGroupName: String = "match3-board"
 
 signal swapped_pieces(from: PieceUI, to: PieceUI, matches: Array[Sequence])
 signal swap_requested(from: PieceUI, to: PieceUI)
@@ -16,14 +17,19 @@ signal piece_holded(piece: PieceUI)
 signal piece_released(piece: PieceUI)
 signal added_piece_to_line_connector(piece: PieceUI)
 signal canceled_line_connector_match(selected_pieces: Array[PieceUI])
-signal state_changed(from: Match3Preloader.BoardState, to: Match3Preloader.BoardState)
+signal state_changed(from: BoardState, to: BoardState)
 signal prepared_board
-signal changed_swap_mode(from: Match3Preloader.BoardMovements, to: Match3Preloader.BoardMovements)
-signal changed_click_mode(from: Match3Preloader.BoardClickMode, to: Match3Preloader.BoardClickMode)
 signal movement_consumed
 signal finished_available_movements
 signal locked
 signal unlocked
+
+enum BoardState {
+	WaitForInput,
+	Fill,
+	Consume
+}
+
 
 @export_group("Editor Debug 🪲")
 @export var preview_grid_in_editor: bool = false:
@@ -63,79 +69,9 @@ signal unlocked
 		if empty_cell_texture != value:
 			empty_cell_texture = value
 			draw_preview_grid()
-@export_group("Size 🔲")
-@export var grid_width: int = 8:
-	set(value):
-		if grid_width != value:
-			grid_width = max(MinGridWidth, value)
-			draw_preview_grid()
-@export var grid_height: int = 7:
-	set(value):
-		if grid_height != value:
-			grid_height = max(MinGridHeight, value)
-			draw_preview_grid()
-@export var cell_size: Vector2i = Vector2i(48, 48):
-	set(value):
-		if value != cell_size:
-			cell_size = value
-			draw_preview_grid()
-@export var cell_offset: Vector2i = Vector2i(25, 25):
-	set(value):
-		if value != cell_offset:
-			cell_offset = value
-			draw_preview_grid()
-@export var empty_cells: Array[Vector2] = []:
-	set(value):
-		if empty_cells != value:
-			empty_cells = value
-			draw_preview_grid()
-@export var draw_background_texture_on_empty_cells: bool = true
 
-@export_group("Configuration 💎")
-## When enabled, the board prepare itself automatically when it's ready on the scene tree
-@export var auto_start: bool = true
-## The layer value from 1 to 32 that is the amount Godot supports. The inside areas will have this layer value to detect other pieces or be detected.
-@export_range(1, 32, 1) var pieces_collision_layer: int = 8
-## The swap mode to use on this board, each has its own particularities and can be changed at runtime.
-@export var swap_mode: Match3Preloader.BoardMovements = Match3Preloader.BoardMovements.Adjacent:
-	set(value):
-		if value != swap_mode:
-			changed_swap_mode.emit(swap_mode, value)
-			swap_mode = value
-## The click mode defines if the swap is made by select & click or dragging the piece to the desired place
-@export var click_mode: Match3Preloader.BoardClickMode = Match3Preloader.BoardClickMode.Selection:
-	set(value):
-		if value != click_mode:
-			changed_click_mode.emit(click_mode, value)
-			click_mode = value
-## The fill mode defines the behaviour when the pieces fall down after a consumed sequence.
-@export var input_action_cancel_line_connector: StringName = &"cancel_line_connector"
-@export var input_action_consume_line_connector: StringName = &"consume_line_connector"
-@export var fill_mode =  Match3Preloader.BoardFillModes.FallDown
-## The available pieces this board can generate to be used by the player
-@export var available_pieces: Array[PieceWeight] = []
-## The available moves when the board is prepared. 
-## This is only informative and only emits signals based on the movements used but does not block the board.
-@export var available_moves_on_start: int = 25
-## When enabled, the matches that could appear in the first board preparation will stay there and be consumed as sequences
-@export var allow_matches_on_start: bool = false
-## When enabled, horizontal matchs between pieces are allowed
-@export var horizontal_shape: bool = true
-## When enabled, vertical matchs between pieces are allowed
-@export var vertical_shape: bool = true
-## When enabled, TShape matchs between pieces are allowed
-@export var tshape: bool = true
-## When enabled, LShape  matchs between pieces are allowed
-@export var lshape: bool = true
-## The minimum amount of pieces to make a match valid
-@export var min_match: int = 3:
-	set(value):
-		min_match = max(3, value)
-## The maximum amount of pieces a match can have.
-@export var max_match: int  = 5:
-	set(value):
-		max_match = max(min_match, value)
-
+@export_group("Board configuration")
+@export var configuration: Match3Configuration
 
 #region Features
 var piece_weight_generator: PieceWeightGenerator
@@ -159,14 +95,15 @@ var is_locked: bool = false:
 			else:
 				unlocked.emit()
 
-var current_state: Match3Preloader.BoardState = Match3Preloader.BoardState.WaitForInput:
+var current_state: BoardState = BoardState.WaitForInput:
 	set(new_state):
 		if new_state != current_state:
 			state_changed.emit(current_state, new_state)
 			current_state = new_state
 		
 var pending_sequences: Array[Sequence] = []
-var current_available_moves: int = available_moves_on_start:
+
+@onready var current_available_moves: int = configuration.available_moves_on_start:
 	set(value):
 		if value != current_available_moves:
 			if value < current_available_moves:
@@ -175,31 +112,23 @@ var current_available_moves: int = available_moves_on_start:
 			elif value == 0:
 				finished_available_movements.emit()
 				
-			current_available_moves = clamp(value, 0, available_moves_on_start)
+			current_available_moves = clamp(value, 0, configuration.available_moves_on_start)
 
-
+	
 func _input(event: InputEvent) -> void:
 	if is_locked:
 		return
 		
 	handle_line_connector_input(event)
 	
-
-func handle_line_connector_input(event: InputEvent) -> void:
-	if is_swap_mode_connect_line() and is_click_mode_selection() and line_connector != null:
-		if InputMap.has_action(input_action_consume_line_connector) and Input.is_action_just_pressed(input_action_consume_line_connector) \
-			or event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-			line_connector.consume_matches()
-	
-		elif InputMap.has_action(input_action_cancel_line_connector) and Input.is_action_just_pressed(input_action_cancel_line_connector) \
-			or event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
-			line_connector.cancel()
-				
 	
 func _enter_tree() -> void:
-	if not Engine.is_editor_hint():
-		add_to_group(Match3Preloader.BoardGroupName)
-		remove_preview_sprites()
+	remove_preview_sprites()
+	
+	if Engine.is_editor_hint():
+		draw_preview_grid()
+	else:
+		add_to_group(BoardGroupName)
 		
 		prepared_board.connect(on_prepared_board)
 		
@@ -230,14 +159,14 @@ func _enter_tree() -> void:
 	
 
 func _ready() -> void:
-	if not Engine.is_editor_hint() and auto_start:
+	if not Engine.is_editor_hint() and configuration.auto_start:
 		prepare_board()
 	
-	if not InputMap.has_action(input_action_consume_line_connector):
-		push_warning("Match3Board: The input action %s to consume a line connection does not exist, it will not be possible to consume a line connector manually" % input_action_consume_line_connector)
+	if not InputMap.has_action(configuration.input_action_consume_line_connector):
+		push_warning("Match3Board: The input action %s to consume a line connection does not exist, it will not be possible to consume a line connector manually" % configuration.input_action_consume_line_connector)
 
-	if not InputMap.has_action(input_action_cancel_line_connector):
-		push_warning("Match3Board: The input action %s to cancel a line connection does not exist, it will not be possible to cancel a line connector manually" % input_action_cancel_line_connector)
+	if not InputMap.has_action(configuration.input_action_cancel_line_connector):
+		push_warning("Match3Board: The input action %s to cancel a line connection does not exist, it will not be possible to cancel a line connector manually" % configuration.input_action_cancel_line_connector)
 
 
 func change_piece_animator(animator: PieceAnimator) -> Match3Board:
@@ -280,18 +209,18 @@ func change_sequence_consumer(consumer: SequenceConsumer) -> Match3Board:
 ## Only prepares the grid cells based on width and height
 func prepare_board():
 	if not Engine.is_editor_hint() and grid_cells.is_empty():
-		for column in grid_width:
+		for column in configuration.grid_width:
 			grid_cells.append([])
 			
-			for row in grid_height:
+			for row in configuration.grid_height:
 				var grid_cell: GridCellUI = GridCellUI.new(row, column)
-				grid_cell.cell_size = cell_size
+				grid_cell.cell_size = configuration.cell_size
 				
 				grid_cells[column].append(grid_cell)
 		
 		grid_cells_flattened.append_array(Match3BoardPluginUtilities.flatten(grid_cells))
 		
-		add_pieces(available_pieces)
+		add_pieces(configuration.available_pieces)
 		
 		prepared_board.emit()
 		
@@ -307,8 +236,8 @@ func draw_board():
 		draw_grid_cell(grid_cell)
 		draw_random_piece_on_cell(grid_cell)
 		
-	if allow_matches_on_start:
-		current_state = Match3Preloader.BoardState.Consume
+	if configuration.allow_matches_on_start:
+		current_state = BoardState.Consume
 	else:
 		remove_matches_from_board()
 	
@@ -320,7 +249,7 @@ func remove_matches_from_board() -> void:
 	
 	while sequences.size() > 0:
 		for sequence: Sequence in sequences:
-			var cells_to_change = sequence.cells.slice(0, (sequence.cells.size() / min_match) + 1)
+			var cells_to_change = sequence.cells.slice(0, (sequence.cells.size() / configuration.min_match) + 1)
 			var piece_exceptions: Array[PieceWeight] = []
 			var piece_id_exceptions: Array[StringName] = []
 			piece_id_exceptions.assign(Match3BoardPluginUtilities.remove_duplicates(cells_to_change.map(func(cell: GridCellUI): return cell.current_piece.piece_definition.id)))
@@ -339,14 +268,14 @@ func remove_matches_from_board() -> void:
 func draw_grid_cell(grid_cell: GridCellUI) -> void:
 	if not grid_cell.is_inside_tree():
 		add_child(grid_cell)
-		grid_cell.position = Vector2(grid_cell.cell_size.x * grid_cell.column + cell_offset.x, grid_cell.cell_size.y * grid_cell.row + cell_offset.y)
-		grid_cell.can_contain_piece = not grid_cell.board_position() in empty_cells
+		grid_cell.position = Vector2(grid_cell.cell_size.x * grid_cell.column + configuration.cell_offset.x, grid_cell.cell_size.y * grid_cell.row + configuration.cell_offset.y)
+		grid_cell.can_contain_piece = not grid_cell.board_position() in configuration.empty_cells
 		
 
 func draw_random_piece_on_cell(grid_cell: GridCellUI, except: Array[PieceWeight] = []) -> void:
 	if grid_cell.can_contain_piece:
 		var new_piece: PieceUI =  piece_weight_generator.roll(
-			available_pieces.filter(func(piece_weight: PieceWeight): return piece_weight.is_disabled)
+			configuration.available_pieces.filter(func(piece_weight: PieceWeight): return piece_weight.is_disabled)
 			)
 			
 		draw_piece_on_cell(grid_cell, new_piece)
@@ -361,8 +290,20 @@ func draw_piece_on_cell(grid_cell: GridCellUI, new_piece: PieceUI) -> void:
 		
 		grid_cell.remove_piece()
 		grid_cell.assign_piece(new_piece)
-		
-		
+#endregion
+
+#region Line Connector
+func handle_line_connector_input(event: InputEvent) -> void:
+	if is_swap_mode_connect_line() and is_click_mode_selection() and line_connector != null:
+		if InputMap.has_action(configuration.input_action_consume_line_connector) and Input.is_action_just_pressed(configuration.input_action_consume_line_connector) \
+			or event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+			line_connector.consume_matches()
+	
+		elif InputMap.has_action(configuration.input_action_cancel_line_connector) and Input.is_action_just_pressed(configuration.input_action_cancel_line_connector) \
+			or event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
+			line_connector.cancel()
+				
+			
 func draw_line_connector(origin_piece: PieceUI) -> void:
 	if is_swap_mode_connect_line() and line_connector == null:
 		line_connector = LineConnector.new()
@@ -395,7 +336,7 @@ func cross_cells_from(origin_cell: GridCellUI) -> Array[GridCellUI]:
 
 
 func cross_diagonal_cells_from(origin_cell: GridCellUI) -> Array[GridCellUI]:
-	var distance: int = grid_width + grid_height
+	var distance: int = configuration.distance()
 	var cross_diagonal_cells: Array[GridCellUI] = []
 	
 	cross_diagonal_cells.assign(Match3BoardPluginUtilities.remove_falsy_values(Match3BoardPluginUtilities.remove_duplicates(
@@ -411,7 +352,7 @@ func cross_diagonal_cells_from(origin_cell: GridCellUI) -> Array[GridCellUI]:
 func diagonal_top_right_cells_from(cell: GridCellUI, distance: int) -> Array[GridCellUI]:
 	var diagonal_cells: Array[GridCellUI] = []
 	
-	distance = clamp(distance, 0, grid_width)
+	distance = clamp(distance, 0, configuration.grid_width)
 	var current_cell = cell.diagonal_neighbour_top_right
 	
 	if distance > 0 and current_cell is GridCellUI:
@@ -423,7 +364,7 @@ func diagonal_top_right_cells_from(cell: GridCellUI, distance: int) -> Array[Gri
 func diagonal_top_left_cells_from(cell: GridCellUI, distance: int) -> Array[GridCellUI]:
 	var diagonal_cells: Array[GridCellUI] = []
 	
-	distance = clamp(distance, 0, grid_width)
+	distance = clamp(distance, 0, configuration.grid_width)
 	var current_cell = cell.diagonal_neighbour_top_left
 	
 	if distance > 0 and current_cell is GridCellUI:
@@ -435,7 +376,7 @@ func diagonal_top_left_cells_from(cell: GridCellUI, distance: int) -> Array[Grid
 func diagonal_bottom_left_cells_from(cell: GridCellUI, distance: int) -> Array[GridCellUI]:
 	var diagonal_cells: Array[GridCellUI] = []
 	
-	distance = clamp(distance, 0, grid_width)
+	distance = clamp(distance, 0, configuration.grid_width)
 	var current_cell = cell.diagonal_neighbour_bottom_left
 	
 	if distance > 0 and current_cell is GridCellUI:
@@ -447,7 +388,7 @@ func diagonal_bottom_left_cells_from(cell: GridCellUI, distance: int) -> Array[G
 func diagonal_bottom_right_cells_from(cell: GridCellUI, distance: int) -> Array[GridCellUI]:
 	var diagonal_cells: Array[GridCellUI] = []
 	
-	distance = clamp(distance, 0, grid_width)
+	distance = clamp(distance, 0, configuration.grid_width)
 	var current_cell = cell.diagonal_neighbour_bottom_right
 	
 	if distance > 0 and current_cell is GridCellUI:
@@ -487,13 +428,11 @@ func grid_cells_from_pieces(pieces: Array[PieceUI]) -> Array[GridCellUI]:
 	return cells
 	
 	
-	
-
 func grid_cells_from_row(row: int) -> Array[GridCellUI]:
 	var cells: Array[GridCellUI] = []
 	
-	if grid_cells.size() > 0 and Match3BoardPluginUtilities.value_is_between(row, 0, grid_height - 1):
-		for column in grid_width:
+	if grid_cells.size() > 0 and Match3BoardPluginUtilities.value_is_between(row, 0, configuration.grid_height - 1):
+		for column in configuration.grid_width:
 			cells.append(grid_cells[column][row])
 	
 	return cells
@@ -502,8 +441,8 @@ func grid_cells_from_row(row: int) -> Array[GridCellUI]:
 func grid_cells_from_column(column: int) -> Array[GridCellUI]:
 	var cells: Array[GridCellUI] = []
 		
-	if grid_cells.size() > 0 and Match3BoardPluginUtilities.value_is_between(column, 0, grid_width - 1):
-		for row in grid_height:
+	if grid_cells.size() > 0 and Match3BoardPluginUtilities.value_is_between(column, 0, configuration.grid_width - 1):
+		for row in configuration.grid_height:
 			cells.append(grid_cells[column][row])
 	
 	return cells
@@ -545,12 +484,21 @@ func pending_empty_cells_to_fill() -> Array[GridCellUI]:
 #endregion
 
 #region Sequence finder
+func consume_pending_sequences() -> void:
+	if pending_sequences.is_empty():
+		pending_sequences = find_board_sequences()
+	
+	await sequence_consumer.consume_sequences(pending_sequences)
+	await get_tree().process_frame
+	current_state = BoardState.Fill
+	
+
 @warning_ignore("unassigned_variable")
 func find_horizontal_sequences(cells: Array[GridCellUI]) -> Array[Sequence]:
 	var sequences: Array[Sequence] = []
 	var current_matches: Array[GridCellUI] = []
 	
-	if horizontal_shape:
+	if configuration.horizontal_shape:
 		var valid_cells = cells.filter(func(cell: GridCellUI): return cell.has_piece())
 		var previous_cell: GridCellUI
 		
@@ -560,17 +508,17 @@ func find_horizontal_sequences(cells: Array[GridCellUI]) -> Array[Sequence]:
 				or (previous_cell is GridCellUI and previous_cell.is_row_neighbour_of(current_cell) and current_cell.current_piece.match_with(previous_cell.current_piece)):
 				current_matches.append(current_cell)
 				
-				if current_matches.size() == max_match:
+				if current_matches.size() == configuration.max_match:
 					sequences.append(Sequence.new(current_matches, Sequence.Shapes.Horizontal))
 					current_matches.clear()
 			else:
-				if Match3BoardPluginUtilities.value_is_between(current_matches.size(), min_match, max_match):
+				if Match3BoardPluginUtilities.value_is_between(current_matches.size(), configuration.min_match, configuration.max_match):
 					sequences.append(Sequence.new(current_matches, Sequence.Shapes.Horizontal))
 				
 				current_matches.clear()
 				current_matches.append(current_cell)
 			
-			if current_cell == valid_cells.back() and Match3BoardPluginUtilities.value_is_between(current_matches.size(), min_match, max_match):
+			if current_cell == valid_cells.back() and Match3BoardPluginUtilities.value_is_between(current_matches.size(), configuration.min_match, configuration.max_match):
 				sequences.append(Sequence.new(current_matches, Sequence.Shapes.Horizontal))
 				
 			previous_cell = current_cell
@@ -585,7 +533,7 @@ func find_vertical_sequences(cells: Array[GridCellUI]) -> Array[Sequence]:
 	var sequences: Array[Sequence] = []
 	var current_matches: Array[GridCellUI] = []
 	
-	if vertical_shape:
+	if configuration.vertical_shape:
 		var valid_cells = cells.filter(func(cell: GridCellUI): return cell.has_piece())
 		var previous_cell: GridCellUI
 		
@@ -595,17 +543,17 @@ func find_vertical_sequences(cells: Array[GridCellUI]) -> Array[Sequence]:
 				or (previous_cell is GridCellUI and previous_cell.is_column_neighbour_of(current_cell) and current_cell.current_piece.match_with(previous_cell.current_piece)):
 				current_matches.append(current_cell)
 				
-				if current_matches.size() == max_match:
+				if current_matches.size() == configuration.max_match:
 					sequences.append(Sequence.new(current_matches, Sequence.Shapes.Vertical))
 					current_matches.clear()
 			else:
-				if Match3BoardPluginUtilities.value_is_between(current_matches.size(), min_match, max_match):
+				if Match3BoardPluginUtilities.value_is_between(current_matches.size(), configuration.min_match, configuration.max_match):
 					sequences.append(Sequence.new(current_matches, Sequence.Shapes.Vertical))
 					
 				current_matches.clear()
 				current_matches.append(current_cell)
 			
-			if current_cell.in_same_grid_position_as(valid_cells.back().board_position()) and Match3BoardPluginUtilities.value_is_between(current_matches.size(), min_match, max_match):
+			if current_cell.in_same_grid_position_as(valid_cells.back().board_position()) and Match3BoardPluginUtilities.value_is_between(current_matches.size(), configuration.min_match, configuration.max_match):
 				sequences.append(Sequence.new(current_matches, Sequence.Shapes.Vertical))
 				
 			previous_cell = current_cell
@@ -617,7 +565,7 @@ func find_vertical_sequences(cells: Array[GridCellUI]) -> Array[Sequence]:
 	
 	
 func find_tshape_sequence(sequence_a: Sequence, sequence_b: Sequence):
-	if tshape and sequence_a != sequence_b and  sequence_a.is_horizontal_or_vertical_shape() and sequence_b.is_horizontal_or_vertical_shape():
+	if configuration.tshape and sequence_a != sequence_b and  sequence_a.is_horizontal_or_vertical_shape() and sequence_b.is_horizontal_or_vertical_shape():
 		var horizontal_sequence: Sequence = sequence_a if sequence_a.is_horizontal_shape() else sequence_b
 		var vertical_sequence: Sequence = sequence_a if sequence_a.is_vertical_shape() else sequence_b
 		
@@ -645,7 +593,7 @@ func find_tshape_sequence(sequence_a: Sequence, sequence_b: Sequence):
 
 
 func find_lshape_sequence(sequence_a: Sequence, sequence_b: Sequence):
-	if tshape and sequence_a != sequence_b and  sequence_a.is_horizontal_or_vertical_shape() and sequence_b.is_horizontal_or_vertical_shape():
+	if configuration.lshape and sequence_a != sequence_b and  sequence_a.is_horizontal_or_vertical_shape() and sequence_b.is_horizontal_or_vertical_shape():
 		var horizontal_sequence: Sequence = sequence_a if sequence_a.is_horizontal_shape() else sequence_b
 		var vertical_sequence: Sequence = sequence_a if sequence_a.is_vertical_shape() else sequence_b
 		
@@ -673,7 +621,7 @@ func find_lshape_sequence(sequence_a: Sequence, sequence_b: Sequence):
 func find_horizontal_board_sequences() -> Array[Sequence]:
 	var horizontal_sequences: Array[Sequence] = []
 	
-	for row in grid_height:
+	for row in configuration.grid_height:
 		horizontal_sequences.append_array(find_horizontal_sequences(grid_cells_from_row(row)))
 	
 	return horizontal_sequences
@@ -682,12 +630,12 @@ func find_horizontal_board_sequences() -> Array[Sequence]:
 func find_vertical_board_sequences() -> Array[Sequence]:
 	var vertical_sequences: Array[Sequence] = []
 	
-	for column in grid_width:
+	for column in configuration.grid_width:
 		vertical_sequences.append_array(find_vertical_sequences(grid_cells_from_column(column)))
 	
 	return vertical_sequences
 	
-	
+
 func find_board_sequences() -> Array[Sequence]:
 	var horizontal_sequences: Array[Sequence] = find_horizontal_board_sequences()
 	var vertical_sequences: Array[Sequence] = find_vertical_board_sequences()
@@ -787,7 +735,7 @@ func calculate_fall_movements_on_column(column: int) -> Array[Match3Preloader.Fa
 func calculate_all_fall_movements() -> Array[Match3Preloader.FallMovement]:
 	var movements: Array[Match3Preloader.FallMovement] = []
 	
-	for column in grid_width:
+	for column in configuration.grid_width:
 		movements.append_array(calculate_fall_movements_on_column(column))
 	
 	return movements
@@ -796,22 +744,22 @@ func calculate_all_fall_movements() -> Array[Match3Preloader.FallMovement]:
 
 #region Swap
 func swap_pieces_request(from_grid_cell: GridCellUI, to_grid_cell: GridCellUI) -> void:
-	match swap_mode:
-		Match3Preloader.BoardMovements.Adjacent:
+	match configuration.swap_mode:
+		Match3Configuration.BoardMovements.Adjacent:
 			swap_adjacent(from_grid_cell, to_grid_cell)
-		Match3Preloader.BoardMovements.AdjacentWithDiagonals:
+		Match3Configuration.BoardMovements.AdjacentWithDiagonals:
 			swap_adjacent_with_diagonals(from_grid_cell, to_grid_cell)
-		Match3Preloader.BoardMovements.AdjacentOnlyDiagonals:
+		Match3Configuration.BoardMovements.AdjacentOnlyDiagonals:
 			swap_adjacent_only_diagonals(from_grid_cell, to_grid_cell)
-		Match3Preloader.BoardMovements.Free:
+		Match3Configuration.BoardMovements.Free:
 			swap_free(from_grid_cell, to_grid_cell)
-		Match3Preloader.BoardMovements.Row:
+		Match3Configuration.BoardMovements.Row:
 			swap_row(from_grid_cell, to_grid_cell)
-		Match3Preloader.BoardMovements.Column:
+		Match3Configuration.BoardMovements.Column:
 			swap_column(from_grid_cell, to_grid_cell)
-		Match3Preloader.BoardMovements.Cross:
+		Match3Configuration.BoardMovements.Cross:
 			swap_cross(from_grid_cell, to_grid_cell)
-		Match3Preloader.BoardMovements.CrossDiagonal:
+		Match3Configuration.BoardMovements.CrossDiagonal:
 			swap_cross_diagonal(from_grid_cell, to_grid_cell)
 		_:
 			unlock()
@@ -877,10 +825,10 @@ func swap_pieces(from_grid_cell: GridCellUI, to_grid_cell: GridCellUI) -> void:
 	if from_grid_cell.can_swap_piece_with(to_grid_cell):
 		var matches: Array[Sequence] = []
 		
-		for sequence: Sequence in Match3BoardPluginUtilities.remove_falsy_values([
-			find_match_from_cell(from_grid_cell), 
-			find_match_from_cell(to_grid_cell)
-		]):
+		var sequence_from: Sequence = find_match_from_cell(from_grid_cell)
+		var sequence_to: Sequence = find_match_from_cell(to_grid_cell)
+
+		for sequence: Sequence in Match3BoardPluginUtilities.remove_falsy_values([sequence_from, sequence_to]):
 			matches.append(sequence)
 		
 		await piece_animator.swap_pieces(from_grid_cell.current_piece, to_grid_cell.current_piece)
@@ -979,51 +927,51 @@ func all_pieces_of_shape(shape: String) -> Array[PieceUI]:
 
 #region Information helpers
 func state_is_wait_for_input() -> bool:
-	return current_state == Match3Preloader.BoardState.WaitForInput
+	return current_state == BoardState.WaitForInput
 
 
 func state_is_consume() -> bool:
-	return current_state == Match3Preloader.BoardState.Consume
+	return current_state == BoardState.Consume
 
 
 func state_is_fill() -> bool:
-	return current_state == Match3Preloader.BoardState.Fill
+	return current_state == BoardState.Fill
 
 
 func is_click_mode_selection() -> bool:
-	return click_mode == Match3Preloader.BoardClickMode.Selection
+	return configuration.is_click_mode_selection()
 	
 
 func is_click_mode_drag() -> bool:
-	return click_mode == Match3Preloader.BoardClickMode.Drag
+	return configuration.is_click_mode_drag()
 	
 
 func is_swap_mode_adjacent() -> bool:
-	return swap_mode == Match3Preloader.BoardMovements.Adjacent
+	return configuration.is_swap_mode_adjacent()
 	
 	
 func is_swap_mode_adjacent_with_diagonals() -> bool:
-	return swap_mode == Match3Preloader.BoardMovements.AdjacentWithDiagonals
+	return configuration.is_swap_mode_adjacent_with_diagonals()
 	
 	
 func is_swap_mode_adjacent_only_diagonals() -> bool:
-	return swap_mode == Match3Preloader.BoardMovements.AdjacentOnlyDiagonals
+	return configuration.is_swap_mode_adjacent_only_diagonals()
 	
 
 func is_swap_mode_free() -> bool:
-	return swap_mode == Match3Preloader.BoardMovements.Free
+	return configuration.is_swap_mode_free()
 
 
 func is_swap_mode_cross() -> bool:
-	return swap_mode == Match3Preloader.BoardMovements.Cross
+	return configuration.is_swap_mode_cross()
 	
 	
 func is_swap_mode_cross_diagonal() -> bool:
-	return swap_mode == Match3Preloader.BoardMovements.CrossDiagonal
+	return configuration.is_swap_mode_cross_diagonal()
 	
 	
 func is_swap_mode_connect_line() -> bool:
-	return swap_mode == Match3Preloader.BoardMovements.ConnectLine
+	return configuration.is_swap_mode_connect_line()
 #endregion
 
 #region Debug
@@ -1037,27 +985,27 @@ func draw_preview_grid() -> void:
 			add_child(debug_preview_node)
 			Match3BoardPluginUtilities.set_owner_to_edited_scene_root(debug_preview_node)
 			
-		for column in grid_width:
-			for row in grid_height:
+		for column in configuration.grid_width:
+			for row in configuration.grid_height:
 				
 				var current_cell_sprite: Sprite2D = Sprite2D.new()
 				current_cell_sprite.name = "Cell_Column%d_Row%d" % [column, row]
 				
-				if empty_cells.has(Vector2(row, column)):
+				if configuration.empty_cells.has(Vector2(row, column)):
 					current_cell_sprite.texture = empty_cell_texture
 				elif even_cell_texture and odd_cell_texture:
 					current_cell_sprite.texture = even_cell_texture if (column + row) % 2 == 0 else odd_cell_texture
 				else:
 					current_cell_sprite.texture = even_cell_texture if even_cell_texture else odd_cell_texture
 					
-				current_cell_sprite.position = Vector2(cell_size.x * column + cell_offset.x, cell_size.y * row + cell_offset.y)
+				current_cell_sprite.position = Vector2(configuration.cell_size.x * column + configuration.cell_offset.x, configuration.cell_size.y * row + configuration.cell_offset.y)
 				
 				debug_preview_node.add_child(current_cell_sprite)
 				Match3BoardPluginUtilities.set_owner_to_edited_scene_root(current_cell_sprite)
 				
 				if current_cell_sprite.texture:
 					var cell_texture_size = current_cell_sprite.texture.get_size()
-					current_cell_sprite.scale = Vector2(cell_size.x / cell_texture_size.x, cell_size.y / cell_texture_size.y)
+					current_cell_sprite.scale = Vector2(configuration.cell_size.x / cell_texture_size.x, configuration.cell_size.y / cell_texture_size.y)
 				
 				var available_preview_pieces = Match3BoardPluginUtilities.remove_falsy_values(preview_pieces)
 				
@@ -1073,17 +1021,16 @@ func draw_preview_grid() -> void:
 					if current_piece_sprite.texture:
 						var piece_texture_size = current_piece_sprite.texture.get_size()
 						## The 0.85 value it's to adjust the piece inside the cell reducing the scale size
-						current_piece_sprite.scale = Vector2(cell_size.x / piece_texture_size.x, cell_size.y / piece_texture_size.y) * 0.85
+						current_piece_sprite.scale = Vector2(configuration.cell_size.x / piece_texture_size.x, configuration.cell_size.y / piece_texture_size.y) * 0.85
 						
 					
-
 func remove_preview_sprites() -> void:
 	if Engine.is_editor_hint():
-		if debug_preview_node:
+		if debug_preview_node != null:
 			debug_preview_node.free()
 			debug_preview_node = null
 	
-	for child: Node2D in get_children(true).filter(func(node: Node): return node is Node2D):
+	for child: Node2D in get_children().filter(func(node: Node): return node is Node2D):
 		child.free()
 #endregion
 
@@ -1093,24 +1040,17 @@ func on_prepared_board() -> void:
 	update_grid_cells_neighbours()
 
 
-func on_state_changed(from: Match3Preloader.BoardState, to: Match3Preloader.BoardState) -> void:
+func on_state_changed(from: BoardState, to: BoardState) -> void:
 	match to:
-		Match3Preloader.BoardState.WaitForInput:
+		BoardState.WaitForInput:
 			current_available_moves -= 1
 			reset_all_pieces_positions()
 			await get_tree().create_timer(0.15).timeout
 			unlock()
-		Match3Preloader.BoardState.Consume:
+		BoardState.Consume:
 			lock()
-			
-			if pending_sequences.is_empty():
-				pending_sequences = find_board_sequences()
-			
-			await sequence_consumer.consume_sequences(pending_sequences)
-			await get_tree().process_frame
-			
-			current_state = Match3Preloader.BoardState.Fill
-		Match3Preloader.BoardState.Fill:
+			consume_pending_sequences()
+		BoardState.Fill:
 			lock()
 			
 			pending_sequences.clear()
@@ -1120,7 +1060,7 @@ func on_state_changed(from: Match3Preloader.BoardState, to: Match3Preloader.Boar
 			
 			pending_sequences = find_board_sequences()
 			
-			current_state = Match3Preloader.BoardState.WaitForInput if pending_sequences.is_empty() else Match3Preloader.BoardState.Consume
+			current_state = BoardState.WaitForInput if pending_sequences.is_empty() else BoardState.Consume
 		
 
 func on_swap_requested(from_piece: PieceUI, to_piece: PieceUI) -> void:
@@ -1137,8 +1077,12 @@ func on_swap_requested(from_piece: PieceUI, to_piece: PieceUI) -> void:
 	
 	
 func on_swapped_pieces(_from: PieceUI, _to: PieceUI, matches: Array[Sequence]) -> void:
-	pending_sequences = matches
-	current_state = Match3Preloader.BoardState.Consume
+	pending_sequences += matches
+	
+	for sequence: Sequence in pending_sequences:
+		sequence.generated_from_swap = true
+		
+	current_state = BoardState.Consume
 	
 
 func on_swap_failed(_from: PieceUI, _to: PieceUI) -> void:
@@ -1153,17 +1097,21 @@ func on_consume_requested(sequence: Sequence) -> void:
 	if is_locked:
 		return
 	
-	if sequence.size() >= min_match or sequence.contains_special_piece():
-		pending_sequences = [sequence] as Array[Sequence]
-		current_state = Match3Preloader.BoardState.Consume
+	if sequence.size() >=configuration.min_match or (not sequence.generated_from_swap and sequence.contains_special_piece()):
+		pending_sequences.append(sequence)
 		
-	
+		if state_is_consume():
+			consume_pending_sequences()
+		else:
+			current_state = BoardState.Consume
+
+
 func on_piece_selected(piece: PieceUI) -> void:
 	if is_locked or is_click_mode_drag():
 		return
 	
 	draw_line_connector(piece)
-			
+
 	if current_selected_piece and current_selected_piece != piece:
 		swap_requested.emit(current_selected_piece as PieceUI, piece as PieceUI)
 		current_selected_piece = null
@@ -1171,7 +1119,7 @@ func on_piece_selected(piece: PieceUI) -> void:
 		return
 
 	current_selected_piece = piece
-	cell_highlighter.highlight_cells_from_origin_cell(grid_cell_from_piece(current_selected_piece), swap_mode)
+	cell_highlighter.highlight_cells_from_origin_cell(grid_cell_from_piece(current_selected_piece), configuration.swap_mode)
 
 
 func on_piece_unselected(_piece: PieceUI) -> void:
@@ -1190,7 +1138,7 @@ func on_piece_holded(piece: PieceUI) -> void:
 	draw_line_connector(piece)
 	
 	current_selected_piece = piece
-	cell_highlighter.highlight_cells_from_origin_cell(grid_cell_from_piece(current_selected_piece), swap_mode)
+	cell_highlighter.highlight_cells_from_origin_cell(grid_cell_from_piece(current_selected_piece), configuration.swap_mode)
 	
 
 func on_piece_released(piece: PieceUI) -> void:
