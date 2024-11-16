@@ -45,6 +45,7 @@ fill_mode = 0
 available_pieces = Array[ExtResource("1_e14ms")]([SubResource("Resource_s3jf7"), SubResource("Resource_nujv7"), SubResource("Resource_lj83x"), SubResource("Resource_lned8")])
 available_moves_on_start = 25
 allow_matches_on_start = false
+reset_position_on_swap_failed = true
 horizontal_shape = true
 vertical_shape = true
 tshape = true

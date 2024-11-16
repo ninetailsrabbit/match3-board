@@ -2,7 +2,6 @@ class_name Match3Configuration extends Resource
 
 signal changed_swap_mode(from: BoardMovements, to: BoardMovements)
 signal changed_click_mode(from: BoardClickMode, to: BoardClickMode)
-signal changed_size
 
 const MinGridWidth: int = 3
 const MinGridHeight: int = 3
@@ -31,31 +30,11 @@ enum BoardFillModes {
 }
 
 @export_group("Size 🔲")
-@export var grid_width: int = 8:
-	set(value):
-		if grid_width != value:
-			grid_width = max(MinGridWidth, value)
-			changed_size.emit()
-@export var grid_height: int = 7:
-	set(value):
-		if grid_height != value:
-			grid_height = max(MinGridHeight, value)
-			changed_size.emit()
-@export var cell_size: Vector2i = Vector2i(48, 48):
-	set(value):
-		if value != cell_size:
-			cell_size = value
-			changed_size.emit()
-@export var cell_offset: Vector2i = Vector2i(25, 25):
-	set(value):
-		if value != cell_offset:
-			cell_offset = value
-			changed_size.emit()
-@export var empty_cells: Array[Vector2] = []:
-	set(value):
-		if empty_cells != value:
-			empty_cells = value
-			changed_size.emit()
+@export var grid_width: int = 8
+@export var grid_height: int = 7
+@export var cell_size: Vector2i = Vector2i(48, 48)
+@export var cell_offset: Vector2i = Vector2i(25, 25)
+@export var empty_cells: Array[Vector2] = []
 @export var draw_background_texture_on_empty_cells: bool = true
 
 @export_group("Parameters 💎")
@@ -86,6 +65,8 @@ enum BoardFillModes {
 @export var available_moves_on_start: int = 25
 ## When enabled, the matches that could appear in the first board preparation will stay there and be consumed as sequences
 @export var allow_matches_on_start: bool = false
+## When enabled, the pieces after a failed swap are returned to their original positions before the swap
+@export var reset_position_on_swap_failed: bool = true
 ## When enabled, horizontal matchs between pieces are allowed
 @export var horizontal_shape: bool = true
 ## When enabled, vertical matchs between pieces are allowed
@@ -107,10 +88,15 @@ enum BoardFillModes {
 func distance() -> int:
 	return grid_width + grid_height
 	
+
 func size() -> int:
 	return grid_width * grid_height
 
 
+func not_disabled_pieces() -> Array[PieceWeight]:
+	return available_pieces.filter(func(piece_weight: PieceWeight): return piece_weight.is_disabled)
+
+	
 func is_click_mode_selection() -> bool:
 	return click_mode == BoardClickMode.Selection
 	

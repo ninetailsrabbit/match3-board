@@ -1,6 +1,15 @@
-@tool
 class_name Match3Board extends Node2D
 
+class FallMovement:
+	var from_cell: GridCellUI
+	var to_cell: GridCellUI
+	var is_diagonal: bool = false
+	
+	func _init(_from_cell: GridCellUI, _to_cell: GridCellUI, _is_diagonal: bool = false) -> void:
+		from_cell = _from_cell
+		to_cell = _to_cell
+		is_diagonal = _is_diagonal
+		
 const MinGridWidth: int = 3
 const MinGridHeight: int = 3
 const BoardGroupName: String = "match3-board"
@@ -19,6 +28,7 @@ signal added_piece_to_line_connector(piece: PieceUI)
 signal canceled_line_connector_match(selected_pieces: Array[PieceUI])
 signal state_changed(from: BoardState, to: BoardState)
 signal prepared_board
+signal drawed_board
 signal movement_consumed
 signal finished_available_movements
 signal locked
@@ -31,56 +41,15 @@ enum BoardState {
 }
 
 
-@export_group("Editor Debug 🪲")
-@export var preview_grid_in_editor: bool = false:
-	set(value):
-		if value != preview_grid_in_editor:
-			preview_grid_in_editor = value
-			
-			if preview_grid_in_editor:
-				draw_preview_grid()
-			else:
-				remove_preview_sprites()
-
-## Tool button to clean the current grid preview
-@export var clean_current_preview: bool = false:
-	get: 
-		return false
-	set(value):
-		remove_preview_sprites()
-
-@export var preview_pieces: Array[Texture2D]:
-	set(value):
-		if preview_pieces != value:
-			preview_pieces = value
-			draw_preview_grid()
-@export var odd_cell_texture: Texture2D = Match3Preloader.OddCellTexture:
-	set(value):
-		if odd_cell_texture != value:
-			odd_cell_texture = value
-			draw_preview_grid()
-@export var even_cell_texture: Texture2D = Match3Preloader.EvenCellTexture:
-	set(value):
-		if even_cell_texture != value:
-			even_cell_texture = value
-			draw_preview_grid()
-@export var empty_cell_texture: Texture2D:
-	set(value):
-		if empty_cell_texture != value:
-			empty_cell_texture = value
-			draw_preview_grid()
-
-@export_group("Board configuration")
 @export var configuration: Match3Configuration
 
-#region Features
+#region Components
 var piece_weight_generator: PieceWeightGenerator
 var piece_animator: PieceAnimator
 var sequence_consumer: SequenceConsumer
 var cell_highlighter: CellHighlighter
 #endregion
 
-var debug_preview_node: Node2D
 var grid_cells: Array = [] # Multidimensional to access cells by column & row
 var grid_cells_flattened: Array[GridCellUI] = []
 var current_selected_piece: PieceUI
@@ -103,7 +72,7 @@ var current_state: BoardState = BoardState.WaitForInput:
 		
 var pending_sequences: Array[Sequence] = []
 
-@onready var current_available_moves: int = configuration.available_moves_on_start:
+var current_available_moves: int = 0:
 	set(value):
 		if value != current_available_moves:
 			if value < current_available_moves:
@@ -115,6 +84,10 @@ var pending_sequences: Array[Sequence] = []
 			current_available_moves = clamp(value, 0, configuration.available_moves_on_start)
 
 	
+var prepared: bool = false
+var drawed: bool = false
+
+
 func _input(event: InputEvent) -> void:
 	if is_locked:
 		return
@@ -123,43 +96,43 @@ func _input(event: InputEvent) -> void:
 	
 	
 func _enter_tree() -> void:
-	remove_preview_sprites()
+	add_to_group(BoardGroupName)
 	
-	if Engine.is_editor_hint():
-		draw_preview_grid()
-	else:
-		add_to_group(BoardGroupName)
+	current_available_moves = configuration.available_moves_on_start
+	
+	if piece_weight_generator == null:
+		piece_weight_generator = PieceWeightGenerator.new()
 		
-		prepared_board.connect(on_prepared_board)
+	if cell_highlighter == null:
+		change_cell_highlighter(CellHighlighter.new())
 		
-		piece_selected.connect(on_piece_selected)
-		piece_unselected.connect(on_piece_unselected)
-		piece_holded.connect(on_piece_holded)
-		piece_released.connect(on_piece_released)
+	if piece_animator == null:
+		change_piece_animator(PieceAnimator.new())
 		
-		swap_requested.connect(on_swap_requested)
-		swap_failed.connect(on_swap_failed)
-		swap_rejected.connect(on_swap_rejected)
-		swapped_pieces.connect(on_swapped_pieces)
+	if sequence_consumer == null:
+		change_sequence_consumer(SequenceConsumer.new())
 		
-		consume_requested.connect(on_consume_requested)
-		state_changed.connect(on_state_changed)
 		
-		if piece_weight_generator == null:
-			piece_weight_generator = PieceWeightGenerator.new()
-			
-		if cell_highlighter == null:
-			change_cell_highlighter(CellHighlighter.new())
-			
-		if piece_animator == null:
-			change_piece_animator(PieceAnimator.new())
-			
-		if sequence_consumer == null:
-			change_sequence_consumer(SequenceConsumer.new())
+	prepared_board.connect(on_prepared_board)
+	
+	piece_selected.connect(on_piece_selected)
+	piece_unselected.connect(on_piece_unselected)
+	piece_holded.connect(on_piece_holded)
+	piece_released.connect(on_piece_released)
+	
+	swap_requested.connect(on_swap_requested)
+	swap_failed.connect(on_swap_failed)
+	swap_rejected.connect(on_swap_rejected)
+	swapped_pieces.connect(on_swapped_pieces)
+	
+	consume_requested.connect(on_consume_requested)
+	state_changed.connect(on_state_changed)
 	
 
 func _ready() -> void:
-	if not Engine.is_editor_hint() and configuration.auto_start:
+	assert(configuration is Match3Configuration, "Match3Board: This board needs a valid Match3Configuration resource to be drawed in the scene")
+	
+	if configuration.auto_start:
 		prepare_board()
 	
 	if not InputMap.has_action(configuration.input_action_consume_line_connector):
@@ -169,6 +142,7 @@ func _ready() -> void:
 		push_warning("Match3Board: The input action %s to cancel a line connection does not exist, it will not be possible to cancel a line connector manually" % configuration.input_action_cancel_line_connector)
 
 
+#region Component setters
 func change_piece_animator(animator: PieceAnimator) -> Match3Board:
 	if piece_animator != null and piece_animator.is_inside_tree():
 		piece_animator.free()
@@ -204,24 +178,25 @@ func change_sequence_consumer(consumer: SequenceConsumer) -> Match3Board:
 	add_child(sequence_consumer)
 	
 	return self
+#endregion
 
 #region Board
-## Only prepares the grid cells based on width and height
+## Only prepares the grid cells based on width and height configuration parameters
 func prepare_board():
-	if not Engine.is_editor_hint() and grid_cells.is_empty():
+	if not prepared and grid_cells.is_empty():
 		for column in configuration.grid_width:
 			grid_cells.append([])
 			
 			for row in configuration.grid_height:
 				var grid_cell: GridCellUI = GridCellUI.new(row, column)
 				grid_cell.cell_size = configuration.cell_size
-				
 				grid_cells[column].append(grid_cell)
 		
 		grid_cells_flattened.append_array(Match3BoardPluginUtilities.flatten(grid_cells))
 		
 		add_pieces(configuration.available_pieces)
 		
+		prepared = true
 		prepared_board.emit()
 		
 	return self
@@ -232,6 +207,9 @@ func add_pieces(new_pieces: Array[PieceWeight]) -> void:
 
 
 func draw_board():
+	if drawed:
+		return
+		
 	for grid_cell: GridCellUI in grid_cells_flattened:
 		draw_grid_cell(grid_cell)
 		draw_random_piece_on_cell(grid_cell)
@@ -240,6 +218,9 @@ func draw_board():
 		current_state = BoardState.Consume
 	else:
 		remove_matches_from_board()
+	
+	drawed = true
+	drawed_board.emit()
 	
 	return self
 	
@@ -274,10 +255,7 @@ func draw_grid_cell(grid_cell: GridCellUI) -> void:
 
 func draw_random_piece_on_cell(grid_cell: GridCellUI, except: Array[PieceWeight] = []) -> void:
 	if grid_cell.can_contain_piece:
-		var new_piece: PieceUI =  piece_weight_generator.roll(
-			configuration.available_pieces.filter(func(piece_weight: PieceWeight): return piece_weight.is_disabled)
-			)
-			
+		var new_piece: PieceUI =  piece_weight_generator.roll(configuration.not_disabled_pieces())
 		draw_piece_on_cell(grid_cell, new_piece)
 		
 
@@ -287,9 +265,7 @@ func draw_piece_on_cell(grid_cell: GridCellUI, new_piece: PieceUI) -> void:
 		new_piece.position = grid_cell.position
 		
 		add_child(new_piece)
-		
-		grid_cell.remove_piece()
-		grid_cell.assign_piece(new_piece)
+		grid_cell.replace_piece(new_piece)
 #endregion
 
 #region Line Connector
@@ -490,6 +466,7 @@ func consume_pending_sequences() -> void:
 	
 	await sequence_consumer.consume_sequences(pending_sequences)
 	await get_tree().process_frame
+	
 	current_state = BoardState.Fill
 	
 
@@ -674,9 +651,13 @@ func find_board_sequences() -> Array[Sequence]:
 			
 	var result: Array[Sequence] = valid_horizontal_sequences + valid_vertical_sequences + tshape_sequences + lshape_sequences
 	
-	return result.filter(func(sequence: Sequence): return not sequence.contains_special_piece())
+	return result
 
 
+func find_match_from_piece(piece: PieceUI):
+	return find_match_from_cell(grid_cell_from_piece(piece))
+	
+	
 func find_match_from_cell(cell: GridCellUI):
 	if cell.has_piece():
 		var horizontal_sequences: Array[Sequence] = find_horizontal_board_sequences()
@@ -711,9 +692,9 @@ func _sort_by_size_descending(a: Sequence, b: Sequence):
 
 #region Movements
 ## TODO - INTEGRATE THE DIAGONAL SIDE DOWN FEATURE ON THIS CALCULATION
-func calculate_fall_movements_on_column(column: int) -> Array[Match3Preloader.FallMovement]:
+func calculate_fall_movements_on_column(column: int) -> Array[FallMovement]:
 	var cells: Array[GridCellUI] = grid_cells_from_column(column)
-	var movements: Array[Match3Preloader.FallMovement] = []
+	var movements: Array[FallMovement] = []
 	
 	while cells.any(
 		func(cell: GridCellUI): 
@@ -727,13 +708,13 @@ func calculate_fall_movements_on_column(column: int) -> Array[Match3Preloader.Fa
 			# The pieces needs to be assign here to detect the new empty cells in the while loop
 			to_cell.assign_piece(from_cell.current_piece, true)
 			from_cell.remove_piece()
-			movements.append(Match3Preloader.FallMovement.new(from_cell, to_cell))
+			movements.append(FallMovement.new(from_cell, to_cell))
 		
 	return movements
 
 
-func calculate_all_fall_movements() -> Array[Match3Preloader.FallMovement]:
-	var movements: Array[Match3Preloader.FallMovement] = []
+func calculate_all_fall_movements() -> Array[FallMovement]:
+	var movements: Array[FallMovement] = []
 	
 	for column in configuration.grid_width:
 		movements.append_array(calculate_fall_movements_on_column(column))
@@ -836,14 +817,13 @@ func swap_pieces(from_grid_cell: GridCellUI, to_grid_cell: GridCellUI) -> void:
 		if matches.size() > 0:
 			swapped_pieces.emit(from_grid_cell.current_piece, to_grid_cell.current_piece, matches)
 		else:
-			await piece_animator.swap_pieces(from_grid_cell.current_piece, to_grid_cell.current_piece)
-			
-			from_grid_cell.swap_piece_with(to_grid_cell)
-			swap_rejected.emit(from_grid_cell.current_piece as PieceUI, to_grid_cell.current_piece as PieceUI)
-		
-		return
-	
-	swap_failed.emit(from_grid_cell, to_grid_cell)
+			if configuration.reset_position_on_swap_failed:
+				await piece_animator.swap_pieces(from_grid_cell.current_piece, to_grid_cell.current_piece)
+				
+				from_grid_cell.swap_piece_with(to_grid_cell)
+				swap_rejected.emit(from_grid_cell.current_piece as PieceUI, to_grid_cell.current_piece as PieceUI)
+	else:
+		swap_failed.emit(from_grid_cell, to_grid_cell)
 	
 #endregion
 
@@ -972,66 +952,6 @@ func is_swap_mode_cross_diagonal() -> bool:
 	
 func is_swap_mode_connect_line() -> bool:
 	return configuration.is_swap_mode_connect_line()
-#endregion
-
-#region Debug
-func draw_preview_grid() -> void:
-	if Engine.is_editor_hint() and preview_grid_in_editor:
-		remove_preview_sprites()
-		
-		if debug_preview_node == null:
-			debug_preview_node = Node2D.new()
-			debug_preview_node.name = "BoardEditorPreview"
-			add_child(debug_preview_node)
-			Match3BoardPluginUtilities.set_owner_to_edited_scene_root(debug_preview_node)
-			
-		for column in configuration.grid_width:
-			for row in configuration.grid_height:
-				
-				var current_cell_sprite: Sprite2D = Sprite2D.new()
-				current_cell_sprite.name = "Cell_Column%d_Row%d" % [column, row]
-				
-				if configuration.empty_cells.has(Vector2(row, column)):
-					current_cell_sprite.texture = empty_cell_texture
-				elif even_cell_texture and odd_cell_texture:
-					current_cell_sprite.texture = even_cell_texture if (column + row) % 2 == 0 else odd_cell_texture
-				else:
-					current_cell_sprite.texture = even_cell_texture if even_cell_texture else odd_cell_texture
-					
-				current_cell_sprite.position = Vector2(configuration.cell_size.x * column + configuration.cell_offset.x, configuration.cell_size.y * row + configuration.cell_offset.y)
-				
-				debug_preview_node.add_child(current_cell_sprite)
-				Match3BoardPluginUtilities.set_owner_to_edited_scene_root(current_cell_sprite)
-				
-				if current_cell_sprite.texture:
-					var cell_texture_size = current_cell_sprite.texture.get_size()
-					current_cell_sprite.scale = Vector2(configuration.cell_size.x / cell_texture_size.x, configuration.cell_size.y / cell_texture_size.y)
-				
-				var available_preview_pieces = Match3BoardPluginUtilities.remove_falsy_values(preview_pieces)
-				
-				if available_preview_pieces.size() > 0:
-					var current_piece_sprite: Sprite2D = Sprite2D.new()
-					current_piece_sprite.name = "Piece_Column%d_Row%d" % [column, row]
-					current_piece_sprite.texture = available_preview_pieces.pick_random()
-					current_piece_sprite.position = current_cell_sprite.position
-					
-					debug_preview_node.add_child(current_piece_sprite)
-					Match3BoardPluginUtilities.set_owner_to_edited_scene_root(current_piece_sprite)
-					
-					if current_piece_sprite.texture:
-						var piece_texture_size = current_piece_sprite.texture.get_size()
-						## The 0.85 value it's to adjust the piece inside the cell reducing the scale size
-						current_piece_sprite.scale = Vector2(configuration.cell_size.x / piece_texture_size.x, configuration.cell_size.y / piece_texture_size.y) * 0.85
-						
-					
-func remove_preview_sprites() -> void:
-	if Engine.is_editor_hint():
-		if debug_preview_node != null:
-			debug_preview_node.free()
-			debug_preview_node = null
-	
-	for child: Node2D in get_children().filter(func(node: Node): return node is Node2D):
-		child.free()
 #endregion
 
 #region Signal callbacks

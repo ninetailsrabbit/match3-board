@@ -1,30 +1,12 @@
-[gd_scene load_steps=9 format=3 uid="uid://ccqn6wrassd5a"]
+[gd_scene load_steps=4 format=3 uid="uid://ccqn6wrassd5a"]
 
 [ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/demo/demo.gd" id="1_dqalp"]
-[ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/match3_board.gd" id="2_38jho"]
-[ext_resource type="Texture2D" uid="uid://ct0v34xosfrrt" path="res://addons/ninetailsrabbit.match3_board/demo/assets/pixel_art_gems.png" id="3_2otbh"]
-[ext_resource type="Resource" uid="uid://dd30jhn85qexx" path="res://addons/ninetailsrabbit.match3_board/demo/demo_board_configuration.tres" id="4_i1p4j"]
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_gxa2c"]
-atlas = ExtResource("3_2otbh")
-region = Rect2(1, 5, 30, 22)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_26je2"]
-atlas = ExtResource("3_2otbh")
-region = Rect2(37, 3, 22, 26)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_qymik"]
-atlas = ExtResource("3_2otbh")
-region = Rect2(70, 3, 20, 26)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_4xnmi"]
-atlas = ExtResource("3_2otbh")
-region = Rect2(87, 35, 18, 27)
+[ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/match3_board.gd" id="2_m7do7"]
+[ext_resource type="Resource" uid="uid://dd30jhn85qexx" path="res://addons/ninetailsrabbit.match3_board/demo/demo_board_configuration.tres" id="3_kewbg"]
 
 [node name="Demo" type="Node2D"]
 script = ExtResource("1_dqalp")
 
 [node name="Match3Board" type="Node2D" parent="."]
-script = ExtResource("2_38jho")
-preview_pieces = Array[Texture2D]([SubResource("AtlasTexture_gxa2c"), SubResource("AtlasTexture_26je2"), SubResource("AtlasTexture_qymik"), SubResource("AtlasTexture_4xnmi")])
-configuration = ExtResource("4_i1p4j")
+script = ExtResource("2_m7do7")
+configuration = ExtResource("3_kewbg")
