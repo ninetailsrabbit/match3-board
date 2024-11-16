@@ -652,6 +652,22 @@ func find_board_sequences() -> Array[Sequence]:
 	return result
 
 
+func find_matches_from_swap(from_cell: GridCellUI, to_cell: GridCellUI) -> Array[Sequence]:
+	var matches: Array[Sequence] = []
+		
+	var sequence_from: Sequence = find_match_from_cell(from_cell)
+	var sequence_to: Sequence = find_match_from_cell(to_cell)
+
+	matches.assign(Match3BoardPluginUtilities.remove_falsy_values([sequence_from, sequence_to]))
+	
+	
+	return matches
+
+
+func find_matches_from_swapped_pieces(from: PieceUI, to: PieceUI) -> Array[Sequence]:
+	return find_matches_from_swap(grid_cell_from_piece(from), grid_cell_from_piece(to))
+
+
 func find_match_from_piece(piece: PieceUI):
 	return find_match_from_cell(grid_cell_from_piece(piece))
 	
@@ -802,13 +818,7 @@ func swap_cross_diagonal(from_grid_cell: GridCellUI, to_grid_cell: GridCellUI) -
 	
 func swap_pieces(from_grid_cell: GridCellUI, to_grid_cell: GridCellUI) -> void:
 	if from_grid_cell.can_swap_piece_with(to_grid_cell):
-		var matches: Array[Sequence] = []
-		
-		var sequence_from: Sequence = find_match_from_cell(from_grid_cell)
-		var sequence_to: Sequence = find_match_from_cell(to_grid_cell)
-
-		for sequence: Sequence in Match3BoardPluginUtilities.remove_falsy_values([sequence_from, sequence_to]):
-			matches.append(sequence)
+		var matches: Array[Sequence] = find_matches_from_swap(from_grid_cell, to_grid_cell)
 		
 		await piece_animator.swap_pieces(from_grid_cell.current_piece, to_grid_cell.current_piece)
 		
@@ -822,7 +832,6 @@ func swap_pieces(from_grid_cell: GridCellUI, to_grid_cell: GridCellUI) -> void:
 				swap_rejected.emit(from_grid_cell.current_piece as PieceUI, to_grid_cell.current_piece as PieceUI)
 	else:
 		swap_failed.emit(from_grid_cell, to_grid_cell)
-	
 #endregion
 
 #region Lock related
@@ -1041,7 +1050,10 @@ func on_swap_requested(from_piece: PieceUI, to_piece: PieceUI) -> void:
 			swap_pieces_request(from_grid_cell, to_grid_cell)
 	
 	
-func on_swapped_pieces(_from: PieceUI, _to: PieceUI, matches: Array[Sequence]) -> void:
+func on_swapped_pieces(from: PieceUI, to: PieceUI, matches: Array[Sequence] = []) -> void:
+	if matches.is_empty():
+		matches = find_matches_from_swapped_pieces(from, to)
+	
 	pending_sequences += matches
 	
 	for sequence: Sequence in pending_sequences:
