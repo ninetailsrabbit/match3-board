@@ -730,7 +730,6 @@ func calculate_fall_movements_on_column(column: int) -> Array[FallMovement]:
 	var to_cell: GridCellUI = last_empty_cell_on_column(column)
 	
 	if from_cell and from_cell.has_piece() and to_cell:
-		# The pieces needs to be assign here to detect the new empty cells in the while loop
 		to_cell.replace_piece(from_cell.current_piece)
 		from_cell.remove_piece()
 		movements.append(FallMovement.new(from_cell, to_cell))
@@ -738,14 +737,9 @@ func calculate_fall_movements_on_column(column: int) -> Array[FallMovement]:
 	return movements
 
 
-func calculate_all_fall_movements() -> Array[FallMovement]:
+func calculate_current_fall_movements() -> Array[FallMovement]:
 	var movements: Array[FallMovement] = []
 	
-	#while grid_cells_flattened.any(
-		#func(cell: GridCellUI): 
-			#return cell.has_piece() and cell.current_piece.can_be_moved() and (cell.neighbour_bottom and cell.neighbour_bottom.can_contain_piece and cell.neighbour_bottom.is_empty())
-			#):
-		#
 	for column in configuration.grid_width:
 		movements.append_array(calculate_fall_movements_on_column(column))
 	
@@ -956,17 +950,15 @@ func obstacle_pieces_of_shape(shape: String) -> Array[PieceUI]:
 	
 	
 func fall_pieces() -> void:
-	var fall_movements: Array[FallMovement] = calculate_all_fall_movements()
-	
-	await piece_animator.fall_down_pieces(fall_movements)
+	var fall_movements: Array[FallMovement] = []
 	
 	while grid_cells_flattened.any(
 		func(cell: GridCellUI): 
 			return cell.has_piece() and cell.current_piece.can_be_moved() and (cell.neighbour_bottom and cell.neighbour_bottom.can_contain_piece and cell.neighbour_bottom.is_empty())
 			):
-				fall_movements = calculate_all_fall_movements()
+				fall_movements = calculate_current_fall_movements()
 				await piece_animator.fall_down_pieces(fall_movements)
-		
+
 
 func fill_pieces() -> void:
 	var empty_cells = pending_empty_cells_to_fill()
