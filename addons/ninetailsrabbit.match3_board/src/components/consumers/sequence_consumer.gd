@@ -14,8 +14,6 @@ func _enter_tree() -> void:
 
 #region Overridables
 func consume_sequence(sequence: Sequence) -> void:
-	board.pending_sequences.erase(sequence)
-	
 	if sequence.is_special_shape() and sequence.contains_special_piece():
 		var special_pieces: Array[PieceUI] = sequence.get_special_pieces()
 		
@@ -26,7 +24,8 @@ func consume_sequence(sequence: Sequence) -> void:
 			await consume_special_piece(sequence, special_pieces[0])
 		
 		consumed_sequence.emit(sequence)
-			
+		board.pending_sequences.erase(sequence)
+		
 		return
 		
 	var new_piece_to_spawn = detect_new_combined_piece(sequence)
@@ -45,6 +44,8 @@ func consume_sequence(sequence: Sequence) -> void:
 		await board.piece_animator.consume_pieces(sequence.normal_pieces())
 		sequence.consume_only_normal_pieces()
 	
+	board.pending_sequences.erase(sequence)
+	
 	consumed_sequence.emit(sequence)
 	
 
@@ -61,6 +62,8 @@ func consume_sequences(sequences: Array[Sequence], callback: Callable) -> void:
 	
 	board.consumed_sequences.emit(sequences)
 	consumed_sequences.emit()
+	print("pending seq", board.pending_sequences)
+	print("pending special", special_pieces_queue)
 	callback.call()
 
 

@@ -52,10 +52,9 @@ var mouse_region: Button
 var piece_area: Area2D
 var detection_area: Area2D
 var triggered: bool = false
-var is_locked: bool = false
 var is_holded: bool = false:
 	set(value):
-		if value != is_holded and not is_locked and is_inside_tree():
+		if value != is_holded and not is_locked() and is_inside_tree():
 			is_holded = value
 			
 			if is_holded:
@@ -144,9 +143,9 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	if is_locked:
+	if is_locked():
 		return
-		
+	
 	if is_click_mode_drag():
 		global_position = global_position.lerp(get_global_mouse_position(), smooth_factor * delta) if smooth_factor > 0 else get_global_mouse_position()
 		current_position = global_position + m_offset
@@ -212,13 +211,8 @@ func reset_position() -> void:
 			position = cell.position
 
 
-func lock() -> void:
-	is_locked = true
-	is_selected = false
-
-
-func unlock() -> void:
-	is_locked = false
+func is_locked() -> bool:
+	return board.is_locked
 
 
 func is_click_mode_selection() -> bool:
@@ -352,12 +346,12 @@ func _prepare_area_detectors() -> void:
 
 #region Internals
 func _can_be_selected() -> bool:
-	return is_inside_tree() and not board.is_locked and not is_locked
+	return is_inside_tree() and not is_locked()
 #endregion
 
 #region Signal callbacks
 func on_mouse_region_pressed() -> void:
-	if is_locked:
+	if is_locked():
 		return
 	
 	if piece_definition.can_be_triggered and not piece_definition.can_be_swapped\
@@ -369,7 +363,7 @@ func on_mouse_region_pressed() -> void:
 		
 
 func on_mouse_region_holded() -> void:
-	if is_locked:
+	if is_locked():
 		return
 		
 	if is_click_mode_drag() and not is_selected:
@@ -385,7 +379,7 @@ func on_mouse_region_holded() -> void:
 
 			
 func on_mouse_region_released() -> void:
-	if is_locked:
+	if is_locked():
 		return
 		
 	if is_click_mode_drag() and is_selected:

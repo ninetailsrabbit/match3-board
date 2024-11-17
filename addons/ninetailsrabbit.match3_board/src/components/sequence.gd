@@ -18,8 +18,6 @@ enum Shapes {
 
 var cells: Array[GridCellUI] = []
 var shape: Shapes = Shapes.Irregular
-var generated_from_swap: bool = false
-var generated_from_special: bool = false
 
 
 func _init(sequence_cells: Array[GridCellUI], _shape: Shapes = Shapes.Irregular) -> void:

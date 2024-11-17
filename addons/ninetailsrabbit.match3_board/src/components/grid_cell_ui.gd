@@ -277,8 +277,8 @@ func can_swap_piece_with(other_cell: GridCellUI) -> bool:
 		and has_piece() \
 		and can_contain_piece \
 		and other_cell.can_contain_piece \
-		and not current_piece.is_locked \
-		and not other_cell.current_piece.is_locked \
+		and not current_piece.is_locked() \
+		and not other_cell.current_piece.is_locked() \
 		and other_cell.current_piece != current_piece \
 		and current_piece.can_be_swapped() and other_cell.current_piece.can_be_swapped()
 
