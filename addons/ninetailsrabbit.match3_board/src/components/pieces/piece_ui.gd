@@ -92,6 +92,8 @@ var original_z_index: int = 0
 var current_position: Vector2 = Vector2.ZERO
 var m_offset: Vector2 = Vector2.ZERO
 
+var combined_with: PieceUI
+
 
 func _enter_tree() -> void:
 	add_to_group(GroupName)

@@ -60,6 +60,10 @@ func pieces() -> Array[PieceUI]:
 	
 	return current_pieces
 	
+	
+func normal_pieces() -> Array[PieceUI]:
+	return pieces().filter(func(piece: PieceUI): return piece.is_normal())
+	
 
 func contains_special_piece() -> bool:
 	return pieces().any(func(piece: PieceUI): return piece.is_special())

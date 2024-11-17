@@ -4,7 +4,6 @@ class_name SpecialCrossPiece extends PieceUI
 
 
 var extra_sequence: Sequence
-var combined_with: PieceUI
 
 
 func _ready() -> void:

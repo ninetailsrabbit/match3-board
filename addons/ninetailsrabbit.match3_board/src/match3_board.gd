@@ -833,6 +833,9 @@ func swap_pieces(from_grid_cell: GridCellUI, to_grid_cell: GridCellUI) -> void:
 	if from_grid_cell.can_swap_piece_with(to_grid_cell):
 		var matches: Array[Sequence] = []
 		
+		from_grid_cell.current_piece.combined_with = to_grid_cell.current_piece
+		to_grid_cell.current_piece.combined_with = from_grid_cell.current_piece
+		
 		## When a special it's detected on any of the swapped cells 
 		## It creates a sequence with only both to trigger the special piece and consume the target
 		if from_grid_cell.current_piece.is_special() and not to_grid_cell.current_piece.is_special():

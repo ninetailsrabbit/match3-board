@@ -64,7 +64,7 @@ func _roll_piece(pieces: Array[PieceWeight], total_weight: float):
 	
 	for piece_weight: PieceWeight in pieces:
 		if roll_result <= piece_weight.total_accum_weight:
-			selected_piece = piece_weight.piece_scene.instantiate() as PieceUI
+			selected_piece = piece_weight.piece_scene.instantiate()
 			
 			if not piece_id_mapper.has(selected_piece.piece_definition.id):
 				piece_id_mapper[selected_piece.piece_definition.id] = piece_weight

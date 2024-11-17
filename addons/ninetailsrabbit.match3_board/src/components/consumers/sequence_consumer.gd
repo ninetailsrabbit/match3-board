@@ -18,10 +18,9 @@ func consume_sequence(sequence: Sequence) -> void:
 	
 	if sequence.is_special_shape() and sequence.contains_special_piece():
 		var special_pieces: Array[PieceUI] = sequence.get_special_pieces()
-			
+		
 		if special_pieces.size() == 1:
 			await consume_special_piece(sequence.get_special_piece())
-			
 		else:
 			special_pieces[0].combine_effect_with(special_pieces[1])
 			

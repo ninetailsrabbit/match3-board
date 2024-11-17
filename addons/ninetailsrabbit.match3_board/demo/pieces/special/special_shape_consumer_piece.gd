@@ -16,9 +16,11 @@ func _process(delta: float) -> void:
 
 func on_requested_piece_special_trigger() -> void:
 	if not triggered and not shape_to_consume.is_empty():
-		print("shape to consume ", shape_to_consume)
 		triggered = true
 		
+		if combined_with != null:
+			shape_to_consume = combined_with.piece_definition.shape
+			
 		var target_pieces: Array[PieceUI] = board.pieces_of_shape(shape_to_consume)
 		
 		var sequence: Sequence = Sequence.new(board.grid_cells_from_pieces(target_pieces), Sequence.Shapes.Irregular)

@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=3 uid="uid://67bpif3urkwd"]
 
-[ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/demo/pieces/special/special_type_consumer_piece.gd" id="1_6nr6r"]
+[ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/demo/pieces/special/special_shape_consumer_piece.gd" id="1_6nr6r"]
 [ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/components/pieces/piece_definition.gd" id="2_5xyog"]
 [ext_resource type="Texture2D" uid="uid://ct0v34xosfrrt" path="res://addons/ninetailsrabbit.match3_board/demo/assets/pixel_art_gems.png" id="2_sc5me"]
 
@@ -11,10 +11,10 @@ name = "Special shape consumer"
 description = "Consume all the pieces with the shape provided as parameter"
 type = 1
 shape = "special_shape"
-can_be_swapped = true
+can_be_swapped = false
 can_be_moved = true
 can_be_shuffled = true
-can_be_triggered = false
+can_be_triggered = true
 can_be_replaced = false
 can_be_consumed = true
 
