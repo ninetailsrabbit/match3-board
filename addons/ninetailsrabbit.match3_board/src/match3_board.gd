@@ -127,6 +127,7 @@ func _enter_tree() -> void:
 	
 	consume_requested.connect(on_consume_requested)
 	consumed_sequence.connect(on_consumed_sequence)
+	consumed_sequences.connect(on_consumed_sequences)
 	state_changed.connect(on_state_changed)
 	
 
@@ -482,7 +483,7 @@ func start_consume_sequence_pipeline() -> void:
 
 	# 2- We run the SequenceConsumer on the gathered sequences to manage them individually
 	# the creation of pieces is handled here
-	sequence_consumer.consume_sequences(pending_sequences, func(): current_state = BoardState.Fill)
+	sequence_consumer.consume_sequences(pending_sequences)
 			
 
 
@@ -735,9 +736,9 @@ func calculate_fall_movements_on_column(column: int) -> Array[FallMovement]:
 		var from_cell = first_movable_cell_on_column(column)
 		var to_cell = last_empty_cell_on_column(column)
 		
-		if from_cell is GridCellUI and to_cell is GridCellUI:
+		if from_cell and to_cell:
 			# The pieces needs to be assign here to detect the new empty cells in the while loop
-			to_cell.assign_piece(from_cell.current_piece, true)
+			to_cell.replace_piece(from_cell.current_piece)
 			from_cell.remove_piece()
 			movements.append(FallMovement.new(from_cell, to_cell))
 		
@@ -836,7 +837,7 @@ func swap_cross_diagonal(from_grid_cell: GridCellUI, to_grid_cell: GridCellUI) -
 func swap_pieces(from_grid_cell: GridCellUI, to_grid_cell: GridCellUI) -> void:
 	if from_grid_cell.can_swap_piece_with(to_grid_cell):
 		var matches: Array[Sequence] = []
-		print("swap pieces ", from_grid_cell, to_grid_cell)
+		
 		from_grid_cell.current_piece.combined_with = to_grid_cell.current_piece
 		to_grid_cell.current_piece.combined_with = from_grid_cell.current_piece
 		
@@ -855,10 +856,8 @@ func swap_pieces(from_grid_cell: GridCellUI, to_grid_cell: GridCellUI) -> void:
 		await piece_animator.swap_pieces(from_grid_cell.current_piece, to_grid_cell.current_piece)
 		
 		if matches.size() > 0:
-			print("swapped matches ", matches)
 			swapped_pieces.emit(from_grid_cell.current_piece, to_grid_cell.current_piece, matches)
 		else:
-			print("no matches")
 			if configuration.reset_position_on_swap_failed:
 				await piece_animator.swap_pieces(from_grid_cell.current_piece, to_grid_cell.current_piece)
 				
@@ -1066,13 +1065,11 @@ func on_state_changed(from: BoardState, to: BoardState) -> void:
 				current_state = BoardState.Consume
 				return
 				
-			#pending_sequences.clear()
-			
 			await fall_pieces()
 			await get_tree().process_frame
 			await fill_pieces()
 		
-			#pending_sequences = find_board_sequences() 
+			pending_sequences += find_board_sequences() 
 			
 			current_state = BoardState.WaitForInput if pending_sequences.is_empty() else BoardState.Consume
 		
@@ -1124,6 +1121,10 @@ func on_consumed_sequence(sequence: Sequence) -> void:
 	pending_sequences.erase(sequence)
 
 
+func on_consumed_sequences(sequences: Array[Sequence]) -> void:
+	current_state = BoardState.Fill
+
+
 func on_piece_selected(piece: PieceUI) -> void:
 	if is_locked or is_click_mode_drag():
 		return
@@ -1131,7 +1132,6 @@ func on_piece_selected(piece: PieceUI) -> void:
 	draw_line_connector(piece)
 
 	if current_selected_piece and current_selected_piece != piece:
-		print("piece swap ", current_selected_piece, piece)
 		swap_requested.emit(current_selected_piece as PieceUI, piece as PieceUI)
 		current_selected_piece = null
 		cell_highlighter.remove_current_highlighters()
@@ -1140,7 +1140,6 @@ func on_piece_selected(piece: PieceUI) -> void:
 	current_selected_piece = piece
 	cell_highlighter.highlight_cells_from_origin_cell(grid_cell_from_piece(current_selected_piece), configuration.swap_mode)
 	
-	print("piece selected ", current_selected_piece)
 
 func on_piece_unselected(_piece: PieceUI) -> void:
 	if is_locked:

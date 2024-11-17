@@ -49,7 +49,7 @@ func consume_sequence(sequence: Sequence) -> void:
 	consumed_sequence.emit(sequence)
 	
 
-func consume_sequences(sequences: Array[Sequence], callback: Callable) -> void:
+func consume_sequences(sequences: Array[Sequence]) -> void:
 	for sequence: Sequence in sequences:
 		consume_sequence(sequence)
 		await consumed_sequence
@@ -62,9 +62,6 @@ func consume_sequences(sequences: Array[Sequence], callback: Callable) -> void:
 	
 	board.consumed_sequences.emit(sequences)
 	consumed_sequences.emit()
-	print("pending seq", board.pending_sequences)
-	print("pending special", special_pieces_queue)
-	callback.call()
 
 
 func consume_special_piece(sequence: Sequence, special_piece: PieceUI) -> void:

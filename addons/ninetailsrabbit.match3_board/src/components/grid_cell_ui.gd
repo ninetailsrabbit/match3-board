@@ -195,9 +195,7 @@ func assign_piece(new_piece: PieceUI, overwrite: bool = false) -> void:
 
 
 func replace_piece(new_piece: PieceUI) -> PieceUI:
-	var previous_piece = current_piece
-	current_piece = null
-	
+	var previous_piece = remove_piece()
 	assign_piece(new_piece)
 	
 	return previous_piece if is_instance_valid(previous_piece) else null
