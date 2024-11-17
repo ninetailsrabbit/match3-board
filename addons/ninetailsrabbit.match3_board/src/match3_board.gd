@@ -864,7 +864,7 @@ func swap_pieces(from_grid_cell: GridCellUI, to_grid_cell: GridCellUI) -> void:
 
 #region Lock related
 func lock() -> void:
-	if current_selected_piece is PieceUI and current_selected_piece.is_selected:
+	if current_selected_piece != null and current_selected_piece.is_selected:
 		current_selected_piece.is_selected = false
 		current_selected_piece.reset_position()
 	
@@ -1073,7 +1073,7 @@ func on_state_changed(from: BoardState, to: BoardState) -> void:
 		
 
 func on_swap_requested(from_piece: PieceUI, to_piece: PieceUI) -> void:
-	if current_selected_piece is PieceUI:
+	if is_instance_valid(current_selected_piece):
 		current_selected_piece.is_selected = false
 		current_selected_piece = null
 	

@@ -23,7 +23,7 @@ var generated_from_special: bool = false
 
 
 func _init(sequence_cells: Array[GridCellUI], _shape: Shapes = Shapes.Irregular) -> void:
-	cells.assign(Match3BoardPluginUtilities.remove_duplicates(sequence_cells.filter(func(grid_cell: GridCellUI): return grid_cell.can_contain_piece and grid_cell.has_piece())))
+	cells.assign(Match3BoardPluginUtilities.remove_duplicates(sequence_cells.filter(func(grid_cell: GridCellUI): return is_instance_valid(grid_cell) and grid_cell.can_contain_piece and grid_cell.has_piece())))
 	shape = _detect_shape() if _shape == Shapes.Irregular else _shape
 
 
@@ -43,10 +43,10 @@ func consume(except: Array[GridCellUI] = []) -> void:
 
 
 func consume_cell(cell: GridCellUI, remove_from_sequence: bool = false) -> void:
-	if cells.has(cell) and not is_special_shape():
+	if cells.has(cell):# and not is_special_shape():
 		var removed_piece = cell.remove_piece()
 		
-		if removed_piece is PieceUI:
+		if is_instance_valid(removed_piece) and removed_piece != null:
 			removed_piece.consumed.emit()
 			removed_piece.queue_free()
 		
@@ -89,8 +89,19 @@ func remove_cell(grid_cell: GridCellUI) -> void:
 	cells.erase(grid_cell)
 
 
+
+func remove_cells(grid_cells: Array[GridCellUI]) -> void:
+	for cell: GridCellUI in grid_cells:
+		remove_cell(cell)
+
+
 func remove_cell_with_piece(piece: PieceUI) -> void:
 	cells = cells.filter(func(cell: GridCellUI): return cell.current_piece != piece)
+
+
+func remove_cells_with_pieces(pieces: Array[PieceUI]) -> void:
+	for piece: PieceUI in pieces:
+		remove_cell_with_piece(piece)
 
 
 func all_pieces_are_special() -> bool:

@@ -200,7 +200,7 @@ func replace_piece(new_piece: PieceUI) -> PieceUI:
 	
 	assign_piece(new_piece)
 	
-	return previous_piece
+	return previous_piece if is_instance_valid(previous_piece) else null
 	
 
 func remove_piece():

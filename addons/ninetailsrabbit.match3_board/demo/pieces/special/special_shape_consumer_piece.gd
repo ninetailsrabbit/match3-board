@@ -18,6 +18,8 @@ func on_requested_piece_special_trigger() -> void:
 	if not triggered and not shape_to_consume.is_empty():
 		triggered = true
 		
+		board.lock()
+		
 		if combined_with != null:
 			shape_to_consume = combined_with.piece_definition.shape
 			

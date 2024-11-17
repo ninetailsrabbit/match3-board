@@ -15,6 +15,8 @@ func on_requested_piece_special_trigger() -> void:
 	if not triggered:
 		triggered = true
 		
+		board.lock()
+		
 		var sequence: Sequence = Sequence.new(board.cross_cells_from(cell()), Sequence.Shapes.Cross)
 		
 		if extra_sequence:
@@ -28,16 +30,13 @@ func on_requested_piece_special_trigger() -> void:
 		finished_piece_special_trigger.emit()
 		
 		board.consume_requested.emit(sequence)
-		
-			
+
 
 func combine_effect_with(other_piece: PieceUI):
 	if other_piece.is_special():
 		
-		match other_piece.shape:
+		match other_piece.piece_definition.shape:
 			piece_definition.shape:
 				combined_with = other_piece
 				extra_sequence = Sequence.new(board.cross_diagonal_cells_from(cell()), Sequence.Shapes.CrossDiagonal)
 				extra_sequence.add_cell(other_piece.cell())
-				
-				board.sequence_consumer.special_pieces_queue.append(combined_with)

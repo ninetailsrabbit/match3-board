@@ -360,8 +360,9 @@ func on_mouse_region_pressed() -> void:
 	if is_locked:
 		return
 	
-	if piece_definition.can_be_triggered and not piece_definition.can_be_swapped:
-		requested_piece_special_trigger.emit()
+	if piece_definition.can_be_triggered and not piece_definition.can_be_swapped\
+		and (board.current_selected_piece == null or board.current_selected_piece == self):
+		board.consume_requested.emit(Sequence.new([cell()]))
 	else:
 		if is_click_mode_selection():
 			is_selected = !is_selected

@@ -25,12 +25,9 @@ func consume_sequence(sequence: Sequence) -> void:
 			special_pieces[0].combine_effect_with(special_pieces[1])
 			
 			await consume_special_piece(special_pieces[0])
-			
-			var special_queued_piece: PieceUI = special_pieces_queue.pop_front()
-			
-			if special_queued_piece:
-				consume_special_piece(special_queued_piece)
-			
+		
+		sequence.consume()
+		
 		return
 		
 	var new_piece_to_spawn = detect_new_combined_piece(sequence)
@@ -44,15 +41,14 @@ func consume_sequence(sequence: Sequence) -> void:
 		board.draw_piece_on_cell(target_cell_to_spawn, new_piece_to_spawn)
 		await board.piece_animator.spawn_special_piece(target_cell_to_spawn, new_piece_to_spawn)
 	else:
-		#for special_piece: PieceUI in sequence.get_special_pieces():
-			#sequence.remove_cell(special_piece.cell())
-			#
+		special_pieces_queue.append_array(sequence.get_special_pieces())
+		sequence.remove_cells_with_pieces(special_pieces_queue)
+		
 		await board.piece_animator.consume_sequence(sequence)
 		sequence.consume()
 		
-		for special_piece: PieceUI in sequence.get_special_pieces():
-			special_piece.requested_piece_special_trigger.emit()
-			await special_piece.finished_piece_special_trigger
+		if not special_pieces_queue.is_empty():
+			consume_sequence(Sequence.new([special_pieces_queue.pop_front().cell()], Sequence.Shapes.Special))
 			
 
 func consume_sequences(sequences: Array[Sequence], callback: Callable) -> void:
@@ -67,6 +63,7 @@ func consume_special_piece(special_piece: PieceUI) -> void:
 	special_piece.requested_piece_special_trigger.emit()
 	await special_piece.finished_piece_special_trigger
 	
+	special_piece.queue_free()
 	
 func detect_new_combined_piece(sequence: Sequence):
 	pass
