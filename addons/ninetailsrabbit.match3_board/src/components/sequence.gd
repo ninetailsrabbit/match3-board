@@ -31,6 +31,10 @@ func size() -> int:
 	return cells.size()
 	
 	
+func combine_with(other_sequence: Sequence) -> Sequence:
+	return Sequence.new(cells + other_sequence.cells)
+
+
 func consume(except: Array[GridCellUI] = []) -> void:
 	consumed.emit(pieces())
 	
@@ -39,7 +43,7 @@ func consume(except: Array[GridCellUI] = []) -> void:
 
 
 func consume_cell(cell: GridCellUI, remove_from_sequence: bool = false) -> void:
-	if cells.has(cell):
+	if cells.has(cell) and not is_special_shape():
 		var removed_piece = cell.remove_piece()
 		
 		if removed_piece is PieceUI:
@@ -69,6 +73,10 @@ func get_special_piece():
 	return null
 
 
+func get_special_pieces() -> Array[PieceUI]:
+	return pieces().filter(func(piece: PieceUI): return piece.is_special())
+	
+
 func add_cell(new_cell: GridCellUI) -> void:
 	if not cells.has(new_cell):
 		cells.append(new_cell)
@@ -82,7 +90,7 @@ func remove_cell_with_piece(piece: PieceUI) -> void:
 	cells = cells.filter(func(cell: GridCellUI): return cell.current_piece != piece)
 
 
-func all_pieces_are_special(type: PieceDefinitionResource.PieceType) -> bool:
+func all_pieces_are_special() -> bool:
 	if pieces().is_empty():
 		return false
 	else:

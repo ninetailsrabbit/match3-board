@@ -406,7 +406,7 @@ func grid_cell_from_piece(piece: PieceUI):
 
 func grid_cells_from_pieces(pieces: Array[PieceUI]) -> Array[GridCellUI]:
 	var cells: Array[GridCellUI] = []
-	cells.assign(Match3BoardPluginUtilities.remove_falsy_values(pieces.map(func(piece: PieceUI): return grid_cell_from_piece(piece))))
+	cells.assign(Match3BoardPluginUtilities.remove_falsy_values(pieces.map(func(piece: PieceUI): return piece.cell())))
 	
 	return cells
 	
@@ -663,7 +663,7 @@ func find_board_sequences() -> Array[Sequence]:
 			
 	var result: Array[Sequence] = valid_horizontal_sequences + valid_vertical_sequences + tshape_sequences + lshape_sequences
 	
-	return result.filter(func(sequence: Sequence): return not sequence.contains_special_piece())
+	return result#.filter(func(sequence: Sequence): return not sequence.contains_special_piece())
 
 
 func find_matches_from_swap(from_cell: GridCellUI, to_cell: GridCellUI) -> Array[Sequence]:
@@ -835,7 +835,11 @@ func swap_pieces(from_grid_cell: GridCellUI, to_grid_cell: GridCellUI) -> void:
 		
 		## When a special it's detected on any of the swapped cells 
 		## It creates a sequence with only both to trigger the special piece and consume the target
-		if from_grid_cell.current_piece.is_special() or to_grid_cell.current_piece.is_special():
+		if from_grid_cell.current_piece.is_special() and not to_grid_cell.current_piece.is_special():
+			matches.append(Sequence.new([from_grid_cell], Sequence.Shapes.Special))
+		elif to_grid_cell.current_piece.is_special() and not from_grid_cell.current_piece.is_special():
+			matches.append(Sequence.new([to_grid_cell], Sequence.Shapes.Special))
+		elif from_grid_cell.current_piece.is_special() and to_grid_cell.current_piece.is_special():
 			matches.append(Sequence.new([from_grid_cell, to_grid_cell], Sequence.Shapes.Special))
 		else:
 			matches = find_matches_from_swap(from_grid_cell, to_grid_cell)\

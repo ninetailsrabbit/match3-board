@@ -283,8 +283,10 @@ func _prepare_mouse_region_button() -> void:
 	mouse_region.mouse_exited.connect(on_mouse_region_mouse_exited)
 	mouse_region.focus_entered.connect(on_mouse_region_focus_entered)
 	mouse_region.focus_exited.connect(on_mouse_region_focus_exited)
-	requested_piece_special_trigger.connect(on_requested_piece_special_trigger)
-	finished_piece_special_trigger.connect(on_finished_piece_special_trigger)
+	
+	if is_special():
+		requested_piece_special_trigger.connect(on_requested_piece_special_trigger)
+		finished_piece_special_trigger.connect(on_finished_piece_special_trigger)
 
 
 func _prepare_sprites() -> void:
@@ -412,6 +414,10 @@ func on_mouse_region_focus_exited() -> void:
 	
 
 #region Overridables
+func combine_effect_with(other_piece: PieceUI):
+	pass
+
+
 func on_piece_selected() -> void:
 	pass
 	

@@ -19,20 +19,20 @@ func on_requested_piece_special_trigger() -> void:
 		triggered = true
 		
 		var target_pieces: Array[PieceUI] = board.pieces_of_shape(shape_to_consume)
-		target_pieces.append(self)
 		
-		var sequence: Sequence = Sequence.new(board.grid_cells_from_pieces(target_pieces), Sequence.Shapes.Special)
+		var sequence: Sequence = Sequence.new(board.grid_cells_from_pieces(target_pieces), Sequence.Shapes.Irregular)
 
 		set_process(true)
 		
 		var tween: Tween = create_tween().set_parallel(true)
 		
 		for piece: PieceUI in target_pieces:
-			if piece != self:
-				tween.tween_property(piece, "scale", Vector2(piece.scale.x * 1.2, piece.scale.y * 1.5), 1.0)\
-					.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO)
+			tween.tween_property(piece, "scale", Vector2(piece.scale.x * 1.1, piece.scale.y * 1.3), 1.0)\
+				.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO)
 		
-		await get_tree().create_timer(0.7).timeout
+		sequence.add_cell(cell())
+		
+		await tween.finished
 		
 		finished_piece_special_trigger.emit()
 		board.consume_requested.emit(sequence)
