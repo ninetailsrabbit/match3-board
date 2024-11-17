@@ -95,6 +95,20 @@ func consume_sequence(sequence: Sequence):
 		await tween.finished
 		
 		animation_finished.emit()
+
+
+func consume_pieces(pieces: Array[PieceUI]):
+	if pieces.size() > 0:
+		animation_started.emit()
+		
+		var tween: Tween = create_tween().set_parallel(true)
+		
+		for piece: PieceUI in pieces:
+			tween.tween_property(piece, "scale", Vector2.ZERO, 0.15).set_ease(Tween.EASE_OUT)
+		
+		await tween.finished
+		
+		animation_finished.emit()
 		
 		
 func spawn_special_piece(target_cell: GridCellUI, new_piece: PieceUI):

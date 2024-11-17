@@ -27,6 +27,17 @@ func _init(sequence_cells: Array[GridCellUI], _shape: Shapes = Shapes.Irregular)
 	shape = _detect_shape() if _shape == Shapes.Irregular else _shape
 
 
+static func create_from_piece(piece: PieceUI) -> Sequence:
+	return Sequence.new([piece.cell()])
+
+
+static func create_from_pieces(pieces: Array[PieceUI]) -> Sequence:
+	var cells: Array[GridCellUI] = []
+	cells.assign(pieces.map(func(piece: PieceUI): return piece.cell()))
+	
+	return Sequence.new(cells)
+	
+
 func size() -> int:
 	return cells.size()
 	
@@ -35,11 +46,43 @@ func combine_with(other_sequence: Sequence) -> Sequence:
 	return Sequence.new(cells + other_sequence.cells)
 
 
-func consume(except: Array[GridCellUI] = []) -> void:
-	consumed.emit(pieces())
+func consume() -> void:
+	var pieces: Array[PieceUI] = []
 	
-	for cell: GridCellUI in cells.filter(func(grid_cell: GridCellUI): return not except.has(grid_cell)):
+	for cell: GridCellUI in cells.filter(func(grid_cell: GridCellUI): return grid_cell.has_piece()):
+		pieces.append(cell.current_piece)
 		consume_cell(cell)
+	
+	consumed.emit(pieces)
+
+
+func consume_except(except: Array[GridCellUI] = []) -> void:
+	var pieces: Array[PieceUI] = []
+	
+	for cell: GridCellUI in cells.filter(func(grid_cell: GridCellUI): return not except.has(grid_cell) and grid_cell.has_piece()):
+		pieces.append(cell.current_piece)
+		consume_cell(cell)
+	
+	consumed.emit(pieces)
+
+
+func consume_only(cells: Array[GridCellUI] = []) -> void:
+	var pieces: Array[PieceUI] = []
+	
+	for cell: GridCellUI in cells.filter(func(grid_cell: GridCellUI): return grid_cell.has_piece()):
+		pieces.append(cell.current_piece)
+		consume_cell(cell)
+	
+	consumed.emit(pieces)
+
+
+func consume_only_normal_pieces() -> void:
+	consume_only(normal_pieces_cells())
+
+
+func consume_piece(piece: PieceUI, remove_from_sequence: bool = false) -> void:
+	if pieces().has(piece):
+		consume_cell(piece.cell())
 
 
 func consume_cell(cell: GridCellUI, remove_from_sequence: bool = false) -> void:
@@ -61,6 +104,17 @@ func pieces() -> Array[PieceUI]:
 	return current_pieces
 	
 	
+func normal_pieces_cells() -> Array[GridCellUI]:
+	var cells: Array[GridCellUI] = []
+	cells.assign(
+		Match3BoardPluginUtilities.remove_falsy_values(
+			normal_pieces().map(func(piece: PieceUI): return piece.cell())
+		)
+	)
+	
+	return cells
+
+
 func normal_pieces() -> Array[PieceUI]:
 	return pieces().filter(func(piece: PieceUI): return piece.is_normal())
 	
@@ -87,7 +141,6 @@ func add_cell(new_cell: GridCellUI) -> void:
 
 func remove_cell(grid_cell: GridCellUI) -> void:
 	cells.erase(grid_cell)
-
 
 
 func remove_cells(grid_cells: Array[GridCellUI]) -> void:

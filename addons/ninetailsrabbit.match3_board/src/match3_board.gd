@@ -20,6 +20,7 @@ signal swap_failed(from: GridCellUI, to: GridCellUI)
 signal swap_rejected(from: PieceUI, to: PieceUI)
 signal consume_requested(sequence: Sequence)
 signal consumed_sequence(sequence: Sequence)
+signal consumed_sequences(sequence: Array[Sequence])
 signal piece_selected(piece: PieceUI)
 signal piece_unselected(piece: PieceUI)
 signal piece_holded(piece: PieceUI)
@@ -479,7 +480,11 @@ func start_consume_sequence_pipeline() -> void:
 
 	# 2- We run the SequenceConsumer on the gathered sequences to manage them individually
 	# the creation of pieces is handled here
-	sequence_consumer.consume_sequences(pending_sequences, func(): current_state = BoardState.Fill)
+	sequence_consumer.consume_sequences(pending_sequences, 
+		func(): 
+			if not pending_sequences.is_empty() or sequence_consumer.special_pieces_queue.is_empty():
+				current_state = BoardState.Fill
+			)
 
 
 @warning_ignore("unassigned_variable")
@@ -1066,8 +1071,13 @@ func on_state_changed(from: BoardState, to: BoardState) -> void:
 			await fall_pieces()
 			await get_tree().process_frame
 			await fill_pieces()
-			
-			pending_sequences = find_board_sequences()
+			#
+			#if sequence_consumer.special_pieces_queue.is_empty():
+				#pending_sequences = find_board_sequences() 
+			#else:
+				#pending_sequences = [Sequence.create_from_piece(sequence_consumer.special_pieces_queue.pop_front())]
+			#
+			pending_sequences = find_board_sequences() 
 			
 			current_state = BoardState.WaitForInput if pending_sequences.is_empty() else BoardState.Consume
 		
