@@ -484,8 +484,6 @@ func start_consume_sequence_pipeline() -> void:
 	# 2- We run the SequenceConsumer on the gathered sequences to manage them individually
 	# the creation of pieces is handled here
 	sequence_consumer.consume_sequences(pending_sequences)
-			
-
 
 @warning_ignore("unassigned_variable")
 func find_horizontal_sequences(cells: Array[GridCellUI]) -> Array[Sequence]:
@@ -728,31 +726,30 @@ func calculate_fall_movements_on_column(column: int) -> Array[FallMovement]:
 	var cells: Array[GridCellUI] = grid_cells_from_column(column)
 	var movements: Array[FallMovement] = []
 	
-	while cells.any(
-		func(cell: GridCellUI): 
-			return cell.has_piece() and cell.current_piece.can_be_moved() and (cell.neighbour_bottom and cell.neighbour_bottom.can_contain_piece and cell.neighbour_bottom.is_empty())
-			):
-		
-		var from_cell: GridCellUI = first_movable_cell_on_column(column)
-		var to_cell: GridCellUI = last_empty_cell_on_column(column)
-		
-		if from_cell.has_piece() and to_cell:
-			# The pieces needs to be assign here to detect the new empty cells in the while loop
-			to_cell.replace_piece(from_cell.current_piece)
-			from_cell.remove_piece()
-			movements.append(FallMovement.new(from_cell, to_cell))
-		
+	var from_cell: GridCellUI = first_movable_cell_on_column(column)
+	var to_cell: GridCellUI = last_empty_cell_on_column(column)
+	
+	if from_cell and from_cell.has_piece() and to_cell:
+		# The pieces needs to be assign here to detect the new empty cells in the while loop
+		to_cell.replace_piece(from_cell.current_piece)
+		from_cell.remove_piece()
+		movements.append(FallMovement.new(from_cell, to_cell))
+	
 	return movements
 
 
 func calculate_all_fall_movements() -> Array[FallMovement]:
 	var movements: Array[FallMovement] = []
 	
+	#while grid_cells_flattened.any(
+		#func(cell: GridCellUI): 
+			#return cell.has_piece() and cell.current_piece.can_be_moved() and (cell.neighbour_bottom and cell.neighbour_bottom.can_contain_piece and cell.neighbour_bottom.is_empty())
+			#):
+		#
 	for column in configuration.grid_width:
 		movements.append_array(calculate_fall_movements_on_column(column))
 	
 	return movements
-	
 #endregion
 
 #region Swap
@@ -959,9 +956,18 @@ func obstacle_pieces_of_shape(shape: String) -> Array[PieceUI]:
 	
 	
 func fall_pieces() -> void:
-	await piece_animator.fall_down_pieces(calculate_all_fall_movements())
-
+	var fall_movements: Array[FallMovement] = calculate_all_fall_movements()
 	
+	await piece_animator.fall_down_pieces(fall_movements)
+	
+	while grid_cells_flattened.any(
+		func(cell: GridCellUI): 
+			return cell.has_piece() and cell.current_piece.can_be_moved() and (cell.neighbour_bottom and cell.neighbour_bottom.can_contain_piece and cell.neighbour_bottom.is_empty())
+			):
+				fall_movements = calculate_all_fall_movements()
+				await piece_animator.fall_down_pieces(fall_movements)
+		
+
 func fill_pieces() -> void:
 	var empty_cells = pending_empty_cells_to_fill()
 	
@@ -1056,7 +1062,7 @@ func on_state_changed(from: BoardState, to: BoardState) -> void:
 			await fall_pieces()
 			await get_tree().process_frame
 			await fill_pieces()
-		
+			
 			pending_sequences += find_board_sequences() 
 			
 			current_state = BoardState.WaitForInput if pending_sequences.is_empty() else BoardState.Consume

@@ -57,7 +57,7 @@ func fall_down_pieces(movements) -> void:
 		var tween: Tween = create_tween().set_parallel(true)
 		
 		for movement in movements:
-			tween.tween_property(movement.to_cell.current_piece, "position", movement.to_cell.position, 0.2)\
+			tween.tween_property(movement.to_cell.current_piece, "position", movement.to_cell.position, 0.1)\
 			.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_LINEAR)
 			
 		await tween.finished
