@@ -6,6 +6,9 @@ signal consumed_sequences(sequences: Array[Sequence])
 
 @onready var board: Match3Board = get_tree().get_first_node_in_group(Match3Board.BoardGroupName)
 
+var special_pieces_queue: Array[PieceUI] = []
+
+
 func _enter_tree() -> void:
 	name = "SequenceConsumer"
 
@@ -17,17 +20,17 @@ func consume_sequence(sequence: Sequence) -> void:
 		var special_pieces: Array[PieceUI] = sequence.get_special_pieces()
 			
 		if special_pieces.size() == 1:
-			var special_piece = sequence.get_special_piece()
-			special_piece.requested_piece_special_trigger.emit()
-			await special_piece.finished_piece_special_trigger
+			await consume_special_piece(sequence.get_special_piece())
 			
 		else:
 			special_pieces[0].combine_effect_with(special_pieces[1])
-			special_pieces[0].requested_piece_special_trigger.emit()
-			special_pieces[1].requested_piece_special_trigger.emit()
 			
-			await special_pieces[0].finished_piece_special_trigger
-			await special_pieces[1].finished_piece_special_trigger
+			await consume_special_piece(special_pieces[0])
+			
+			var special_queued_piece: PieceUI = special_pieces_queue.pop_front()
+			
+			if special_queued_piece:
+				consume_special_piece(special_queued_piece)
 			
 		return
 		
@@ -59,6 +62,11 @@ func consume_sequences(sequences: Array[Sequence], callback: Callable) -> void:
 		
 	consumed_sequences.emit(sequences)
 	callback.call()
+	
+	
+func consume_special_piece(special_piece: PieceUI) -> void:
+	special_piece.requested_piece_special_trigger.emit()
+	await special_piece.finished_piece_special_trigger
 	
 	
 func detect_new_combined_piece(sequence: Sequence):

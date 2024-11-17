@@ -4,6 +4,8 @@ class_name SpecialCrossPiece extends PieceUI
 
 
 var extra_sequence: Sequence
+var combined_with: PieceUI
+
 
 func _ready() -> void:
 	super._ready()
@@ -25,13 +27,18 @@ func on_requested_piece_special_trigger() -> void:
 		await animation_player.animation_finished
 		
 		finished_piece_special_trigger.emit()
+		
 		board.consume_requested.emit(sequence)
-
+		
+			
 
 func combine_effect_with(other_piece: PieceUI):
 	if other_piece.is_special():
 		
 		match other_piece.shape:
 			piece_definition.shape:
+				combined_with = other_piece
 				extra_sequence = Sequence.new(board.cross_diagonal_cells_from(cell()), Sequence.Shapes.CrossDiagonal)
 				extra_sequence.add_cell(other_piece.cell())
+				
+				board.sequence_consumer.special_pieces_queue.append(combined_with)

@@ -43,7 +43,6 @@ func roll(except: Array[PieceWeight] = []) -> PieceUI:
 	while selected_piece == null:
 		selected_piece = _roll_piece(available_pieces_to_roll, _prepare_weight(available_pieces_to_roll))
 	
-
 	return selected_piece
 	
 

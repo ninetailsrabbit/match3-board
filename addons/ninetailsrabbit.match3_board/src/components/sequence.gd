@@ -56,7 +56,6 @@ func consume_cell(cell: GridCellUI, remove_from_sequence: bool = false) -> void:
 
 func pieces() -> Array[PieceUI]:
 	var current_pieces: Array[PieceUI] = []
-	
 	current_pieces.assign(Match3BoardPluginUtilities.remove_falsy_values(cells.map(func(grid_cell: GridCellUI): return grid_cell.current_piece)))
 	
 	return current_pieces

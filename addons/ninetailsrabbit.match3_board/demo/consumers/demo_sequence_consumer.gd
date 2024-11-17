@@ -15,6 +15,7 @@ func detect_new_combined_piece(sequence: Sequence):
 					return new_special_piece
 				4:
 					var new_special_piece: SpecialShapeConsumerPiece = SpecialShapeConsumerPieceScene.instantiate() as SpecialShapeConsumerPiece
+					print(",".join(sequence.pieces()))
 					new_special_piece.shape_to_consume = piece.piece_definition.shape
 					return new_special_piece
 		

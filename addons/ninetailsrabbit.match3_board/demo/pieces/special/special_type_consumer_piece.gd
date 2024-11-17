@@ -16,6 +16,7 @@ func _process(delta: float) -> void:
 
 func on_requested_piece_special_trigger() -> void:
 	if not triggered and not shape_to_consume.is_empty():
+		print("shape to consume ", shape_to_consume)
 		triggered = true
 		
 		var target_pieces: Array[PieceUI] = board.pieces_of_shape(shape_to_consume)
