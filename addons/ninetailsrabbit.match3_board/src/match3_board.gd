@@ -68,8 +68,9 @@ var is_locked: bool = false:
 var current_state: BoardState = BoardState.WaitForInput:
 	set(new_state):
 		if new_state != current_state:
-			state_changed.emit(current_state, new_state)
+			var previous_state: BoardState = current_state
 			current_state = new_state
+			state_changed.emit(previous_state, current_state)
 		
 var current_available_moves: int = 0:
 	set(value):
@@ -125,6 +126,7 @@ func _enter_tree() -> void:
 	swapped_pieces.connect(on_swapped_pieces)
 	
 	consume_requested.connect(on_consume_requested)
+	
 	state_changed.connect(on_state_changed)
 	
 
@@ -482,8 +484,11 @@ func start_consume_sequence_pipeline() -> void:
 	# the creation of pieces is handled here
 	sequence_consumer.consume_sequences(pending_sequences, 
 		func(): 
-			if not pending_sequences.is_empty() or sequence_consumer.special_pieces_queue.is_empty():
-				current_state = BoardState.Fill
+			current_state = BoardState.Fill
+			#if sequence_consumer.special_pieces_queue.is_empty():
+				#current_state = BoardState.Fill
+			#else:
+				#start_consume_sequence_pipeline()
 			)
 
 
@@ -1046,6 +1051,7 @@ func on_prepared_board() -> void:
 
 
 func on_state_changed(from: BoardState, to: BoardState) -> void:
+	print(from, to)
 	match to:
 		BoardState.WaitForInput:
 			current_available_moves -= 1
@@ -1059,24 +1065,19 @@ func on_state_changed(from: BoardState, to: BoardState) -> void:
 		BoardState.Fill:
 			lock()
 			
-			var cells_to_consume: Array[GridCellUI] = grid_cells_from_sequences(pending_sequences)
-	
-			for orphan_cell: GridCellUI in cells_to_consume.filter(func(cell: GridCellUI): return cell.has_piece() and cell.current_piece.is_normal()):
-				orphan_cell.remove_piece()
-					
-			await get_tree().process_frame
-			
+			for orphan_piece: PieceUI in pieces().filter(func(piece: PieceUI): return piece.is_normal() and piece.cell() == null):
+				orphan_piece.queue_free()
+				
+			if not pending_sequences.is_empty() or not sequence_consumer.special_pieces_queue.is_empty():
+				current_state = BoardState.Consume
+				return
+				
 			pending_sequences.clear()
 			
 			await fall_pieces()
 			await get_tree().process_frame
 			await fill_pieces()
-			#
-			#if sequence_consumer.special_pieces_queue.is_empty():
-				#pending_sequences = find_board_sequences() 
-			#else:
-				#pending_sequences = [Sequence.create_from_piece(sequence_consumer.special_pieces_queue.pop_front())]
-			#
+		
 			pending_sequences = find_board_sequences() 
 			
 			current_state = BoardState.WaitForInput if pending_sequences.is_empty() else BoardState.Consume
@@ -1120,12 +1121,12 @@ func on_swap_rejected(_from: PieceUI, _to: PieceUI) -> void:
 
 
 func on_consume_requested(sequence: Sequence) -> void:
-	pending_sequences = [sequence]
+	pending_sequences.append(sequence)
 	
-	if state_is_consume():
-		start_consume_sequence_pipeline()
-	else:
-		current_state = BoardState.Consume
+	#if state_is_consume():
+		#start_consume_sequence_pipeline()
+	#else:
+	current_state = BoardState.Consume
 
 
 func on_piece_selected(piece: PieceUI) -> void:

@@ -11,22 +11,21 @@ var special_pieces_queue: Array[PieceUI] = []
 
 func _enter_tree() -> void:
 	name = "SequenceConsumer"
-	
-	#consumed_sequences.connect(on_consumed_sequences)
 
 #region Overridables
 func consume_sequence(sequence: Sequence) -> void:
+	board.pending_sequences.erase(sequence)
+	
 	if sequence.is_special_shape() and sequence.contains_special_piece():
 		var special_pieces: Array[PieceUI] = sequence.get_special_pieces()
 		
 		if special_pieces.size() == 1:
 			await consume_special_piece(sequence, sequence.get_special_piece())
-			consumed_sequence.emit(sequence)
-			
 		else:
 			special_pieces[0].combine_effect_with(special_pieces[1])
 			await consume_special_piece(sequence, special_pieces[0])
-			consumed_sequence.emit(sequence)
+		
+		consumed_sequence.emit(sequence)
 			
 		return
 		
@@ -46,21 +45,22 @@ func consume_sequence(sequence: Sequence) -> void:
 		await board.piece_animator.consume_pieces(sequence.normal_pieces())
 		sequence.consume_only_normal_pieces()
 	
-	await get_tree().process_frame
 	consumed_sequence.emit(sequence)
-
+	
 
 func consume_sequences(sequences: Array[Sequence], callback: Callable) -> void:
 	for sequence: Sequence in sequences:
-		await consume_sequence(sequence)
+		consume_sequence(sequence)
+		await consumed_sequence
 	
 	while not special_pieces_queue.is_empty():
-		print("special piece queue", special_pieces_queue.front())
-
-		await consume_sequence(Sequence.create_from_piece(special_pieces_queue.pop_front()))
-		
-	consumed_sequences.emit()
+		consume_sequence(Sequence.create_from_piece(special_pieces_queue.pop_front()))
+		await consumed_sequence
+	
+	await get_tree().process_frame
+	
 	board.consumed_sequences.emit(sequences)
+	consumed_sequences.emit()
 	callback.call()
 
 
