@@ -733,10 +733,10 @@ func calculate_fall_movements_on_column(column: int) -> Array[FallMovement]:
 			return cell.has_piece() and cell.current_piece.can_be_moved() and (cell.neighbour_bottom and cell.neighbour_bottom.can_contain_piece and cell.neighbour_bottom.is_empty())
 			):
 		
-		var from_cell = first_movable_cell_on_column(column)
-		var to_cell = last_empty_cell_on_column(column)
+		var from_cell: GridCellUI = first_movable_cell_on_column(column)
+		var to_cell: GridCellUI = last_empty_cell_on_column(column)
 		
-		if from_cell and to_cell:
+		if from_cell.has_piece() and to_cell:
 			# The pieces needs to be assign here to detect the new empty cells in the while loop
 			to_cell.replace_piece(from_cell.current_piece)
 			from_cell.remove_piece()
@@ -869,10 +869,10 @@ func swap_pieces(from_grid_cell: GridCellUI, to_grid_cell: GridCellUI) -> void:
 
 #region Lock related
 func lock() -> void:
-	if current_selected_piece != null and current_selected_piece.is_selected:
-		current_selected_piece.is_selected = false
-		current_selected_piece.reset_position()
-	
+	#if current_selected_piece != null and is_instance_valid(current_selected_piece) and current_selected_piece.is_selected:
+		#current_selected_piece.is_selected = false
+		#current_selected_piece.reset_position()
+	#
 	is_locked = true
 	current_selected_piece = null
 	
@@ -882,18 +882,6 @@ func lock() -> void:
 func unlock() -> void:
 	is_locked = false
 	
-	#unlock_all_pieces()
-	
-
-func lock_all_pieces() -> void:
-	for piece: PieceUI in pieces():
-		piece.lock()
-
-
-func unlock_all_pieces() -> void:
-	for piece: PieceUI in pieces():
-		piece.unlock()
-
 
 func unselect_all_pieces() -> void:
 	for piece: PieceUI in pieces():
@@ -1126,7 +1114,7 @@ func on_consumed_sequences(sequences: Array[Sequence]) -> void:
 
 
 func on_piece_selected(piece: PieceUI) -> void:
-	if is_locked or is_click_mode_drag():
+	if is_locked or is_click_mode_drag() or piece.can_be_triggered():
 		return
 	
 	draw_line_connector(piece)
@@ -1150,7 +1138,7 @@ func on_piece_unselected(_piece: PieceUI) -> void:
 	
 	
 func on_piece_holded(piece: PieceUI) -> void:
-	if is_locked or is_click_mode_selection() or current_selected_piece != null:
+	if is_locked or is_click_mode_selection() or current_selected_piece != null or piece.can_be_triggered():
 		return
 	
 	draw_line_connector(piece)
