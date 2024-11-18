@@ -126,8 +126,7 @@ func _enter_tree() -> void:
 	swapped_pieces.connect(on_swapped_pieces)
 	
 	consume_requested.connect(on_consume_requested)
-	consumed_sequence.connect(on_consumed_sequence)
-	consumed_sequences.connect(on_consumed_sequences)
+	
 	state_changed.connect(on_state_changed)
 	
 
@@ -178,6 +177,9 @@ func change_sequence_consumer(consumer: SequenceConsumer) -> Match3Board:
 	sequence_consumer = consumer
 	
 	add_child(sequence_consumer)
+	
+	sequence_consumer.consumed_sequence.connect(on_consumed_sequence)
+	sequence_consumer.consumed_sequences.connect(on_consumed_sequences)
 	
 	return self
 #endregion
@@ -474,8 +476,11 @@ func pending_empty_cells_to_fill() -> Array[GridCellUI]:
 func start_consume_sequence_pipeline() -> void:
 	# 1- Make sure the pending sequences has valid sequences even when if it's empty when calling
 	# this function
+	print("pending sequences before pipeline", pending_sequences.size())
 	if pending_sequences.is_empty():
 		pending_sequences = find_board_sequences()
+		
+		print("pending sequences after pipeline", pending_sequences.size())
 	
 		if pending_sequences.is_empty():
 			current_state = BoardState.Fill
@@ -666,7 +671,7 @@ func find_board_sequences() -> Array[Sequence]:
 			
 	var result: Array[Sequence] = valid_horizontal_sequences + valid_vertical_sequences + tshape_sequences + lshape_sequences
 	
-	return result#.filter(func(sequence: Sequence): return not sequence.contains_special_piece())
+	return result
 
 
 func find_matches_from_swap(from_cell: GridCellUI, to_cell: GridCellUI) -> Array[Sequence]:
@@ -890,7 +895,7 @@ func pieces() -> Array[PieceUI]:
 	var pieces: Array[PieceUI] = []
 	pieces.assign(get_tree().get_nodes_in_group(PieceUI.GroupName))
 	
-	return pieces
+	return pieces.filter(func(piece: PieceUI): return is_instance_valid(piece))
 
 
 func pieces_of_type(type: PieceDefinitionResource.PieceType) -> Array[PieceUI]:

@@ -6,59 +6,62 @@ signal consumed_sequences(sequences: Array[Sequence])
 
 @onready var board: Match3Board = get_tree().get_first_node_in_group(Match3Board.BoardGroupName)
 
+
+var sequences_to_consume: Array[Sequence] = []
 var sequence_actions_queue: Array[SequenceAction] = []
+var new_elements_added_flag: int = 0:
+	set(value):
+		new_elements_added_flag = maxi(0, value)
 
 
 func _enter_tree() -> void:
 	name = "SequenceConsumer"
+	
+	consumed_sequence.connect(on_consumed_sequence)
 
-#region Overridables
 func prepare_action_queue(sequences: Array[Sequence]) -> void:
+	sequences_to_consume = sequences
+	
 	for sequence: Sequence in sequences:
-		
 		if sequence.is_special_shape() and sequence.contains_special_piece():
 			if sequence.special_pieces_count() == 1:
-				sequence_actions_queue.append(create_special_sequence_action(sequence))
+				add_action_to_queue(create_special_sequence_action(sequence))
 			else:
-				sequence_actions_queue.append(create_special_combined_sequence_action(sequence))
+				add_action_to_queue(create_special_combined_sequence_action(sequence))
 				
 			return
 			
 		var new_piece_to_spawn = detect_new_combined_piece(sequence)
 	
 		if new_piece_to_spawn is PieceUI:
-			sequence_actions_queue.append(create_draw_piece_action(sequence, new_piece_to_spawn))
+			add_action_to_queue(create_draw_piece_action(sequence, new_piece_to_spawn))
 		else:
-			sequence_actions_queue.append(create_normal_sequence_action(sequence))
-
-
-func consume_sequence_action(action: SequenceAction) -> void:
-	action.run()
-	await consumed_sequence
+			add_action_to_queue(create_normal_sequence_action(sequence))
+	
+			
+func consume_next_action() -> void:
+	var next_action: SequenceAction = sequence_actions_queue.pop_front()
+	
+	if next_action == null:
+		new_elements_added_flag = 0
+		consumed_sequences.emit(sequences_to_consume)
+		sequences_to_consume.clear()
+	else:
+		await next_action.run()
+		consumed_sequence.emit(next_action.sequence)
 
 
 func consume_sequences(sequences: Array[Sequence]) -> void:
 	prepare_action_queue(sequences)
-	
-	while sequence_actions_queue.size() > 0:
-		var current_action: SequenceAction = sequence_actions_queue.pop_front()
-		print(current_action.get_class_name())
-		await consume_sequence_action(current_action)
-	
-	print(sequence_actions_queue)
-	await get_tree().process_frame
-	
-	board.consumed_sequences.emit(sequences)
-	consumed_sequences.emit()
+	consume_next_action()
 
 
 func trigger_special_piece(sequence: Sequence, special_piece: PieceUI) -> void:
-	special_piece.requested_piece_special_trigger.emit()
-	await special_piece.finished_piece_special_trigger
-	
+	await special_piece.trigger_special_effect()
 	sequence.consume_piece(special_piece)
+	
 
-
+#region Overridables
 func detect_new_combined_piece(sequence: Sequence):
 	pass
 #endregion
@@ -110,12 +113,11 @@ class ConsumeNormalSequenceAction extends SequenceAction:
 	func run() -> void:
 		## The special pieces detected on this sequences will be appended to queue to be consumed after in the chain action
 		for special_piece: PieceUI in sequence.get_special_pieces():
-			consumer.sequence_actions_queue.append(ConsumeSpecialPieceAction.new(consumer, Sequence.create_from_piece(special_piece)))
+			consumer.add_action_to_queue(ConsumeSpecialPieceAction.new(consumer, Sequence.create_from_piece(special_piece)), true)
 		
 		await consumer.board.piece_animator.consume_pieces(sequence.normal_pieces())
 		sequence.consume_only_normal_pieces()
-
-		consumer.consumed_sequence.emit(sequence)
+		
 	
 	func get_class_name() -> StringName:
 		return &"ConsumeNormalSequenceAction"
@@ -126,12 +128,12 @@ class DrawNewPieceSequenceAction extends SequenceAction:
 		var target_cell_to_spawn: GridCellUI = sequence.middle_cell()
 		
 		await consumer.board.piece_animator.consume_pieces(sequence.normal_pieces())
+		
 		sequence.consume_only_normal_pieces()
 
 		consumer.board.draw_piece_on_cell(target_cell_to_spawn, arguments.new_piece)
 		await consumer.board.piece_animator.spawn_special_piece(target_cell_to_spawn, arguments.new_piece)
 		
-		consumer.consumed_sequence.emit(sequence)
 
 	func get_class_name() -> StringName:
 		return &"DrawNewPieceSequenceAction"
@@ -141,8 +143,6 @@ class ConsumeSpecialPieceAction extends SequenceAction:
 	func run() -> void:
 		await consumer.trigger_special_piece(sequence, sequence.get_special_piece())
 		
-		consumer.consumed_sequence.emit(sequence)
-	
 	func get_class_name() -> StringName:
 		return &"ConsumeSpecialPieceAction"
 		
@@ -153,9 +153,13 @@ class ConsumeSpecialPieceCombinedAction extends SequenceAction:
 		
 		special_pieces[0].combine_effect_with(special_pieces[1])
 		await consumer.trigger_special_piece(sequence, special_pieces[0])
-	
-		consumer.consumed_sequence.emit(sequence)
+
 
 	func get_class_name() -> StringName:
 		return &"ConsumeSpecialPieceCombinedAction"
+#endregion
+
+#region Signal callbacks
+func on_consumed_sequence(_sequence: Sequence) -> void:
+	consume_next_action()
 #endregion

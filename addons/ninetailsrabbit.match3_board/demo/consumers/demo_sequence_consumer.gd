@@ -5,14 +5,13 @@ const SpecialShapeConsumerPieceScene: PackedScene = preload("res://addons/nineta
 
 
 func detect_new_combined_piece(sequence: Sequence):
-	if sequence.all_pieces_are_of_type(PieceDefinitionResource.PieceType.Normal):
-		
-		if sequence.is_horizontal_or_vertical_shape():
+	if sequence.all_pieces_are_of_type(PieceDefinitionResource.PieceType.Normal) \
+		and (sequence.is_horizontal_or_vertical_shape() or sequence.is_tshape_or_lshape()):
 			match sequence.size():
-				5:
+				4:
 					var new_special_piece: SpecialCrossPiece = SpecialCrossPieceScene.instantiate() as SpecialCrossPiece
 					return new_special_piece
-				4:
+				5:
 					var new_special_piece: SpecialShapeConsumerPiece = SpecialShapeConsumerPieceScene.instantiate() as SpecialShapeConsumerPiece
 					var pieces = sequence.pieces()
 				

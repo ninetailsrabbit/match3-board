@@ -415,6 +415,10 @@ func combine_effect_with(other_piece: PieceUI):
 	pass
 
 
+func trigger_special_effect():
+	pass
+
+
 func on_piece_selected() -> void:
 	pass
 	
@@ -442,6 +446,7 @@ func on_piece_mouse_entered() -> void:
 func on_piece_mouse_exited() -> void:
 	pass
 	
+	
 func on_piece_focus_entered() -> void:
 	pass
 	
@@ -451,8 +456,8 @@ func on_piece_focus_exited() -> void:
 
 
 func on_requested_piece_special_trigger() -> void:
-	pass
-	
+	trigger_special_effect()
+
 func on_finished_piece_special_trigger() -> void:
 	pass
 #endregion
