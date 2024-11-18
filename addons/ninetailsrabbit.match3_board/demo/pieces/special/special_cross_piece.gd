@@ -23,7 +23,10 @@ func trigger_special_effect() -> void:
 			sequence = sequence.combine_with(extra_sequence)
 
 		sequence.add_cell(cell())
-
+		
+		if is_instance_valid(combined_with) and combined_with is SpecialCrossPiece:
+			combined_with.animation_player.play("explode")
+		
 		animation_player.play("explode")
 		await animation_player.animation_finished
 
@@ -38,5 +41,6 @@ func combine_effect_with(other_piece: PieceUI):
 		match other_piece.piece_definition.shape:
 			piece_definition.shape:
 				combined_with = other_piece
+				other_piece.triggered = true
 				extra_sequence = Sequence.new(board.cross_diagonal_cells_from(cell()), Sequence.Shapes.CrossDiagonal)
 				extra_sequence.add_cell(other_piece.cell())

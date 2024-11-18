@@ -112,8 +112,11 @@ class ConsumeNormalSequenceAction extends SequenceAction:
 			consumer.add_action_to_queue(ConsumeSpecialPieceAction.new(consumer, Sequence.create_from_piece(special_piece)), true)
 		
 		await consumer.board.piece_animator.consume_pieces(sequence.normal_pieces())
-		sequence.consume_only_normal_pieces()
 		
+		if sequence.all_special_pieces_are_triggered():
+			sequence.consume()
+		else:
+			sequence.consume_only_normal_pieces()
 	
 	func get_class_name() -> StringName:
 		return &"ConsumeNormalSequenceAction"

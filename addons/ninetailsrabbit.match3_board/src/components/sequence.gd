@@ -122,16 +122,24 @@ func contains_special_piece() -> bool:
 	return pieces().any(func(piece: PieceUI): return piece.is_special())
 
 
+func contains_special_piece_triggered() -> bool:
+	return pieces().any(func(piece: PieceUI): return piece.is_special() and piece.triggered)
+
+	
+func all_special_pieces_are_triggered() -> bool:
+	return get_special_pieces().all(func(piece: PieceUI): return piece.triggered)
+
+
 func get_special_piece():
 	if contains_special_piece():
-		return pieces().filter(func(piece: PieceUI): return piece.is_special()).front()
+		return get_special_pieces().front()
 	
 	return null
 
 
 func get_special_pieces() -> Array[PieceUI]:
-	return pieces().filter(func(piece: PieceUI): return piece.is_special())
-	
+	return pieces().filter(func(piece: PieceUI): return piece.is_special() and not piece.triggered)
+
 	
 func special_pieces_count() -> int:
 	return get_special_pieces().size()
