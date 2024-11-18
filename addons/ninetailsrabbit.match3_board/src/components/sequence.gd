@@ -131,6 +131,10 @@ func get_special_piece():
 func get_special_pieces() -> Array[PieceUI]:
 	return pieces().filter(func(piece: PieceUI): return piece.is_special())
 	
+	
+func special_pieces_count() -> int:
+	return get_special_pieces().size()
+	
 
 func add_cell(new_cell: GridCellUI) -> void:
 	if not cells.has(new_cell):

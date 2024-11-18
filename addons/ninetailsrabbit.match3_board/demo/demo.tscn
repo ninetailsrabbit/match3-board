@@ -10,3 +10,10 @@ script = ExtResource("1_dqalp")
 [node name="Match3Board" type="Node2D" parent="."]
 script = ExtResource("2_m7do7")
 configuration = ExtResource("3_kewbg")
+
+[node name="StateLabel" type="Label" parent="."]
+offset_left = 406.0
+offset_top = 175.0
+offset_right = 453.0
+offset_bottom = 198.0
+text = "STATE"

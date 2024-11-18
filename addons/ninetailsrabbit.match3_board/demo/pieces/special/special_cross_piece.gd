@@ -27,9 +27,10 @@ func on_requested_piece_special_trigger() -> void:
 		animation_player.play("explode")
 		await animation_player.animation_finished
 		
-		finished_piece_special_trigger.emit()
 		
-		board.consume_requested.emit(sequence)
+		board.sequence_consumer.add_action_to_queue(board.sequence_consumer.create_normal_sequence_action(sequence), true)
+		
+		finished_piece_special_trigger.emit()
 
 
 func combine_effect_with(other_piece: PieceUI):

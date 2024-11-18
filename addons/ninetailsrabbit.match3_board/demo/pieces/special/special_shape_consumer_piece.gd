@@ -39,5 +39,5 @@ func on_requested_piece_special_trigger() -> void:
 		
 		await tween.finished
 		
+		board.sequence_consumer.add_action_to_queue(board.sequence_consumer.create_normal_sequence_action(sequence), true)
 		finished_piece_special_trigger.emit()
-		board.consume_requested.emit(sequence)

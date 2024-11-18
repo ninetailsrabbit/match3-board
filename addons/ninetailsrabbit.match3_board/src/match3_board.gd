@@ -1047,10 +1047,6 @@ func on_state_changed(from: BoardState, to: BoardState) -> void:
 			for orphan_piece: PieceUI in pieces().filter(func(piece: PieceUI): return piece.is_normal() and piece.cell() == null):
 				orphan_piece.queue_free()
 				
-			if not pending_sequences.is_empty() or not sequence_consumer.special_pieces_queue.is_empty():
-				current_state = BoardState.Consume
-				return
-				
 			await fall_pieces()
 			await get_tree().process_frame
 			await fill_pieces()
@@ -1108,6 +1104,7 @@ func on_consumed_sequence(sequence: Sequence) -> void:
 
 
 func on_consumed_sequences(sequences: Array[Sequence]) -> void:
+	pending_sequences.clear()
 	current_state = BoardState.Fill
 
 
