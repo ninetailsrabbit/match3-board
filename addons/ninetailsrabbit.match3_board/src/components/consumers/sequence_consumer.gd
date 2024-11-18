@@ -9,9 +9,6 @@ signal consumed_sequences(sequences: Array[Sequence])
 
 var sequences_to_consume: Array[Sequence] = []
 var sequence_actions_queue: Array[SequenceAction] = []
-var new_elements_added_flag: int = 0:
-	set(value):
-		new_elements_added_flag = maxi(0, value)
 
 
 func _enter_tree() -> void:
@@ -43,7 +40,6 @@ func consume_next_action() -> void:
 	var next_action: SequenceAction = sequence_actions_queue.pop_front()
 	
 	if next_action == null:
-		new_elements_added_flag = 0
 		consumed_sequences.emit(sequences_to_consume)
 		sequences_to_consume.clear()
 	else:
