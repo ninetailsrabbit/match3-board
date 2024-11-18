@@ -1,8 +1,8 @@
-[gd_scene load_steps=6 format=3 uid="uid://b6ypngffaa1h6"]
+[gd_scene load_steps=5 format=3 uid="uid://b6ypngffaa1h6"]
 
 [ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/components/pieces/piece_ui.gd" id="1_a562f"]
 [ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/components/pieces/piece_definition.gd" id="2_e773v"]
-[ext_resource type="Texture2D" uid="uid://ct0v34xosfrrt" path="res://addons/ninetailsrabbit.match3_board/demo/assets/pixel_art_gems.png" id="3_6j0kk"]
+[ext_resource type="Texture2D" uid="uid://dchtf3oa72c7v" path="res://addons/ninetailsrabbit.match3_board/src/debug_ui/preview_pieces/green_gem.png" id="3_s061p"]
 
 [sub_resource type="Resource" id="Resource_he840"]
 script = ExtResource("2_e773v")
@@ -18,14 +18,10 @@ can_be_triggered = false
 can_be_replaced = true
 can_be_consumed = true
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_ma8vw"]
-atlas = ExtResource("3_6j0kk")
-region = Rect2(70, 3, 20, 26)
-
 [node name="GreenGem" type="Node2D" node_paths=PackedStringArray("sprite")]
 script = ExtResource("1_a562f")
 sprite = NodePath("Sprite2D")
 piece_definition = SubResource("Resource_he840")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-texture = SubResource("AtlasTexture_ma8vw")
+texture = ExtResource("3_s061p")

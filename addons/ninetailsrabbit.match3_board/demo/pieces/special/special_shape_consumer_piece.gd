@@ -25,6 +25,10 @@ func trigger_special_effect() -> void:
 			
 		var target_pieces: Array[PieceUI] = board.pieces_of_shape(shape_to_consume)
 		
+		if target_pieces.is_empty():
+			finished_piece_special_trigger.emit()
+			return
+		
 		var sequence: Sequence = Sequence.new(board.grid_cells_from_pieces(target_pieces), Sequence.Shapes.Irregular)
 
 		set_process(true)

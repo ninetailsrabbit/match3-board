@@ -29,15 +29,7 @@ enum BoardFillModes {
 	InPlace
 }
 
-@export_group("Size 🔲")
-@export var grid_width: int = 8
-@export var grid_height: int = 7
-@export var cell_size: Vector2i = Vector2i(48, 48)
-@export var cell_offset: Vector2i = Vector2i(25, 25)
-@export var empty_cells: Array[Vector2] = []
-@export var draw_background_texture_on_empty_cells: bool = true
 
-@export_group("Parameters 💎")
 ## When enabled, the board prepare itself automatically when it's ready on the scene tree
 @export var auto_start: bool = true
 ## The layer value from 1 to 32 that is the amount Godot supports. The inside areas will have this layer value to detect other pieces or be detected.
@@ -83,14 +75,6 @@ enum BoardFillModes {
 @export var max_match: int  = 5:
 	set(value):
 		max_match = max(min_match, value)
-
-
-func distance() -> int:
-	return grid_width + grid_height
-	
-
-func size() -> int:
-	return grid_width * grid_height
 
 
 func not_disabled_pieces() -> Array[PieceWeight]:
