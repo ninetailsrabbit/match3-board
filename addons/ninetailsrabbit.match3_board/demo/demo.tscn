@@ -1,15 +1,67 @@
-[gd_scene load_steps=4 format=3 uid="uid://ccqn6wrassd5a"]
+[gd_scene load_steps=18 format=3 uid="uid://ccqn6wrassd5a"]
 
 [ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/demo/demo.gd" id="1_dqalp"]
 [ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/match3_board.gd" id="2_m7do7"]
-[ext_resource type="Resource" uid="uid://dd30jhn85qexx" path="res://addons/ninetailsrabbit.match3_board/demo/demo_board_configuration.tres" id="3_kewbg"]
+[ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/components/pieces/piece_weight.gd" id="3_eifsl"]
+[ext_resource type="Texture2D" uid="uid://ctiniq36c2dh7" path="res://addons/ninetailsrabbit.match3_board/src/debug_ui/preview_pieces/blue_gem.png" id="3_jl4kx"]
+[ext_resource type="PackedScene" uid="uid://brbxemnpgtmts" path="res://addons/ninetailsrabbit.match3_board/demo/pieces/normal/blue_gem.tscn" id="4_3qfei"]
+[ext_resource type="Texture2D" uid="uid://dchtf3oa72c7v" path="res://addons/ninetailsrabbit.match3_board/src/debug_ui/preview_pieces/green_gem.png" id="4_sagls"]
+[ext_resource type="Texture2D" uid="uid://frw370xlyi52" path="res://addons/ninetailsrabbit.match3_board/src/debug_ui/preview_pieces/purple_gem.png" id="5_0f5c7"]
+[ext_resource type="PackedScene" uid="uid://b6ypngffaa1h6" path="res://addons/ninetailsrabbit.match3_board/demo/pieces/normal/green_gem.tscn" id="5_dgycy"]
+[ext_resource type="Texture2D" uid="uid://bxh84kxgxf2df" path="res://addons/ninetailsrabbit.match3_board/src/debug_ui/preview_pieces/yellow_gem.png" id="6_lgoea"]
+[ext_resource type="PackedScene" uid="uid://ik43i2q0pkdu" path="res://addons/ninetailsrabbit.match3_board/demo/pieces/normal/purple_gem.tscn" id="6_seep0"]
+[ext_resource type="PackedScene" uid="uid://cdy53ddoxxy6n" path="res://addons/ninetailsrabbit.match3_board/demo/pieces/normal/red_gem.tscn" id="7_otb5d"]
+[ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/resources/match3_configuration.gd" id="8_q5fox"]
+
+[sub_resource type="Resource" id="Resource_0g1rb"]
+script = ExtResource("3_eifsl")
+weight = 1.0
+piece_scene = ExtResource("4_3qfei")
+
+[sub_resource type="Resource" id="Resource_nv7f3"]
+script = ExtResource("3_eifsl")
+weight = 1.0
+piece_scene = ExtResource("5_dgycy")
+
+[sub_resource type="Resource" id="Resource_r15it"]
+script = ExtResource("3_eifsl")
+weight = 1.0
+piece_scene = ExtResource("6_seep0")
+
+[sub_resource type="Resource" id="Resource_p3tsu"]
+script = ExtResource("3_eifsl")
+weight = 1.0
+piece_scene = ExtResource("7_otb5d")
+
+[sub_resource type="Resource" id="Resource_t513j"]
+script = ExtResource("8_q5fox")
+auto_start = true
+pieces_collision_layer = 8
+swap_mode = 0
+click_mode = 0
+input_action_cancel_line_connector = &"cancel_line_connector"
+input_action_consume_line_connector = &"consume_line_connector"
+fill_mode = 0
+available_pieces = Array[ExtResource("3_eifsl")]([SubResource("Resource_0g1rb"), SubResource("Resource_nv7f3"), SubResource("Resource_r15it"), SubResource("Resource_p3tsu")])
+available_moves_on_start = 25
+allow_matches_on_start = false
+reset_position_on_swap_failed = true
+horizontal_shape = true
+vertical_shape = true
+tshape = true
+lshape = true
+min_match = 3
+max_match = 5
 
 [node name="Demo" type="Node2D"]
 script = ExtResource("1_dqalp")
 
 [node name="Match3Board" type="Node2D" parent="."]
 script = ExtResource("2_m7do7")
-configuration = ExtResource("3_kewbg")
+preview_grid_in_editor = true
+use_placeholder_textures = false
+preview_pieces = Array[Texture2D]([ExtResource("3_jl4kx"), ExtResource("4_sagls"), ExtResource("5_0f5c7"), ExtResource("6_lgoea")])
+configuration = SubResource("Resource_t513j")
 
 [node name="StateLabel" type="Label" parent="."]
 offset_left = 406.0

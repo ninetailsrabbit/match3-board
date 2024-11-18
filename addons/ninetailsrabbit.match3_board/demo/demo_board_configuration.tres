@@ -29,12 +29,6 @@ piece_scene = ExtResource("5_mlu7a")
 
 [resource]
 script = ExtResource("6_kwlty")
-grid_width = 8
-grid_height = 7
-cell_size = Vector2i(48, 48)
-cell_offset = Vector2i(25, 25)
-empty_cells = Array[Vector2]([])
-draw_background_texture_on_empty_cells = true
 auto_start = true
 pieces_collision_layer = 8
 swap_mode = 6

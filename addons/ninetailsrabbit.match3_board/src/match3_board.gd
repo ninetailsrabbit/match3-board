@@ -1,3 +1,4 @@
+@tool
 class_name Match3Board extends Node2D
 
 class FallMovement:
@@ -62,7 +63,28 @@ enum BoardState {
 
 ## When this enabled, a random color placeholder textures are created based on the number of 
 ## available pieces
-@export var use_placeholder_textures: bool = true
+@export var use_placeholder_textures: bool = true:
+	set(value):
+		if use_placeholder_textures != value:
+			use_placeholder_textures = value
+			draw_preview_grid()
+@export var placeholder_textures_colors: Array[Color] = [
+	Color.WHEAT,
+	Color.NAVY_BLUE,
+	Color.YELLOW_GREEN,
+	Color.YELLOW,
+	Color.BLACK,
+	Color.PURPLE,
+	Color.BLACK,
+	Color.WHITE,
+	Color.RED,
+	Color.SADDLE_BROWN
+]:
+	set(value):
+		if placeholder_textures_colors != value:
+			placeholder_textures_colors = value
+			draw_preview_grid()
+
 @export var preview_pieces: Array[Texture2D]:
 	set(value):
 		if preview_pieces != value:
@@ -148,6 +170,8 @@ func _input(event: InputEvent) -> void:
 	
 func _enter_tree() -> void:
 	add_to_group(BoardGroupName)
+	
+	remove_preview_sprites()
 	
 	current_available_moves = configuration.available_moves_on_start
 	
@@ -373,7 +397,7 @@ func cross_cells_from(origin_cell: GridCellUI) -> Array[GridCellUI]:
 
 
 func cross_diagonal_cells_from(origin_cell: GridCellUI) -> Array[GridCellUI]:
-	var distance: int = configuration.distance()
+	var distance: int = distance()
 	var cross_diagonal_cells: Array[GridCellUI] = []
 	
 	cross_diagonal_cells.assign(Match3BoardPluginUtilities.remove_falsy_values(Match3BoardPluginUtilities.remove_duplicates(
@@ -1095,17 +1119,24 @@ func draw_preview_grid() -> void:
 			
 		for column in grid_width:
 			for row in grid_height:
-				
+		
 				var current_cell_sprite: Sprite2D = Sprite2D.new()
 				current_cell_sprite.name = "Cell_Column%d_Row%d" % [column, row]
 				
-				if empty_cells.has(Vector2(row, column)):
-					current_cell_sprite.texture = empty_cell_texture
-				elif even_cell_texture and odd_cell_texture:
-					current_cell_sprite.texture = even_cell_texture if (column + row) % 2 == 0 else odd_cell_texture
-				else:
-					current_cell_sprite.texture = even_cell_texture if even_cell_texture else odd_cell_texture
+				if use_placeholder_textures:
+					current_cell_sprite.texture = PlaceholderTexture2D.new()
+					current_cell_sprite.texture.size = cell_size
 					
+					if not placeholder_textures_colors.is_empty():
+						current_cell_sprite.self_modulate = placeholder_textures_colors.pick_random()
+				else:
+					if empty_cells.has(Vector2(row, column)):
+						current_cell_sprite.texture = empty_cell_texture
+					elif even_cell_texture and odd_cell_texture:
+						current_cell_sprite.texture = even_cell_texture if (column + row) % 2 == 0 else odd_cell_texture
+					else:
+						current_cell_sprite.texture = even_cell_texture if even_cell_texture else odd_cell_texture
+						
 				current_cell_sprite.position = Vector2(cell_size.x * column + cell_offset.x, cell_size.y * row + cell_offset.y)
 				
 				debug_preview_node.add_child(current_cell_sprite)
@@ -1117,7 +1148,7 @@ func draw_preview_grid() -> void:
 				
 				var available_preview_pieces = Match3BoardPluginUtilities.remove_falsy_values(preview_pieces)
 				
-				if available_preview_pieces.size() > 0:
+				if available_preview_pieces.size() > 0 and not use_placeholder_textures:
 					var current_piece_sprite: Sprite2D = Sprite2D.new()
 					current_piece_sprite.name = "Piece_Column%d_Row%d" % [column, row]
 					current_piece_sprite.texture = available_preview_pieces.pick_random()
@@ -1139,7 +1170,7 @@ func remove_preview_sprites() -> void:
 			debug_preview_node.free()
 			debug_preview_node = null
 	
-	for child: Node2D in get_children(true).filter(func(node: Node): return node is Node2D):
+	for child: Node in get_children():
 		child.free()
 #endregion
 
