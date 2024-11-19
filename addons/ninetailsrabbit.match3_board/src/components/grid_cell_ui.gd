@@ -4,15 +4,17 @@ signal swapped_piece(from: GridCellUI, to: GridCellUI)
 signal swap_rejected(from: GridCellUI, to: GridCellUI)
 signal removed_piece(piece: PieceUI)
 
-const group_name: String = "grid_cell"
+const GroupName: String = "grid_cells"
 
 @export var column: int
 @export var row: int
 @export var can_contain_piece: bool = true
 @export var cell_size: Vector2 = Vector2(48, 48)
 ## Texture default path is temporary
+@export var draw_background_texture: bool = true
 @export var odd_cell_texture: Texture2D = Match3Preloader.OddCellTexture
 @export var even_cell_texture: Texture2D = Match3Preloader.EvenCellTexture
+@export var empty_cell_texture: Texture2D
 
 #region Neighbours
 var neighbour_up: GridCellUI
@@ -37,7 +39,7 @@ var current_piece: PieceUI:
 			
 
 func _init(_row: int, _column: int, piece: PieceUI = null, _can_contain_piece: bool = true) -> void:
-	assert(row >=0 and column >=0, "GridCellUI: A grid cell cannot have a negative column %d or row %d" % [column, row])
+	assert(row >= 0 and column >= 0, "GridCellUI: A grid cell cannot have a negative column %d or row %d" % [column, row])
 	
 	row = _row
 	column = _column
@@ -46,7 +48,7 @@ func _init(_row: int, _column: int, piece: PieceUI = null, _can_contain_piece: b
 
 
 func _enter_tree() -> void:
-	add_to_group(group_name)
+	add_to_group(GroupName)
 	
 	name = "Cell_Column%d_Row%d" % [column, row]
 	z_index = 20
@@ -63,8 +65,11 @@ func change_background_image(new_image: Texture2D) -> void:
 	
 	
 func prepare_background_sprite() -> void:
-	selected_background_image = even_cell_texture if (column + row) % 2 == 0 else odd_cell_texture
-	
+	if can_contain_piece:
+		selected_background_image = even_cell_texture if (column + row) % 2 == 0 else odd_cell_texture
+	else:
+		selected_background_image = empty_cell_texture
+		
 	if background_sprite == null:
 		background_sprite = Sprite2D.new()
 		background_sprite.name = "BackgroundSprite"
@@ -72,7 +77,7 @@ func prepare_background_sprite() -> void:
 		background_sprite.z_index = -10
 		add_child(background_sprite)
 	
-	if background_sprite.texture:
+	if background_sprite.texture and draw_background_texture:
 		var texture_size = background_sprite.texture.get_size()
 		background_sprite.scale = Vector2(cell_size.x / texture_size.x, cell_size.y / texture_size.y)
 	
@@ -114,8 +119,10 @@ func is_column_neighbour_of(other_cell: GridCellUI) -> bool:
 		and [upper_row, bottom_row].any(func(near_row: int): return other_cell.row == near_row)
 
 
-func is_adjacent_to(other_cell: GridCellUI) -> bool:
-	return is_row_neighbour_of(other_cell) or is_column_neighbour_of(other_cell)
+func is_adjacent_to(other_cell: GridCellUI, check_diagonal: bool = false) -> bool:
+	return is_row_neighbour_of(other_cell) \
+		or is_column_neighbour_of(other_cell) \
+		or (check_diagonal and in_diagonal_with(other_cell))
 	
 
 func in_diagonal_with(other_cell: GridCellUI) -> bool:
@@ -176,7 +183,7 @@ func is_empty() -> bool:
 	
 
 func has_piece() -> bool:
-	return current_piece is PieceUI
+	return is_instance_valid(current_piece) and current_piece != null
 	
 
 func assign_piece(new_piece: PieceUI, overwrite: bool = false) -> void:
@@ -188,12 +195,10 @@ func assign_piece(new_piece: PieceUI, overwrite: bool = false) -> void:
 
 
 func replace_piece(new_piece: PieceUI) -> PieceUI:
-	var previous_piece = current_piece
-	current_piece = null
-	
+	var previous_piece = remove_piece()
 	assign_piece(new_piece)
 	
-	return previous_piece
+	return previous_piece if is_instance_valid(previous_piece) else null
 	
 
 func remove_piece():
@@ -204,7 +209,8 @@ func remove_piece():
 		return previous_piece
 	
 	return null
-	
+
+
 func swap_piece_with(other_cell: GridCellUI) -> bool:
 	if can_swap_piece_with(other_cell):
 		var previous_piece: PieceUI = current_piece
@@ -240,12 +246,24 @@ func available_neighbours(include_diagonals: bool = false) -> Array[GridCellUI]:
 			diagonal_neighbour_bottom_left
 		]))
 	else:
-		
 		neighbours.assign(Match3BoardPluginUtilities.remove_falsy_values([
 			neighbour_up,
 			neighbour_bottom,
 			neighbour_right,
 			neighbour_left,
+		]))
+	
+	return neighbours
+
+
+func diagonal_neighbours() -> Array[GridCellUI]:
+	var neighbours: Array[GridCellUI] = []
+	
+	neighbours.assign(Match3BoardPluginUtilities.remove_falsy_values([
+			diagonal_neighbour_top_right,
+			diagonal_neighbour_top_left,
+			diagonal_neighbour_bottom_right,
+			diagonal_neighbour_bottom_left
 		]))
 	
 	return neighbours
@@ -257,8 +275,8 @@ func can_swap_piece_with(other_cell: GridCellUI) -> bool:
 		and has_piece() \
 		and can_contain_piece \
 		and other_cell.can_contain_piece \
-		and not current_piece.is_locked \
-		and not other_cell.current_piece.is_locked \
+		and not current_piece.is_locked() \
+		and not other_cell.current_piece.is_locked() \
 		and other_cell.current_piece != current_piece \
 		and current_piece.can_be_swapped() and other_cell.current_piece.can_be_swapped()
 

@@ -1,0 +1,91 @@
+[gd_scene load_steps=10 format=3 uid="uid://ccyof5mub1bei"]
+
+[ext_resource type="Texture2D" uid="uid://ct0v34xosfrrt" path="res://addons/ninetailsrabbit.match3_board/demo/assets/pixel_art_gems.png" id="1_qnhls"]
+[ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/demo/pieces/special/special_cross_piece.gd" id="1_xs65u"]
+[ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/components/pieces/piece_configuration.gd" id="2_6hb7v"]
+
+[sub_resource type="Resource" id="Resource_78scf"]
+script = ExtResource("2_6hb7v")
+id = &"special_cross"
+name = "Special cross"
+description = "Explode the pieces in an entire row & column on cross shape"
+type = 1
+shape = "special_cross"
+can_be_swapped = true
+can_be_moved = true
+can_be_shuffled = true
+can_be_triggered = false
+can_be_replaced = false
+can_be_consumed = true
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tmr2j"]
+atlas = ExtResource("1_qnhls")
+region = Rect2(20, 37, 24, 24)
+
+[sub_resource type="Animation" id="Animation_b714q"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_j5vef"]
+resource_name = "explode"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.4, 0.5),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(0.95, 0.9), Vector2(1.5, 1.5), Vector2(2, 1.1)]
+}
+
+[sub_resource type="Animation" id="Animation_73u2a"]
+resource_name = "idle"
+length = 1.1
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:scale")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0.95, 0.9), Vector2(1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_37nro"]
+_data = {
+"RESET": SubResource("Animation_b714q"),
+"explode": SubResource("Animation_j5vef"),
+"idle": SubResource("Animation_73u2a")
+}
+
+[node name="SpecialCrossPiece" type="Node2D" node_paths=PackedStringArray("sprite")]
+script = ExtResource("1_xs65u")
+sprite = NodePath("Sprite2D")
+piece_definition = SubResource("Resource_78scf")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = SubResource("AtlasTexture_tmr2j")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_37nro")
+}

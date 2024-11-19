@@ -8,15 +8,37 @@
 
 config_version=5
 
+[Match3_Board]
+
+config/ninetailsrabbit.match3_board/update_notification_enabled=true
+
 [application]
 
-config/name="Match3 Board"
+config/name="Match3_Board"
 config/description="This lightweight library provides the core logic and functionality you need to build engaging match-3 games. Focus on game design and mechanics while leaving the complex logic to this library"
-config/version="1.0.1"
+config/version="1.5.0"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 config/icon="res://icon.svg"
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/ninetailsrabbit.match3_board/plugin.cfg")
+
+[input]
+
+cancel_line_connector={
+"deadzone": 0.5,
+"events": [Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"button_mask":2,"position":Vector2(412, 4),"global_position":Vector2(421, 50),"factor":1.0,"button_index":2,"canceled":false,"pressed":true,"double_click":false,"script":null)
+]
+}
+consume_line_connector={
+"deadzone": 0.5,
+"events": [Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"button_mask":1,"position":Vector2(489, 18),"global_position":Vector2(498, 64),"factor":1.0,"button_index":1,"canceled":false,"pressed":true,"double_click":false,"script":null)
+]
+}
+
 [rendering]
 
+textures/canvas_textures/default_texture_filter=0
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
