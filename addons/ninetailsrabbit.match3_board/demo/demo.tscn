@@ -37,7 +37,7 @@ piece_scene = ExtResource("7_otb5d")
 script = ExtResource("8_q5fox")
 auto_start = true
 pieces_collision_layer = 8
-swap_mode = 8
+swap_mode = 0
 click_mode = 0
 input_action_cancel_line_connector = &"cancel_line_connector"
 input_action_consume_line_connector = &"consume_line_connector"
@@ -58,7 +58,6 @@ script = ExtResource("1_dqalp")
 
 [node name="Match3Board" type="Node2D" parent="."]
 script = ExtResource("2_m7do7")
-preview_grid_in_editor = true
 use_placeholder_textures = false
 preview_pieces = Array[Texture2D]([ExtResource("3_jl4kx"), ExtResource("4_sagls"), ExtResource("5_0f5c7"), ExtResource("6_lgoea")])
 configuration = SubResource("Resource_t513j")

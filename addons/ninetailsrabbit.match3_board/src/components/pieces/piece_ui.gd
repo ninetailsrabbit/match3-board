@@ -21,7 +21,7 @@ const ObstacleGroupName: StringName = "obstacle-pieces"
 ## The sprite that represents an animated texture piece
 @export var animated_sprite: AnimatedSprite2D
 ## The piece definition with all the important data about the behaviour of this piece in the board
-@export var piece_definition: PieceDefinitionResource
+@export var piece_definition: PieceConfiguration
 ## The size this piece will have in the board, if this value changes the sprites are prepared again to adapt the regions.
 @export var cell_size: Vector2i = Vector2(48, 48):
 	set(value):

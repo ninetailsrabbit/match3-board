@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://ct0v34xosfrrt" path="res://addons/ninetailsrabbit.match3_board/demo/assets/pixel_art_gems.png" id="1_qnhls"]
 [ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/demo/pieces/special/special_cross_piece.gd" id="1_xs65u"]
-[ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/components/pieces/piece_definition.gd" id="2_6hb7v"]
+[ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/components/pieces/piece_configuration.gd" id="2_6hb7v"]
 
 [sub_resource type="Resource" id="Resource_78scf"]
 script = ExtResource("2_6hb7v")

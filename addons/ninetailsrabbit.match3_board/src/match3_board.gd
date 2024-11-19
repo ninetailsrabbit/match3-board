@@ -372,6 +372,8 @@ func draw_line_connector(origin_piece: PieceUI) -> void:
 		get_tree().root.add_child(line_connector)
 		line_connector.tree_exited.connect(remove_line_connector)
 		line_connector.add_piece(origin_piece)
+		line_connector.added_piece.connect(func(piece: PieceUI): added_piece_to_line_connector.emit(piece))
+		line_connector.canceled_match.connect(func(pieces: Array[PieceUI]): canceled_line_connector_match.emit(pieces))
 		
 
 func remove_line_connector() -> void:
@@ -972,7 +974,7 @@ func pieces() -> Array[PieceUI]:
 	return pieces.filter(func(piece: PieceUI): return is_instance_valid(piece))
 
 
-func pieces_of_type(type: PieceDefinitionResource.PieceType) -> Array[PieceUI]:
+func pieces_of_type(type: PieceConfiguration.PieceType) -> Array[PieceUI]:
 	var pieces: Array[PieceUI] = []
 	pieces.assign(pieces().filter(func(piece: PieceUI): return piece.piece_definition.type == type))
 	
@@ -993,7 +995,7 @@ func special_pieces() -> Array[PieceUI]:
 	return pieces
 
 
-func special_pieces_of_type(type: PieceDefinitionResource.PieceType) -> Array[PieceUI]:
+func special_pieces_of_type(type: PieceConfiguration.PieceType) -> Array[PieceUI]:
 	var pieces: Array[PieceUI] = []
 	pieces.assign(pieces().filter(func(piece: PieceUI): return piece.is_special() and piece.piece_definition.type == type))
 	
@@ -1014,7 +1016,7 @@ func obstacle_pieces() -> Array[PieceUI]:
 	return pieces
 
 
-func obstacle_pieces_of_type(type: PieceDefinitionResource.PieceType) -> Array[PieceUI]:
+func obstacle_pieces_of_type(type: PieceConfiguration.PieceType) -> Array[PieceUI]:
 	var pieces: Array[PieceUI] = []
 	pieces.assign(pieces().filter(func(piece: PieceUI): return piece.is_obstacle() and piece.piece_definition.type == type))
 	
@@ -1108,7 +1110,7 @@ func is_swap_mode_connect_line() -> bool:
 
 #region Debug
 func draw_preview_grid() -> void:
-	if Engine.is_editor_hint() and preview_grid_in_editor:
+	if Engine.is_editor_hint() and preview_grid_in_editor and is_inside_tree():
 		remove_preview_sprites()
 		
 		if debug_preview_node == null:

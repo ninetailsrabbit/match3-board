@@ -1,5 +1,4 @@
-@tool
-class_name PieceDefinitionResource extends Resource
+class_name PieceConfiguration extends Resource
 
 enum PieceType {
 	Normal,
@@ -23,7 +22,7 @@ enum PieceType {
 
 
 #region Overridables
-func match_with(other_piece: PieceDefinitionResource) -> bool:
+func match_with(other_piece: PieceConfiguration) -> bool:
 	if not can_be_consumed:
 		return false
 		

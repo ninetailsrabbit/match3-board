@@ -45,7 +45,8 @@ func _process(_delta: float) -> void:
 	add_point(mouse_position)
 	
 	detection_area.global_position = mouse_position
-	
+
+
 	
 func add_piece(new_piece: PieceUI) -> void:
 	new_piece.disable_interaction_areas()
@@ -78,7 +79,7 @@ func detect_new_matches_from_last_piece(last_piece: PieceUI) -> void:
 
 
 func consume_matches() -> void:
-	if pieces_connected.size() >= origin_piece.board.configuration.min_match:
+	if pieces_connected.size() >= origin_piece.board.configuration.min_match or _connected_pieces_has_special():
 		var cells: Array[GridCellUI] = []
 		cells.assign(pieces_connected.map(func(piece: PieceUI): return piece.cell()))
 		
@@ -100,6 +101,10 @@ func cancel() -> void:
 	queue_free()
 
 
+func _connected_pieces_has_special() -> bool:
+	return pieces_connected.any(func(piece: PieceUI): return piece.is_special())
+	
+	
 func _prepare_detection_area(piece: PieceUI) -> void:
 	z_index = piece.z_index
 	z_as_relative = piece.z_as_relative

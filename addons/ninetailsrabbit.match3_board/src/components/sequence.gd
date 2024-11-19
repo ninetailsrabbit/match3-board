@@ -1,6 +1,6 @@
 class_name Sequence
 
-signal consumed(pieces_consumed: Array[PieceDefinitionResource])
+signal consumed(pieces_consumed: Array[PieceConfiguration])
 
 enum Shapes {
 	Horizontal,
@@ -175,7 +175,7 @@ func all_pieces_are_special() -> bool:
 		return pieces().all(func(piece: PieceUI): return piece.is_special())
 
 
-func all_pieces_are_of_type(type: PieceDefinitionResource.PieceType) -> bool:
+func all_pieces_are_of_type(type: PieceConfiguration.PieceType) -> bool:
 	if pieces().is_empty():
 		return false
 	else:

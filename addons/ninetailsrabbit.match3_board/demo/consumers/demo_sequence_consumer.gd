@@ -5,7 +5,7 @@ const SpecialShapeConsumerPieceScene: PackedScene = preload("res://addons/nineta
 
 
 func detect_new_combined_piece(sequence: Sequence):
-	if sequence.all_pieces_are_of_type(PieceDefinitionResource.PieceType.Normal) \
+	if sequence.all_pieces_are_of_type(PieceConfiguration.PieceType.Normal) \
 		and (sequence.is_horizontal_or_vertical_shape() or sequence.is_tshape_or_lshape()):
 			match sequence.size():
 				4:

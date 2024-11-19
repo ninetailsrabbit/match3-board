@@ -63,6 +63,8 @@ To better understand what branch to choose from for which Godot version, please 
 
 # Getting started 🚀
 
+⚠️ **_DOCUMENTATION IS A WORK IN PROGRESS_** ⚠️
+
 To start creating your **Match3** game you have available 3 pillars provided from this plugin to build it:
 
 - 🔳 The `Match3Board` node handles the core game mechanics, including grid size, piece setup, and swap movement mode.
