@@ -65,11 +65,13 @@ To better understand what branch to choose from for which Godot version, please 
 
 ⚠️ **_DOCUMENTATION IS A WORK IN PROGRESS_** ⚠️
 
-To start creating your **Match3** game you have available 3 pillars provided from this plugin to build it:
+To start creating your **Match3** game you have available 5 pillars provided from this plugin to build it:
 
 - 🔳 The `Match3Board` node handles the core game mechanics, including grid size, piece setup, and swap movement mode.
 - 💎 The `PieceUI` node provides the visual representation and interactive behavior of game pieces. You can customize it or create your own variations.
-- 📝 The `PieceDefinitionResource` defines the properties and behaviors of each piece type, such as its match logic and special abilities.
+- 📝 The `PieceConfiguration` defines the properties and behaviors of each piece type, such as its match logic and special abilities.
+- 🎲 The `PieceWeight` defines a weight value and a piece scene to be used for weight selection when drawing new pieces on the board. You can link any scene where the root node is `PieceUI`.
+- ⛓ The `LineConnector` which allows parts to be connected on the basis of a Line2D when `LineConnected` swap mode is selected on the board configuration.
 
 # Editor preview 🪲
 
@@ -93,6 +95,8 @@ You have available default textures on this plugin to visualize a preview in the
 
 - **Preview grid in editor:** Enable or disable the preview
 - **Clean current preview:** Removes the current preview from the editor
+- **Use placeholder textures:** Use PlaceholderTexture2D as default texture to draw grids on the preview editor
+- **Placeholder textures colors:** Define colors for the placeholder textures to have a better visualization.
 - **Preview pieces:** The textures to preview in the grid randomly placed on each generation
 - **Odd cell texture:** The texture to place in odd cell positions in the board
 - **Even cell texture:** The texture to place in even cell positions in the board
