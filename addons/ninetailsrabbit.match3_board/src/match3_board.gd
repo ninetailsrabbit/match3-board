@@ -366,7 +366,7 @@ func handle_line_connector_input(event: InputEvent) -> void:
 				
 			
 func draw_line_connector(origin_piece: PieceUI) -> void:
-	if is_swap_mode_connect_line() and line_connector == null:
+	if is_swap_mode_connect_line() and line_connector == null and not origin_piece.can_be_triggered():
 		line_connector = LineConnector.new()
 		line_connector.board = self
 		get_tree().root.add_child(line_connector)

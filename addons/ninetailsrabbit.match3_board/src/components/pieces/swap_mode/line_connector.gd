@@ -73,12 +73,12 @@ func detect_new_matches_from_last_piece(last_piece: PieceUI) -> void:
 		for cell: GridCellUI in adjacent_cells:
 			var piece: PieceUI = cell.current_piece as PieceUI
 			
-			if not pieces_connected.has(piece) and piece.match_with(last_piece):
+			if not pieces_connected.has(piece) and (piece.match_with(last_piece) or piece.is_special()):
 				possible_next_matches.append(piece)
 
 
 func consume_matches() -> void:
-	if pieces_connected.size() >= origin_piece.board.min_match:
+	if pieces_connected.size() >= origin_piece.board.configuration.min_match:
 		var cells: Array[GridCellUI] = []
 		cells.assign(pieces_connected.map(func(piece: PieceUI): return piece.cell()))
 		
@@ -147,7 +147,7 @@ func on_added_piece(piece: PieceUI) -> void:
 
 		_prepare_detection_area(origin_piece)
 	
-	if pieces_connected.size() < origin_piece.board.max_match:
+	if pieces_connected.size() < origin_piece.board.configuration.max_match:
 		detect_new_matches_from_last_piece(piece)
 		board.cell_highlighter.remove_current_highlighters()
 		board.cell_highlighter.highlight_cells(board.grid_cells_from_pieces(possible_next_matches))

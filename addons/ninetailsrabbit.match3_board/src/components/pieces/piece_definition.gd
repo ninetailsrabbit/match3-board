@@ -1,3 +1,4 @@
+@tool
 class_name PieceDefinitionResource extends Resource
 
 enum PieceType {
