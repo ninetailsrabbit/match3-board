@@ -125,14 +125,20 @@ class ConsumeNormalSequenceAction extends SequenceAction:
 
 class DrawNewPieceSequenceAction extends SequenceAction:
 	func run() -> void:
-		var target_cell_to_spawn: GridCellUI = sequence.middle_cell()
-		
-		await consumer.board.piece_animator.consume_pieces(sequence.normal_pieces())
-		
-		sequence.consume_only_normal_pieces()
+		if arguments.has("new_piece") and is_instance_valid(arguments.new_piece):
+			arguments.new_piece.board = consumer.board
+			
+			var target_cell_to_spawn: GridCellUI = arguments.new_piece.custom_spawn_and_draw({"sequence": sequence})
+			
+			if target_cell_to_spawn == null:
+				target_cell_to_spawn = sequence.middle_cell()
+			
+			await consumer.board.piece_animator.consume_pieces(sequence.normal_pieces())
+			
+			sequence.consume_only_normal_pieces()
 
-		consumer.board.draw_piece_on_cell(target_cell_to_spawn, arguments.new_piece)
-		await consumer.board.piece_animator.spawn_special_piece(target_cell_to_spawn, arguments.new_piece)
+			consumer.board.draw_piece_on_cell(target_cell_to_spawn, arguments.new_piece)
+			await consumer.board.piece_animator.spawn_special_piece(target_cell_to_spawn, arguments.new_piece)
 		
 
 	func get_class_name() -> StringName:

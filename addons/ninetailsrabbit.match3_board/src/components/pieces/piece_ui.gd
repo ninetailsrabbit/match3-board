@@ -111,7 +111,7 @@ func _enter_tree() -> void:
 	if board == null:
 		board = get_tree().get_first_node_in_group(Match3Board.BoardGroupName)
 	
-	assert(board is Match3Board, "PieceUI: The piece ui needs a linked Match3Board to be functional. ")
+	assert(board is Match3Board, "PieceUI: The piece %s needs a linked Match3Board to be functional" % name)
 	
 	cell_size = board.cell_size
 	
@@ -419,6 +419,10 @@ func trigger_special_effect():
 	pass
 
 
+func custom_spawn_and_draw(arguments: Dictionary = {}):
+	return null
+	
+	
 func on_piece_selected() -> void:
 	pass
 	
