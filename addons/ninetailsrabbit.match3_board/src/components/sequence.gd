@@ -100,7 +100,7 @@ func pieces() -> Array[PieceUI]:
 	current_pieces.assign(
 		Match3BoardPluginUtilities.remove_falsy_values(cells.map(func(grid_cell: GridCellUI): return grid_cell.current_piece)))
 	
-	return current_pieces.filter(func(piece): return is_instance_valid(piece))
+	return current_pieces.filter(func(piece: PieceUI): return is_instance_valid(piece) and piece != null)
 	
 	
 func normal_pieces_cells() -> Array[GridCellUI]:

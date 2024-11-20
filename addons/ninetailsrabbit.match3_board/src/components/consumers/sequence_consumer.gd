@@ -53,9 +53,10 @@ func consume_sequences(sequences: Array[Sequence]) -> void:
 
 
 func trigger_special_piece(sequence: Sequence, special_piece: PieceUI) -> void:
-	await special_piece.trigger_special_effect()
-	sequence.consume_piece(special_piece)
-	
+	if is_instance_valid(special_piece) and special_piece != null:
+		await special_piece.trigger_special_effect()
+		sequence.consume_piece(special_piece)
+		
 
 #region Overridables
 func detect_new_combined_piece(sequence: Sequence):
