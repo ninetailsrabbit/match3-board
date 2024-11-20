@@ -106,11 +106,31 @@ enum BoardState {
 			empty_cell_texture = value
 			draw_preview_grid()
 @export_group("Size 🔲")
-@export var grid_width: int = 8
-@export var grid_height: int = 7
-@export var cell_size: Vector2i = Vector2i(48, 48)
-@export var cell_offset: Vector2i = Vector2i(25, 25)
-@export var empty_cells: Array[Vector2] = []
+@export var grid_width: int = 8:
+		set(value):
+			if grid_width != value:
+				grid_width = maxi(MinGridWidth, value)
+				draw_preview_grid()
+@export var grid_height: int = 7:
+		set(value):
+			if grid_height != value:
+				grid_height = maxi(MinGridHeight, value)
+				draw_preview_grid()
+@export var cell_size: Vector2i = Vector2i(48, 48):
+		set(value):
+			if cell_size != value:
+				cell_size = value
+				draw_preview_grid()
+@export var cell_offset: Vector2i = Vector2i(25, 25):
+	set(value):
+		if cell_offset != value:
+			cell_offset = value
+			draw_preview_grid()
+@export var empty_cells: Array[Vector2] = []:
+	set(value):
+		if empty_cells != value:
+			empty_cells = value
+			draw_preview_grid()
 @export var draw_background_texture_on_empty_cells: bool = true
 @export_group("Configuration 💎")
 @export var configuration: Match3Configuration
