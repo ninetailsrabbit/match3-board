@@ -9,7 +9,7 @@ var extra_sequence: Sequence
 func _ready() -> void:
 	super._ready()
 	animation_player.play("idle")
-
+	
 
 func trigger_special_effect() -> void:
 	if not triggered:
