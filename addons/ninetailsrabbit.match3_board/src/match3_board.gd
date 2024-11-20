@@ -169,52 +169,54 @@ func _input(event: InputEvent) -> void:
 	
 	
 func _enter_tree() -> void:
-	add_to_group(BoardGroupName)
-	
 	remove_preview_sprites()
 	
-	current_available_moves = configuration.available_moves_on_start
-	
-	if piece_weight_generator == null:
-		piece_weight_generator = PieceWeightGenerator.new()
+	if not Engine.is_editor_hint():
+		add_to_group(BoardGroupName)
 		
-	if cell_highlighter == null:
-		change_cell_highlighter(CellHighlighter.new())
+		current_available_moves = configuration.available_moves_on_start
 		
-	if piece_animator == null:
-		change_piece_animator(PieceAnimator.new())
+		if piece_weight_generator == null:
+			piece_weight_generator = PieceWeightGenerator.new()
+			
+		if cell_highlighter == null:
+			change_cell_highlighter(CellHighlighter.new())
+			
+		if piece_animator == null:
+			change_piece_animator(PieceAnimator.new())
+			
+		if sequence_consumer == null:
+			change_sequence_consumer(SequenceConsumer.new())
+			
+		prepared_board.connect(on_prepared_board)
 		
-	if sequence_consumer == null:
-		change_sequence_consumer(SequenceConsumer.new())
+		piece_selected.connect(on_piece_selected)
+		piece_unselected.connect(on_piece_unselected)
+		piece_holded.connect(on_piece_holded)
+		piece_released.connect(on_piece_released)
 		
-	prepared_board.connect(on_prepared_board)
-	
-	piece_selected.connect(on_piece_selected)
-	piece_unselected.connect(on_piece_unselected)
-	piece_holded.connect(on_piece_holded)
-	piece_released.connect(on_piece_released)
-	
-	swap_requested.connect(on_swap_requested)
-	swap_failed.connect(on_swap_failed)
-	swap_rejected.connect(on_swap_rejected)
-	swapped_pieces.connect(on_swapped_pieces)
-	
-	consume_requested.connect(on_consume_requested)
-	
-	state_changed.connect(on_state_changed)
+		swap_requested.connect(on_swap_requested)
+		swap_failed.connect(on_swap_failed)
+		swap_rejected.connect(on_swap_rejected)
+		swapped_pieces.connect(on_swapped_pieces)
+		
+		consume_requested.connect(on_consume_requested)
+		
+		state_changed.connect(on_state_changed)
 	
 
 func _ready() -> void:
 	assert(configuration is Match3Configuration, "Match3Board: This board needs a valid Match3Configuration resource to be drawed in the scene")
 	
-	if not InputMap.has_action(configuration.input_action_consume_line_connector):
-		push_warning("Match3Board: The input action %s to consume a line connection does not exist, it will not be possible to consume a line connector manually" % configuration.input_action_consume_line_connector)
+	if not Engine.is_editor_hint():
+		if not InputMap.has_action(configuration.input_action_consume_line_connector):
+			push_warning("Match3Board: The input action %s to consume a line connection does not exist, it will not be possible to consume a line connector manually" % configuration.input_action_consume_line_connector)
 
-	if not InputMap.has_action(configuration.input_action_cancel_line_connector):
-		push_warning("Match3Board: The input action %s to cancel a line connection does not exist, it will not be possible to cancel a line connector manually" % configuration.input_action_cancel_line_connector)
+		if not InputMap.has_action(configuration.input_action_cancel_line_connector):
+			push_warning("Match3Board: The input action %s to cancel a line connection does not exist, it will not be possible to cancel a line connector manually" % configuration.input_action_cancel_line_connector)
 
-	if configuration.auto_start:
-		prepare_board()
+		if configuration.auto_start:
+			prepare_board()
 	
 
 func distance() -> int:
