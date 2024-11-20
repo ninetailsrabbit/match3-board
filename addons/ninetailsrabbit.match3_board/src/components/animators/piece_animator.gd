@@ -106,7 +106,7 @@ func consume_pieces(pieces: Array[PieceUI]):
 	if pieces.size() > 0:
 		var tween: Tween = create_tween().set_parallel(true)
 		
-		for piece: PieceUI in pieces.filter(func(piece): return is_instance_valid(piece)):
+		for piece: PieceUI in pieces.filter(func(piece: PieceUI): return is_instance_valid(piece)):
 			tween.tween_property(piece, "scale", Vector2.ZERO, 0.15).set_ease(Tween.EASE_OUT)
 		
 		await tween.finished
@@ -117,16 +117,17 @@ func consume_pieces(pieces: Array[PieceUI]):
 func spawn_special_piece(target_cell: GridCellUI, new_piece: PieceUI):
 		animation_started.emit()
 		
-		new_piece.hide()
-		var tween: Tween = create_tween().set_parallel(true)
-		
-		tween.tween_property(target_cell.current_piece, "position", target_cell.position, 0.15)\
-			.set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_QUAD)
-		tween.chain()
-		tween.tween_property(new_piece, "visible", true, 0.1)
-		
-		await tween.finished
-		
+		if is_instance_valid(new_piece) and target_cell.current_piece == new_piece:
+			new_piece.hide()
+			var tween: Tween = create_tween().set_parallel(true)
+			
+			tween.tween_property(target_cell.current_piece, "position", target_cell.position, 0.15)\
+				.set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_QUAD)
+			tween.chain()
+			tween.tween_property(new_piece, "visible", true, 0.1)
+			
+			await tween.finished
+			
 		animation_finished.emit()
 
 
