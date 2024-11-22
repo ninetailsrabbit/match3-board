@@ -671,11 +671,14 @@ func find_tshape_sequence(sequence_a: Sequence, sequence_b: Sequence):
 			var bottom_edge_cell: GridCellUI = vertical_sequence.bottom_edge_cell()
 			var horizontal_middle_cell: GridCellUI = horizontal_sequence.middle_cell()
 			var vertical_middle_cell: GridCellUI = vertical_sequence.middle_cell()
-			
-			if horizontal_middle_cell.in_same_position_as(top_edge_cell) \
-				or horizontal_middle_cell.in_same_position_as(bottom_edge_cell) \
-				or vertical_middle_cell.in_same_position_as(left_edge_cell) or vertical_middle_cell.in_same_position_as(right_edge_cell):
-				
+
+			var intersection_cell: GridCellUI = get_cell_or_null(horizontal_middle_cell.row, vertical_middle_cell.column)
+			if intersection_cell in horizontal_sequence.cells and intersection_cell in vertical_sequence.cells and not (
+				(left_edge_cell.in_same_position_as(intersection_cell) and top_edge_cell.in_same_position_as(intersection_cell)) \
+				or (left_edge_cell.in_same_position_as(intersection_cell) and bottom_edge_cell.in_same_position_as(intersection_cell)) \
+				or (right_edge_cell.in_same_position_as(intersection_cell) and top_edge_cell.in_same_position_as(intersection_cell)) \
+				or (right_edge_cell.in_same_position_as(intersection_cell) and bottom_edge_cell.in_same_position_as(intersection_cell))
+			):			
 				var cells: Array[GridCellUI] = []
 				
 				## We need to iterate manually to be able append the item type on the array
