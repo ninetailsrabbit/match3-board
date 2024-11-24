@@ -102,7 +102,22 @@ func pieces() -> Array[PieceUI]:
 	
 	return current_pieces.filter(func(piece: PieceUI): return is_instance_valid(piece) and piece != null)
 	
-	
+
+func special_piece_cells(include_triggered: bool = false) -> Array[GridCellUI]:
+	var cells: Array[GridCellUI] = []
+	cells.assign(
+		Match3BoardPluginUtilities.remove_falsy_values(
+			special_pieces(include_triggered).map(func(piece: PieceUI): return piece.cell())
+		)
+	)
+
+	return cells
+
+
+func special_pieces(include_triggered: bool = false) -> Array[PieceUI]:
+	return pieces().filter(func(piece: PieceUI): return piece.is_special() and (include_triggered or not piece.triggered))
+
+
 func normal_pieces_cells() -> Array[GridCellUI]:
 	var cells: Array[GridCellUI] = []
 	cells.assign(
