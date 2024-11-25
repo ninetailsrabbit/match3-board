@@ -114,7 +114,7 @@ class ConsumeNormalSequenceAction extends SequenceAction:
 		
 		await consumer.board.piece_animator.consume_pieces(sequence.normal_pieces())
 		
-		sequence.consume_only(sequence.normal_pieces_cells() + sequence.special_piece_cells(true))
+		sequence.consume_except(special_pieces_cells(false))
 	
 	func get_class_name() -> StringName:
 		return &"ConsumeNormalSequenceAction"
