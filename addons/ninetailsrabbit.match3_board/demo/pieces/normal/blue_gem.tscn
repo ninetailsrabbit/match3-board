@@ -9,14 +9,13 @@ script = ExtResource("2_ukldw")
 id = &"blue_gem"
 name = "Blue gem"
 description = ""
-type = 0
 shape = "blue"
-can_be_swapped = true
-can_be_moved = true
-can_be_shuffled = true
-can_be_triggered = false
-can_be_replaced = true
-can_be_consumed = true
+can_be_actions = Dictionary[String, bool]({
+"consumed": true,
+"moved": true,
+"shuffled": true,
+"swapped": true
+})
 
 [node name="BlueGem" type="Node2D" node_paths=PackedStringArray("sprite")]
 script = ExtResource("1_3uypx")

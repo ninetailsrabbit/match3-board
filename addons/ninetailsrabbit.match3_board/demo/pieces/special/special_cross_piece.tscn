@@ -9,14 +9,13 @@ script = ExtResource("2_6hb7v")
 id = &"special_cross"
 name = "Special cross"
 description = "Explode the pieces in an entire row & column on cross shape"
-type = 1
 shape = "special_cross"
-can_be_swapped = true
-can_be_moved = true
-can_be_shuffled = true
-can_be_triggered = false
-can_be_replaced = false
-can_be_consumed = true
+can_be_actions = Dictionary[String, bool]({
+"consumed": true,
+"moved": true,
+"swapped": true,
+"triggered": false
+})
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_tmr2j"]
 atlas = ExtResource("1_qnhls")
@@ -72,9 +71,9 @@ tracks/0/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_37nro"]
 _data = {
-"RESET": SubResource("Animation_b714q"),
-"explode": SubResource("Animation_j5vef"),
-"idle": SubResource("Animation_73u2a")
+&"RESET": SubResource("Animation_b714q"),
+&"explode": SubResource("Animation_j5vef"),
+&"idle": SubResource("Animation_73u2a")
 }
 
 [node name="SpecialCrossPiece" type="Node2D" node_paths=PackedStringArray("sprite")]
@@ -87,5 +86,5 @@ texture = SubResource("AtlasTexture_tmr2j")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
-"": SubResource("AnimationLibrary_37nro")
+&"": SubResource("AnimationLibrary_37nro")
 }

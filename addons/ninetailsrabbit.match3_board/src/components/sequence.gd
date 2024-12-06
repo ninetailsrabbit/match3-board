@@ -18,6 +18,7 @@ enum Shapes {
 
 var cells: Array[GridCellUI] = []
 var shape: Shapes = Shapes.Irregular
+var after_consumed: Callable = func(): pass
 
 
 func _init(sequence_cells: Array[GridCellUI], _shape: Shapes = Shapes.Irregular) -> void:
@@ -34,12 +35,12 @@ static func create_from_pieces(pieces: Array[PieceUI]) -> Sequence:
 	cells.assign(pieces.map(func(piece: PieceUI): return piece.cell()))
 	
 	return Sequence.new(cells)
-	
+
 
 func size() -> int:
 	return cells.size()
-	
-	
+
+
 func combine_with(other_sequence: Sequence) -> Sequence:
 	return Sequence.new(cells + other_sequence.cells)
 
@@ -49,7 +50,7 @@ func consume() -> void:
 	
 	for cell: GridCellUI in cells.filter(func(grid_cell: GridCellUI): return grid_cell.has_piece()):
 		pieces.append(cell.current_piece)
-		consume_cell(cell)
+		await consume_cell(cell)
 	
 	consumed.emit(pieces)
 
@@ -74,25 +75,19 @@ func consume_only(cells: Array[GridCellUI] = []) -> void:
 	consumed.emit(pieces)
 
 
-func consume_only_normal_pieces() -> void:
-	consume_only(normal_pieces_cells())
-
-
 func consume_piece(piece: PieceUI, remove_from_sequence: bool = false) -> void:
 	if pieces().has(piece):
 		consume_cell(piece.cell())
 
 
 func consume_cell(cell: GridCellUI, remove_from_sequence: bool = false) -> void:
-	if cells.has(cell):# and not is_special_shape():
-		var removed_piece = cell.remove_piece()
+	if cells.has(cell):
+		var piece: PieceUI = cell.current_piece
 		
-		if is_instance_valid(removed_piece) and removed_piece != null:
-			removed_piece.consumed.emit()
-			removed_piece.queue_free()
-		
-			if remove_from_sequence:
-				cells.erase(cell)
+		if is_instance_valid(piece) and piece != null:
+			if await piece.consume(self):
+				if remove_from_sequence:
+					cells.erase(cell)
 
 
 func pieces() -> Array[PieceUI]:
@@ -101,64 +96,7 @@ func pieces() -> Array[PieceUI]:
 		Match3BoardPluginUtilities.remove_falsy_values(cells.map(func(grid_cell: GridCellUI): return grid_cell.current_piece)))
 	
 	return current_pieces.filter(func(piece: PieceUI): return is_instance_valid(piece) and piece != null)
-	
 
-func special_piece_cells(include_triggered: bool = false) -> Array[GridCellUI]:
-	var cells: Array[GridCellUI] = []
-	cells.assign(
-		Match3BoardPluginUtilities.remove_falsy_values(
-			special_pieces(include_triggered).map(func(piece: PieceUI): return piece.cell())
-		)
-	)
-
-	return cells
-
-
-func special_pieces(include_triggered: bool = false) -> Array[PieceUI]:
-	return pieces().filter(func(piece: PieceUI): return piece.is_special() and (include_triggered or not piece.triggered))
-
-
-func normal_pieces_cells() -> Array[GridCellUI]:
-	var cells: Array[GridCellUI] = []
-	cells.assign(
-		Match3BoardPluginUtilities.remove_falsy_values(
-			normal_pieces().map(func(piece: PieceUI): return piece.cell())
-		)
-	)
-	
-	return cells
-
-
-func normal_pieces() -> Array[PieceUI]:
-	return pieces().filter(func(piece: PieceUI): return piece.is_normal())
-	
-
-func contains_special_piece() -> bool:
-	return pieces().any(func(piece: PieceUI): return piece.is_special())
-
-
-func contains_special_piece_triggered() -> bool:
-	return pieces().any(func(piece: PieceUI): return piece.is_special() and piece.triggered)
-
-	
-func all_special_pieces_are_triggered() -> bool:
-	return get_special_pieces().all(func(piece: PieceUI): return piece.triggered)
-
-
-func get_special_piece():
-	if contains_special_piece():
-		return get_special_pieces().front()
-	
-	return null
-
-
-func get_special_pieces() -> Array[PieceUI]:
-	return pieces().filter(func(piece: PieceUI): return piece.is_special() and not piece.triggered)
-
-	
-func special_pieces_count() -> int:
-	return get_special_pieces().size()
-	
 
 func add_cell(new_cell: GridCellUI) -> void:
 	if not cells.has(new_cell):
@@ -183,18 +121,14 @@ func remove_cells_with_pieces(pieces: Array[PieceUI]) -> void:
 		remove_cell_with_piece(piece)
 
 
-func all_pieces_are_special() -> bool:
+func all_pieces_are_same_shape() -> bool:
 	if pieces().is_empty():
 		return false
 	else:
-		return pieces().all(func(piece: PieceUI): return piece.is_special())
+		if cells.any(func(cell: GridCellUI): return not cell.has_piece()):
+			return false
 
-
-func all_pieces_are_of_type(type: PieceConfiguration.PieceType) -> bool:
-	if pieces().is_empty():
-		return false
-	else:
-		return pieces().all(func(piece: PieceUI): return piece.piece_definition.type == type)
+		return pieces().all(func(piece: PieceUI): return piece.piece_definition.shape == pieces().front().piece_definition.shape)
 
 
 func all_pieces_are_of_shape(shape: String) -> bool:
@@ -212,10 +146,10 @@ func middle_cell() -> GridCellUI:
 func top_edge_cell():
 	if shape == Shapes.Vertical:
 		return cells.front()
-		
+
 	return null
-	
-	
+
+
 func bottom_edge_cell():
 	if shape == Shapes.Vertical:
 		return cells.back()
@@ -270,16 +204,13 @@ func is_diagonal_shape() -> bool:
 
 func is_line_connected_shape() -> bool:
 	return shape == Shapes.LineConnected
-	
+
 
 func is_special_shape() -> bool:
 	return shape == Shapes.Special
 
 
 func _detect_shape() -> Shapes:
-	if contains_special_piece():
-		return Shapes.Special
-		
 	var is_horizontal: bool = false
 	var is_vertical: bool = false
 	var is_diagonal: bool = false

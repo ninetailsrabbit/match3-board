@@ -14,23 +14,16 @@ func _process(delta: float) -> void:
 	scale += scale * delta
 
 
-func trigger_special_effect() -> void:
-	if not triggered and not shape_to_consume.is_empty():
+func consume(sequence: Sequence) -> bool:
+	if not triggered:
 		triggered = true
-		
 		board.lock()
-		
-		if combined_with != null:
-			shape_to_consume = combined_with.piece_definition.shape
-			
 		var target_pieces: Array[PieceUI] = board.pieces_of_shape(shape_to_consume)
-		
-		if target_pieces.is_empty():
-			finished_piece_special_trigger.emit()
-			return
-		
-		var sequence: Sequence = Sequence.new(board.grid_cells_from_pieces(target_pieces), Sequence.Shapes.Irregular)
 
+		if target_pieces.is_empty():
+			return super.consume(sequence)
+
+		var new_sequence: Sequence = Sequence.new(board.grid_cells_from_pieces(target_pieces), Sequence.Shapes.Special)
 		set_process(true)
 		
 		var tween: Tween = create_tween().set_parallel(true)
@@ -38,11 +31,9 @@ func trigger_special_effect() -> void:
 		for piece: PieceUI in target_pieces:
 			tween.tween_property(piece, "scale", Vector2(piece.scale.x * 1.1, piece.scale.y * 1.3), 1.0)\
 				.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO)
-		
-		sequence.add_cell(cell())
-		
-		await tween.finished
-		
-		board.sequence_consumer.add_action_to_queue(board.sequence_consumer.create_normal_sequence_action(sequence), true)
 
-		finished_piece_special_trigger.emit()
+
+		await tween.finished
+		board.sequence_consumer.add_sequence_to_queue(new_sequence, true)
+
+	return super.consume(sequence)
