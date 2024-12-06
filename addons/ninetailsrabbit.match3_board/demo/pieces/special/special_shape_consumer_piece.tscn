@@ -9,14 +9,13 @@ script = ExtResource("2_5xyog")
 id = &"special_shape_consumer"
 name = "Special shape consumer"
 description = "Consume all the pieces with the shape provided as parameter"
-type = 1
 shape = "special_shape"
-can_be_swapped = false
-can_be_moved = true
-can_be_shuffled = true
-can_be_triggered = true
-can_be_replaced = false
-can_be_consumed = true
+can_be_actions = Dictionary[String, bool]({
+"consumed": true,
+"moved": true,
+"swapped": false,
+"triggered": true
+})
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_d2uv2"]
 atlas = ExtResource("2_sc5me")

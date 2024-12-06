@@ -1,4 +1,5 @@
 @tool
+@icon("res://addons/match3_board/assets/board.svg")
 class_name Match3Board extends Node2D
 
 class FallMovement:
@@ -330,7 +331,7 @@ func draw_board():
 	drawed_board.emit()
 	
 	return self
-	
+
 
 func remove_matches_from_board() -> void:
 	var sequences: Array[Sequence] = find_board_sequences()
@@ -351,7 +352,7 @@ func remove_matches_from_board() -> void:
 				draw_random_piece_on_cell(current_cell, piece_exceptions)
 		
 		sequences = find_board_sequences()
-	
+
 
 func draw_grid_cell(grid_cell: GridCellUI) -> void:
 	if not grid_cell.is_inside_tree():
@@ -364,7 +365,14 @@ func draw_random_piece_on_cell(grid_cell: GridCellUI, except: Array[PieceWeight]
 	if grid_cell.can_contain_piece:
 		var new_piece: PieceUI =  piece_weight_generator.roll(configuration.not_disabled_pieces())
 		draw_piece_on_cell(grid_cell, new_piece)
-		
+
+
+func draw_piece_on_position(column: int, row: int, new_piece: PieceUI, animate: bool = true) -> void:
+	var grid_cell: GridCellUI = get_cell_or_null(column, row)
+	draw_piece_on_cell(grid_cell, new_piece)
+	if animate:
+		await piece_animator.spawn_piece(grid_cell, new_piece)
+
 
 func draw_piece_on_cell(grid_cell: GridCellUI, new_piece: PieceUI) -> void:
 	if grid_cell.can_contain_piece:
@@ -372,7 +380,9 @@ func draw_piece_on_cell(grid_cell: GridCellUI, new_piece: PieceUI) -> void:
 		new_piece.position = grid_cell.position
 		
 		add_child(new_piece)
-		grid_cell.replace_piece(new_piece)
+		var old_piece: PieceUI = grid_cell.replace_piece(new_piece)
+		if old_piece:
+			old_piece.queue_free()
 #endregion
 
 #region Line Connector
@@ -388,7 +398,7 @@ func handle_line_connector_input(event: InputEvent) -> void:
 				
 			
 func draw_line_connector(origin_piece: PieceUI) -> void:
-	if is_swap_mode_connect_line() and line_connector == null and not origin_piece.can_be_triggered():
+	if is_swap_mode_connect_line() and line_connector == null and not origin_piece.can_be("triggered"):
 		line_connector = LineConnector.new()
 		line_connector.board = self
 		get_tree().root.add_child(line_connector)
@@ -552,7 +562,7 @@ func first_movable_cell_on_column(column: int):
 	
 	var movable_cells = cells.filter(
 		func(cell: GridCellUI): 
-			return cell.has_piece() and cell.current_piece.can_be_moved() and (cell.neighbour_bottom and cell.neighbour_bottom.is_empty())
+			return cell.has_piece() and cell.current_piece.can_be("moved") and (cell.neighbour_bottom and cell.neighbour_bottom.is_empty())
 			)
 	
 	if movable_cells.size() > 0:
@@ -672,7 +682,7 @@ func find_tshape_sequence(sequence_a: Sequence, sequence_b: Sequence):
 			var horizontal_middle_cell: GridCellUI = horizontal_sequence.middle_cell()
 			var vertical_middle_cell: GridCellUI = vertical_sequence.middle_cell()
 
-			var intersection_cell: GridCellUI = get_cell_or_null(horizontal_middle_cell.row, vertical_middle_cell.column)
+			var intersection_cell: GridCellUI = get_cell_or_null(vertical_middle_cell.column, horizontal_middle_cell.row)
 			if intersection_cell in horizontal_sequence.cells and intersection_cell in vertical_sequence.cells and not (
 				(left_edge_cell.in_same_position_as(intersection_cell) and top_edge_cell.in_same_position_as(intersection_cell)) \
 				or (left_edge_cell.in_same_position_as(intersection_cell) and bottom_edge_cell.in_same_position_as(intersection_cell)) \
@@ -938,18 +948,16 @@ func swap_pieces(from_grid_cell: GridCellUI, to_grid_cell: GridCellUI) -> void:
 		from_grid_cell.current_piece.combined_with = to_grid_cell.current_piece
 		to_grid_cell.current_piece.combined_with = from_grid_cell.current_piece
 		
-		## When a special it's detected on any of the swapped cells 
-		## It creates a sequence with only both to trigger the special piece and consume the target
-		if from_grid_cell.current_piece.is_special() and not to_grid_cell.current_piece.is_special():
-			matches.append(Sequence.new([from_grid_cell], Sequence.Shapes.Special))
-		elif to_grid_cell.current_piece.is_special() and not from_grid_cell.current_piece.is_special():
-			matches.append(Sequence.new([to_grid_cell], Sequence.Shapes.Special))
-		elif from_grid_cell.current_piece.is_special() and to_grid_cell.current_piece.is_special():
-			matches.append(Sequence.new([from_grid_cell, to_grid_cell], Sequence.Shapes.Special))
+		var sequence_from = from_grid_cell.current_piece.on_swap_with(to_grid_cell.current_piece)
+		var sequence_to = to_grid_cell.current_piece.on_swap_with(from_grid_cell.current_piece)
+		
+		if sequence_from:
+			matches.append(sequence_from)
+		elif sequence_to:
+			matches.append(sequence_to)
 		else:
-			matches = find_matches_from_swap(from_grid_cell, to_grid_cell)\
-				.filter(func(sequence: Sequence): return not sequence.contains_special_piece())
-			
+			matches = find_matches_from_swap(from_grid_cell, to_grid_cell)
+
 		await piece_animator.swap_pieces(from_grid_cell.current_piece, to_grid_cell.current_piece)
 		
 		if matches.size() > 0:
@@ -999,68 +1007,20 @@ func pieces() -> Array[PieceUI]:
 	return pieces.filter(func(piece: PieceUI): return is_instance_valid(piece))
 
 
-func pieces_of_type(type: PieceConfiguration.PieceType) -> Array[PieceUI]:
-	var pieces: Array[PieceUI] = []
-	pieces.assign(pieces().filter(func(piece: PieceUI): return piece.piece_definition.type == type))
-	
-	return pieces
-
-
 func pieces_of_shape(shape: String) -> Array[PieceUI]:
+	print("pieces_of_shape: ", shape)
 	var pieces: Array[PieceUI] = []
 	pieces.assign(pieces().filter(func(piece: PieceUI): return piece.piece_definition.shape == shape))
 	
 	return pieces
 
 
-func special_pieces() -> Array[PieceUI]:
-	var pieces: Array[PieceUI] = []
-	pieces.assign(pieces().filter(func(piece: PieceUI): return piece.is_special()))
-	
-	return pieces
-
-
-func special_pieces_of_type(type: PieceConfiguration.PieceType) -> Array[PieceUI]:
-	var pieces: Array[PieceUI] = []
-	pieces.assign(pieces().filter(func(piece: PieceUI): return piece.is_special() and piece.piece_definition.type == type))
-	
-	return pieces
-
-
-func special_pieces_of_shape(shape: String) -> Array[PieceUI]:
-	var pieces: Array[PieceUI] = []
-	pieces.assign(pieces().filter(func(piece: PieceUI): return piece.is_special() and piece.piece_definition.shape == shape))
-	
-	return pieces
-
-
-func obstacle_pieces() -> Array[PieceUI]:
-	var pieces: Array[PieceUI] = []
-	pieces.assign(pieces().filter(func(piece: PieceUI): return piece.is_obstacle()))
-	
-	return pieces
-
-
-func obstacle_pieces_of_type(type: PieceConfiguration.PieceType) -> Array[PieceUI]:
-	var pieces: Array[PieceUI] = []
-	pieces.assign(pieces().filter(func(piece: PieceUI): return piece.is_obstacle() and piece.piece_definition.type == type))
-	
-	return pieces
-
-
-func obstacle_pieces_of_shape(shape: String) -> Array[PieceUI]:
-	var pieces: Array[PieceUI] = []
-	pieces.assign(pieces().filter(func(piece: PieceUI): return piece.is_obstacle() and piece.piece_definition.shape == shape))
-	
-	return pieces
-	
-	
 func fall_pieces() -> void:
 	var fall_movements: Array[FallMovement] = []
 	
 	while grid_cells_flattened.any(
 		func(cell: GridCellUI): 
-			return cell.has_piece() and cell.current_piece.can_be_moved() and (cell.neighbour_bottom and cell.neighbour_bottom.can_contain_piece and cell.neighbour_bottom.is_empty())
+			return cell.has_piece() and cell.current_piece.can_be("moved") and (cell.neighbour_bottom and cell.neighbour_bottom.can_contain_piece and cell.neighbour_bottom.is_empty())
 			):
 				fall_movements = calculate_current_fall_movements()
 				await piece_animator.fall_down_pieces(fall_movements)
@@ -1221,15 +1181,18 @@ func on_state_changed(from: BoardState, to: BoardState) -> void:
 			lock()
 			start_consume_sequence_pipeline()
 		BoardState.Fill:
-			lock()
-			remove_orphan_pieces()
+			if pending_empty_cells_to_fill().is_empty():
+				current_state = BoardState.WaitForInput
+			else:
+				lock()
+				remove_orphan_pieces()
 				
-			await fall_pieces()
-			await get_tree().process_frame
-			await fill_pieces()
-			
-			pending_sequences += find_board_sequences() 
-			current_state = BoardState.WaitForInput if pending_sequences.is_empty() else BoardState.Consume
+				await fall_pieces()
+				await get_tree().process_frame
+				await fill_pieces()
+				
+				pending_sequences += find_board_sequences() 
+				current_state = BoardState.WaitForInput if pending_sequences.is_empty() else BoardState.Consume
 		
 	
 func on_swap_requested(from_piece: PieceUI, to_piece: PieceUI) -> void:
@@ -1285,7 +1248,7 @@ func on_consumed_sequences(sequences: Array[Sequence]) -> void:
 
 
 func on_piece_selected(piece: PieceUI) -> void:
-	if is_locked or is_click_mode_drag() or piece.can_be_triggered():
+	if is_locked or is_click_mode_drag() or piece.can_be("triggered"):
 		return
 	
 	draw_line_connector(piece)
@@ -1309,7 +1272,7 @@ func on_piece_unselected(_piece: PieceUI) -> void:
 	
 	
 func on_piece_holded(piece: PieceUI) -> void:
-	if is_locked or is_click_mode_selection() or current_selected_piece != null or piece.can_be_triggered():
+	if is_locked or is_click_mode_selection() or current_selected_piece != null or piece.can_be("triggered"):
 		return
 	
 	draw_line_connector(piece)

@@ -74,18 +74,18 @@ func detect_new_matches_from_last_piece(last_piece: PieceUI) -> void:
 		for cell: GridCellUI in adjacent_cells:
 			var piece: PieceUI = cell.current_piece as PieceUI
 			
-			if not pieces_connected.has(piece) and (piece.match_with(last_piece) or piece.is_special()):
+			if not pieces_connected.has(piece) and piece.match_with(last_piece):
 				possible_next_matches.append(piece)
 
 
 func consume_matches() -> void:
-	if pieces_connected.size() >= origin_piece.board.configuration.min_match or _connected_pieces_has_special():
+	if pieces_connected.size() >= origin_piece.board.configuration.min_match:
 		var cells: Array[GridCellUI] = []
 		cells.assign(pieces_connected.map(func(piece: PieceUI): return piece.cell()))
 		
 		origin_piece.board.consume_requested.emit(Sequence.new(cells, Sequence.Shapes.LineConnected))
 		match_selected.emit(pieces_connected)
-		
+		pieces_connected.clear()
 		queue_free()
 	else:
 		cancel()
@@ -99,10 +99,6 @@ func cancel() -> void:
 	board.canceled_line_connector_match.emit(pieces_connected)
 	
 	queue_free()
-
-
-func _connected_pieces_has_special() -> bool:
-	return pieces_connected.any(func(piece: PieceUI): return piece.is_special())
 	
 	
 func _prepare_detection_area(piece: PieceUI) -> void:

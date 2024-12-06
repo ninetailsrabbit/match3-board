@@ -5,16 +5,12 @@ signal unselected
 signal holded
 signal released
 signal consumed
-signal requested_piece_special_trigger
-signal finished_piece_special_trigger
 signal mouse_entered
 signal mouse_exited
 signal focus_entered
 signal focus_exited
 
 const GroupName: String = "pieces"
-const SpecialGroupName: StringName = "special-pieces"
-const ObstacleGroupName: StringName = "obstacle-pieces"
 
 ## The sprite that represents a texture piece
 @export var sprite: Sprite2D
@@ -96,14 +92,8 @@ var combined_with: PieceUI
 
 func _enter_tree() -> void:
 	add_to_group(GroupName)
-	
-	if is_special():
-		add_to_group(SpecialGroupName)
 		
-	if is_obstacle():
-		add_to_group(ObstacleGroupName)
-	
-	name = "%s-%s" % [piece_definition.type, piece_definition.shape.to_pascal_case()]
+	name = piece_definition.shape.to_pascal_case()
 	is_selected = false
 	z_index = 20
 	original_z_index = z_index
@@ -160,36 +150,20 @@ func match_with(other_piece: PieceUI) -> bool:
 	return piece_definition.match_with(other_piece.piece_definition)
 
 
-func can_be_swapped() -> bool:
-	return piece_definition.can_be_swapped
+func can_be(action: String) -> bool:
+	return piece_definition.can_be(action)
 
 
-func can_be_moved() -> bool:
-	return piece_definition.can_be_moved
+func on_swap_with(other_piece: PieceUI) -> Sequence:
+	return null
 
 
-func can_be_replaced() -> bool:
-	return piece_definition.can_be_replaced
-
-
-func can_be_shuffled() -> bool:
-	return piece_definition.can_be_shuffled
-
-
-func can_be_triggered() -> bool:
-	return piece_definition.can_be_triggered
-
-
-func is_normal() -> bool:
-	return piece_definition.is_normal()
-
-
-func is_special() -> bool:
-	return piece_definition.is_special()
-
-
-func is_obstacle() -> bool:
-	return piece_definition.is_obstacle()
+func consume(sequence: Sequence) -> bool:
+	if cell():
+		cell().remove_piece()
+	consumed.emit()
+	queue_free.call_deferred()
+	return true
 
 
 func detect_near_piece():
@@ -255,7 +229,6 @@ func disable_interaction_areas() -> void:
 		detection_area.set_deferred("monitoring", false)
 
 
-
 #region Preparation methods
 func _prepare_mouse_region_button() -> void:
 	if mouse_region == null:
@@ -280,10 +253,6 @@ func _prepare_mouse_region_button() -> void:
 	mouse_region.focus_entered.connect(on_mouse_region_focus_entered)
 	mouse_region.focus_exited.connect(on_mouse_region_focus_exited)
 	
-	if is_special():
-		requested_piece_special_trigger.connect(on_requested_piece_special_trigger)
-		finished_piece_special_trigger.connect(on_finished_piece_special_trigger)
-
 
 func _prepare_sprites() -> void:
 	if sprite is Sprite2D and animated_sprite == null:
@@ -354,8 +323,7 @@ func on_mouse_region_pressed() -> void:
 	if is_locked():
 		return
 	
-	if piece_definition.can_be_triggered and not piece_definition.can_be_swapped\
-		and (board.current_selected_piece == null or board.current_selected_piece == self):
+	if can_be("trigger") and not can_be("swapped") and (board.current_selected_piece == null or board.current_selected_piece == self):
 		board.consume_requested.emit(Sequence.new([cell()]))
 	else:
 		if is_click_mode_selection():
@@ -415,10 +383,6 @@ func combine_effect_with(other_piece: PieceUI):
 	pass
 
 
-func trigger_special_effect():
-	pass
-
-
 func custom_spawn_and_draw(arguments: Dictionary = {}):
 	return null
 	
@@ -457,11 +421,3 @@ func on_piece_focus_entered() -> void:
 	
 func on_piece_focus_exited() -> void:
 	pass
-
-
-func on_requested_piece_special_trigger() -> void:
-	trigger_special_effect()
-
-func on_finished_piece_special_trigger() -> void:
-	pass
-#endregion
