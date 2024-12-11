@@ -782,14 +782,7 @@ func find_board_sequences() -> Array[Sequence]:
 			
 	var result: Array[Sequence] = valid_horizontal_sequences + valid_vertical_sequences + tshape_sequences + lshape_sequences
 
-	# Godot's type system prevents me from using theMatch3BoardPluginUtilities.remove_duplicates :(
-	var cleaned_result: Array[Sequence] = []
-	
-	for element in result:
-		if not cleaned_result.has(element):
-			cleaned_result.append(element)
-		
-	return cleaned_result
+	return clean_sequences(result)
 	
 
 
@@ -801,7 +794,27 @@ func find_matches_from_swap(from_cell: GridCellUI, to_cell: GridCellUI) -> Array
 
 	matches.assign(Match3BoardPluginUtilities.remove_falsy_values([sequence_from, sequence_to]))
 	
-	return matches
+	return clean_sequences(matches)
+
+
+func clean_sequences(sequences: Array[Sequence]) -> Array[Sequence]:
+	var cleaned_result: Array[Sequence] = []
+
+	for idx in sequences.size():
+		var sequence = sequences[idx]
+		var should_add = true
+		for cell in sequence.cells:
+			if not should_add:
+				break
+			for sub_idx in range(idx + 1, sequences.size()):
+				if sequences[sub_idx].cells.has(cell):
+					should_add = false
+					break
+		
+		if should_add:
+			cleaned_result.append(sequence)
+
+	return cleaned_result
 
 
 func find_matches_from_swapped_pieces(from: PieceUI, to: PieceUI) -> Array[Sequence]:
@@ -1199,6 +1212,7 @@ func on_state_changed(from: BoardState, to: BoardState) -> void:
 				await get_tree().process_frame
 				await fill_pieces()
 				
+				print("pending_sequences after fill: ", pending_sequences)
 				pending_sequences += find_board_sequences() 
 				current_state = BoardState.WaitForInput if pending_sequences.is_empty() else BoardState.Consume
 		

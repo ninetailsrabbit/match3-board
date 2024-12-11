@@ -8,15 +8,21 @@ func preprocess_sequence(sequence: Sequence) -> void:
 	if sequence.all_pieces_are_same_shape():
 		var shape: String = sequence.pieces().front().piece_definition.shape
 		if sequence.size() == 4:
-			sequence.after_consumed = func():
-				var cell: GridCellUI = sequence.middle_cell()
-				var piece: PieceUI = SpecialCrossPieceScene.instantiate()
-				board.draw_piece_on_cell(cell, piece)
-				await board.piece_animator.spawn_piece(cell, piece)
+			sequence.after_consumed = create_special_cross_piece.bind(sequence)
 		if sequence.size() >= 5:
-			sequence.after_consumed = func():
-				var new_special_piece: SpecialShapeConsumerPiece = SpecialShapeConsumerPieceScene.instantiate()
-				new_special_piece.shape_to_consume = shape
-				var cell: GridCellUI = sequence.middle_cell()
-				board.draw_piece_on_cell(cell, new_special_piece)
-				await board.piece_animator.spawn_piece(cell, new_special_piece)
+			sequence.after_consumed = create_special_shape_consumer_piece.bind(sequence, shape)
+
+
+func create_special_cross_piece(sequence: Sequence) -> void:
+	var cell: GridCellUI = sequence.middle_cell()
+	var piece: PieceUI = SpecialCrossPieceScene.instantiate()
+	board.draw_piece_on_cell(cell, piece)
+	await board.piece_animator.spawn_piece(cell, piece)
+
+
+func create_special_shape_consumer_piece(sequence: Sequence, shape: String) -> void:
+	var cell: GridCellUI = sequence.middle_cell()
+	var piece: PieceUI = SpecialShapeConsumerPieceScene.instantiate()
+	piece.shape_to_consume = shape
+	board.draw_piece_on_cell(cell, piece)
+	await board.piece_animator.spawn_piece(cell, piece)
