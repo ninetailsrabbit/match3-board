@@ -32,6 +32,5 @@ func consume(sequence: Sequence) -> bool:
 			cells = board.cross_diagonal_cells_from(cell())
 
 		cells.erase(cell())
-		board.sequence_consumer.add_sequence_to_queue(Sequence.new(cells), true)
+		board.sequence_consumer.add_pieces_to_queue(cells.map(func(cell: GridCellUI) -> PieceUI: return cell.current_piece), true)
 	return super.consume(sequence)
-

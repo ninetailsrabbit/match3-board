@@ -9,6 +9,7 @@ signal consumed_sequences(sequences: Array[Sequence])
 
 var sequences_to_consume: Array[Sequence] = []
 var pending_sequences: Array[Sequence] = []
+var pending_pieces: Array[PieceUI] = []
 
 
 func _enter_tree() -> void:
@@ -35,16 +36,28 @@ func consume_next_sequence() -> void:
 
 func consume_sequence(sequence: Sequence) -> void:
 	preprocess_sequence(sequence)
-	await sequence.consume()
+	pending_pieces = sequence.pieces()
+	while pending_pieces.size() > 0:
+		var piece = pending_pieces.pop_front()
+		if is_instance_valid(piece) and piece != null:
+			await piece.consume(sequence)
 	await sequence.after_consumed.call()
 	consumed_sequence.emit(sequence)
 
 
-func add_sequence_to_queue(sequence: Sequence, front := false) -> void:
+func add_pieces_to_queue(pieces: Array, front := false) -> void:
 	if front:
-		pending_sequences.push_front(sequence)
+		for piece in pieces:
+			pending_pieces.push_front(piece)
 	else:
-		pending_sequences.push_back(sequence)
+		pending_pieces.append_array(pieces)
+
+
+# func add_sequence_to_queue(sequence: Sequence, front := false) -> void:
+# 	if front:
+# 		pending_sequences.push_front(sequence)
+# 	else:
+# 		pending_sequences.push_back(sequence)
 
 #region Overridables
 func preprocess_sequence(sequence: Sequence) -> void:

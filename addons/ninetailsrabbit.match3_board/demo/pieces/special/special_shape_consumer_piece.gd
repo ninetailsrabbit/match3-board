@@ -23,7 +23,7 @@ func consume(sequence: Sequence) -> bool:
 		if target_pieces.is_empty():
 			return super.consume(sequence)
 
-		var new_sequence: Sequence = Sequence.new(board.grid_cells_from_pieces(target_pieces), Sequence.Shapes.Special)
+		var new_pieces = board.grid_cells_from_pieces(target_pieces).map(func(cell: GridCellUI) -> PieceUI: return cell.current_piece)
 		set_process(true)
 		
 		var tween: Tween = create_tween().set_parallel(true)
@@ -34,6 +34,6 @@ func consume(sequence: Sequence) -> bool:
 
 
 		await tween.finished
-		board.sequence_consumer.add_sequence_to_queue(new_sequence, true)
+		board.sequence_consumer.add_pieces_to_queue(new_pieces, true)
 
 	return super.consume(sequence)
