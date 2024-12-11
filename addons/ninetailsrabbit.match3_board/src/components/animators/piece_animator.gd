@@ -5,7 +5,6 @@ signal animation_finished
 
 @onready var board = get_tree().get_first_node_in_group(Match3Board.BoardGroupName)
 
-
 var animation_running: bool = false
 
 
@@ -114,7 +113,7 @@ func consume_pieces(pieces: Array[PieceUI]):
 	animation_finished.emit()
 		
 		
-func spawn_special_piece(target_cell: GridCellUI, new_piece: PieceUI):
+func spawn_piece(target_cell: GridCellUI, new_piece: PieceUI):
 		animation_started.emit()
 		
 		if is_instance_valid(new_piece) and target_cell.current_piece == new_piece:
