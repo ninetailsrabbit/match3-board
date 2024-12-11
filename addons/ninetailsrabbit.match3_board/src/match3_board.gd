@@ -1211,8 +1211,7 @@ func on_state_changed(from: BoardState, to: BoardState) -> void:
 				await fall_pieces()
 				await get_tree().process_frame
 				await fill_pieces()
-				
-				print("pending_sequences after fill: ", pending_sequences)
+
 				pending_sequences += find_board_sequences() 
 				current_state = BoardState.WaitForInput if pending_sequences.is_empty() else BoardState.Consume
 		
