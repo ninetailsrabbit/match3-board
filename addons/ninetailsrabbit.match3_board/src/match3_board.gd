@@ -800,6 +800,8 @@ func find_matches_from_swap(from_cell: GridCellUI, to_cell: GridCellUI) -> Array
 func clean_sequences(sequences: Array[Sequence]) -> Array[Sequence]:
 	var cleaned_result: Array[Sequence] = []
 
+	sequences.sort_custom(func(a: Sequence, b: Sequence): return a.size()  b.size())
+
 	for idx in sequences.size():
 		var sequence = sequences[idx]
 		var should_add = true
