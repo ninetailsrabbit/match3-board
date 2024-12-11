@@ -781,8 +781,16 @@ func find_board_sequences() -> Array[Sequence]:
 				valid_horizontal_sequences.append(horizontal_sequence)
 			
 	var result: Array[Sequence] = valid_horizontal_sequences + valid_vertical_sequences + tshape_sequences + lshape_sequences
+
+	# Godot's type system prevents me from using theMatch3BoardPluginUtilities.remove_duplicates :(
+	var cleaned_result: Array[Sequence] = []
 	
-	return result
+	for element in result:
+		if not cleaned_result.has(element):
+			cleaned_result.append(element)
+		
+	return cleaned_result
+	
 
 
 func find_matches_from_swap(from_cell: GridCellUI, to_cell: GridCellUI) -> Array[Sequence]:
