@@ -323,7 +323,7 @@ func on_mouse_region_pressed() -> void:
 	if is_locked():
 		return
 	
-	if can_be("trigger") and not can_be("swapped") and (board.current_selected_piece == null or board.current_selected_piece == self):
+	if can_be("triggered") and not can_be("swapped") and (board.current_selected_piece == null or board.current_selected_piece == self):
 		board.consume_requested.emit(Sequence.new([cell()]))
 	else:
 		if is_click_mode_selection():

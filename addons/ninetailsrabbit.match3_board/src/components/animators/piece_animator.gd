@@ -5,7 +5,6 @@ signal animation_finished
 
 @onready var board = get_tree().get_first_node_in_group(Match3Board.BoardGroupName)
 
-
 var animation_running: bool = false
 
 

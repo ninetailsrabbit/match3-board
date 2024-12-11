@@ -30,7 +30,6 @@ func consume_next_sequence() -> void:
 		consumed_sequences.emit(sequences_to_consume)
 		sequences_to_consume.clear()
 	else:
-		print(next_sequence.pieces())
 		consume_sequence(next_sequence)
 
 
