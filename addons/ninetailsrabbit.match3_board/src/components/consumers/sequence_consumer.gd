@@ -35,7 +35,7 @@ func consume_next_sequence() -> void:
 
 
 func consume_sequence(sequence: Sequence) -> void:
-	preprocess_sequence(sequence)
+	await preprocess_sequence(sequence)
 	pending_pieces = sequence.pieces()
 	while pending_pieces.size() > 0:
 		var piece = pending_pieces.pop_front()
