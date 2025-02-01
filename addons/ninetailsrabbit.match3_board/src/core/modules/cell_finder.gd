@@ -165,3 +165,26 @@ func cross_cells_from(origin_cell: Match3GridCell) -> Array[Match3GridCell]:
 	cross_cells.erase(origin_cell)
 	
 	return cross_cells
+
+
+func empty_cells() -> Array[Match3GridCell]:
+	var cells: Array[Match3GridCell] = []
+	cells.assign(board.grid_cells_flattened.filter(_is_empty_cell))
+	
+	return cells
+	
+	
+func last_empty_cell_on_column(column: int) -> Match3GridCell:
+	var column_cells: Array[Match3GridCell] = grid_cells_from_column(column)
+	column_cells.reverse()
+	
+	var current_empty_cells = column_cells.filter(_is_empty_cell)
+	
+	if current_empty_cells.size() > 0:
+		return current_empty_cells.front()
+	
+	return null
+
+
+func _is_empty_cell(cell: Match3GridCell) -> bool:
+	return cell.can_contain_piece and cell.is_empty()

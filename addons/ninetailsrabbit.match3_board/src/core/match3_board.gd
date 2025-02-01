@@ -106,15 +106,15 @@ func size() -> int:
 func add_pieces(pieces: Array[Dictionary]) -> Board:
 	for piece_data: Dictionary in pieces:
 		if piece_data.has("piece") and piece_data.has("weight"):
-			add_piece(piece_data.piece as Match3Piece, piece_data.weight as Match3PieceWeight)
+			add_piece(piece_data.piece as Match3Piece, float(piece_data.weight))
 	
 	return self
 	
 	
-func add_piece(piece: Match3Piece, weight: Match3PieceWeight) -> Board:
+func add_piece(piece: Match3Piece, weight: float = 1.0) -> Board:
 	assert(not piece.id.is_empty(), "Match3Board: The ID of the piece to add is empty, the piece cannot be added")
 	
-	available_pieces.get_or_add(piece.id, {"piece": piece, "weight": weight})
+	available_pieces.get_or_add(piece.id, {"piece": piece, "weight": Match3PieceWeight.new(piece, weight)})
 	
 	added_piece.emit(piece)
 	
