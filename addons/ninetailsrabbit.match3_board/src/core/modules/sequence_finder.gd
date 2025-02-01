@@ -193,7 +193,39 @@ func find_vertical_board_sequences() -> Array[Match3Sequence]:
 		vertical_sequences.append_array(find_vertical_sequences(board.cell_finder.grid_cells_from_column(column)))
 	
 	return vertical_sequences
-	
 
-func _sort_by_size_descending(a: Sequence, b: Sequence):
+
+func find_match_from_piece(piece: Match3Piece) -> Match3Sequence:
+	return find_match_from_cell(board.cell_finder.grid_cell_from_piece(piece))
+	
+	
+func find_match_from_cell(cell: Match3GridCell) -> Match3Sequence:
+	if cell.has_piece():
+		var horizontal_sequences: Array[Match3Sequence] = find_horizontal_board_sequences()
+		var vertical_sequences: Array[Match3Sequence] = find_vertical_board_sequences()
+		
+		var horizontal = horizontal_sequences.filter(func(sequence: Match3Sequence): return sequence.cells.has(cell))
+		var vertical = vertical_sequences.filter(func(sequence: Match3Sequence): return sequence.cells.has(cell))
+		
+		if not horizontal.is_empty() and not vertical.is_empty():
+			var tshape_sequence = find_tshape_sequence(horizontal.front(), vertical.front())
+			
+			if tshape_sequence:
+				return tshape_sequence
+			
+			var lshape_sequence = find_lshape_sequence(horizontal.front(), vertical.front())
+			
+			if lshape_sequence:
+				return lshape_sequence
+		else:
+			if horizontal:
+				return horizontal.front()
+			
+			if vertical:
+				return vertical.front()
+	
+	return null
+
+
+func _sort_by_size_descending(a: Sequence, b: Sequence) -> bool:
 	return a.size() > b.size()

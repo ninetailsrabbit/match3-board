@@ -16,6 +16,17 @@ func get_cell(column: int, row: int) -> Match3GridCell:
 	return null
 
 
+func grid_cell_from_piece(piece: Match3Piece) -> Match3GridCell:
+	var found_pieces = board.grid_cells_flattened.filter(
+		func(cell: Match3GridCell): return cell.has_piece() and cell.current_piece == piece
+	)
+	
+	if found_pieces.size() == 1:
+		return found_pieces.front()
+	
+	return null
+	
+	
 func grid_cells_from_row(row: int) -> Array[Match3GridCell]:
 	var cells: Array[Match3GridCell] = []
 	
