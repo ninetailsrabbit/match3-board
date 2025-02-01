@@ -29,6 +29,9 @@ func _ready() -> void:
 	
 	g2.remove_piece()
 	print("removed g2 piece: ", g2.piece)
+	
+	var board: Board = Board.new(9, 9, 30, true)
+	
 	#match_3_board.change_sequence_consumer(DemoSequenceConsumer.new())
 	#match_3_board.state_changed.connect(on_state_changed)
 	
