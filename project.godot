@@ -8,6 +8,10 @@
 
 config_version=5
 
+[Match3_Board]
+
+config/ninetailsrabbit.match3_board/update_notification_enabled=true
+
 [application]
 
 config/name="Match3_Board"
@@ -15,6 +19,10 @@ config/description="This lightweight library provides the core logic and functio
 config/version="1.5.2"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 config/icon="res://icon.svg"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/ninetailsrabbit.match3_board/plugin.cfg")
 
 [input]
 

@@ -114,10 +114,15 @@ class ConsumeNormalSequenceAction extends SequenceAction:
 		
 		await consumer.board.piece_animator.consume_pieces(sequence.normal_pieces())
 		
-		sequence.consume_except(special_pieces_cells(false))
+		#sequence.consume_except(special_pieces_cells())
 	
 	func get_class_name() -> StringName:
 		return &"ConsumeNormalSequenceAction"
+
+
+func special_pieces_cells() -> Array[GridCellUI]:
+	return board.pieces().filter(func(piece: PieceUI): return piece.is_special() and not piece.triggered)\
+		.map(func(piece: PieceUI): board.grid_cell_from_piece(piece))
 
 
 class DrawNewPieceSequenceAction extends SequenceAction:
