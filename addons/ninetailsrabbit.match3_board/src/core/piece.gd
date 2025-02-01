@@ -32,6 +32,10 @@ var is_locked: bool = false:
 			else:
 				unlocked.emit()
 
+var triggered: bool = false
+var priority: int = 0:
+	set(value):
+		priority = maxi(0, value)
 
 func _init(_id: StringName, _shape: StringName, _color: Color = Color.WHITE, _type: PieceType = PieceType.Normal) -> void:
 	id = _id
@@ -92,6 +96,11 @@ func with_consumed(enabled: bool) -> Match3Piece:
 	return self
 
 #endregion
+
+func change_priority(new_value: int) -> Match3Piece:
+	priority = new_value
+	
+	return self
 
 #region Types
 func is_normal() -> bool:
