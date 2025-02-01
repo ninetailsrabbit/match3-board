@@ -130,8 +130,8 @@ func in_diagonal_with(other_cell: Match3GridCell) -> bool:
 		or other_cell.in_same_grid_position_as(diagonal_bottom_left)
 
 
-func available_neighbours() -> Dictionary:
-	var neighbours: Dictionary = {
+func neighbours() -> Dictionary:
+	return {
 		"up": neighbour_up,
 		"bottom": neighbour_bottom,
 		"right": neighbour_right,
@@ -142,8 +142,6 @@ func available_neighbours() -> Dictionary:
 		"diagonal_bottom_left": diagonal_neighbour_bottom_left,
 	}
 	
-	return neighbours
-
 
 func is_top_left_corner() -> bool:
 	return neighbour_up == null and neighbour_left == null \

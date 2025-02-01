@@ -1,7 +1,10 @@
 class_name Match3PieceWeight extends RefCounted
 
 var piece: Match3Piece
-var weight: float = 1.0
+var weight: float = 1.0:
+	set(value):
+		weight = maxf(0.0, value)
+		
 var current_weight: float = weight
 var total_accum_weight: float = 0.0
 

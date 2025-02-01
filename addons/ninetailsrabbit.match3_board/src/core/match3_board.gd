@@ -80,7 +80,16 @@ func _init(width: int, height: int, moves_on_start: int = 25, _allow_matches_on_
 	available_moves_on_start = moves_on_start
 	allow_matches_on_start = _allow_matches_on_start
 	
-	
+
+#region Grid cells
+func get_cell(column: int, row: int) -> Match3GridCell:
+	if not grid_cells.is_empty() and column >= 0 and row >= 0:
+		if column <= grid_cells.size() - 1 and row <= grid_cells[0].size() - 1:
+			return grid_cells[column][row]
+			
+	return null
+
+
 func prepare_grid_cells() -> Board:
 	if grid_cells.is_empty():
 		for column in grid_width:
@@ -91,9 +100,27 @@ func prepare_grid_cells() -> Board:
 				grid_cells[column].append(grid_cell)
 		
 		grid_cells_flattened.append_array(Match3BoardPluginUtilities.flatten(grid_cells))
-	
+		_update_grid_cells_neighbours(grid_cells_flattened)
+		
 	return self
+	
+	
+func _update_grid_cells_neighbours(grid_cells: Array[Match3GridCell]) -> void:
+	if not grid_cells.is_empty():
+		for grid_cell: Match3GridCell in grid_cells:
+			grid_cell.neighbour_up = get_cell(grid_cell.column, grid_cell.row - 1)
+			grid_cell.neighbour_bottom = get_cell(grid_cell.column, grid_cell.row + 1)
+			grid_cell.neighbour_right = get_cell(grid_cell.column + 1, grid_cell.row )
+			grid_cell.neighbour_left = get_cell(grid_cell.column - 1, grid_cell.row)
+			grid_cell.diagonal_neighbour_top_right = get_cell(grid_cell.column + 1, grid_cell.row - 1)
+			grid_cell.diagonal_neighbour_top_left = get_cell(grid_cell.column - 1, grid_cell.row - 1)
+			grid_cell.diagonal_neighbour_bottom_right = get_cell(grid_cell.column + 1, grid_cell.row + 1)
+			grid_cell.diagonal_neighbour_bottom_left = get_cell(grid_cell.column - 1, grid_cell.row + 1)
 
+#endregion
 
+#region Piece generator
 func generate_random_piece() -> Match3Piece:
 	return piece_generator.roll()
+
+#endregion

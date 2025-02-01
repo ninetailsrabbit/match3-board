@@ -32,8 +32,8 @@ func _ready() -> void:
 	
 	var board: Board = Board.new(9, 9, 30, true).prepare_grid_cells()
 	
-	for cell in board.grid_cells_flattened:
-		print(cell.board_position())
+	#for cell in board.grid_cells_flattened:
+		#print(cell.neighbours())
 	
 	
 	#match_3_board.change_sequence_consumer(DemoSequenceConsumer.new())
