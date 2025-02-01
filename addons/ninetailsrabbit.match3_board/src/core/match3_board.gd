@@ -70,8 +70,10 @@ var is_locked: bool = false:
 			else:
 				unlocked.emit()
 
-
+#region Modules
 var piece_generator: Match3PieceGenerator = Match3PieceGenerator.new()
+var cell_finder: Match3BoardCellFinder = Match3BoardCellFinder.new(self)
+#endregion
 
 
 func _init(width: int, height: int, moves_on_start: int = 25, _allow_matches_on_start: bool = false) -> void:
@@ -82,14 +84,6 @@ func _init(width: int, height: int, moves_on_start: int = 25, _allow_matches_on_
 	
 
 #region Grid cells
-func get_cell(column: int, row: int) -> Match3GridCell:
-	if not grid_cells.is_empty() and column >= 0 and row >= 0:
-		if column <= grid_cells.size() - 1 and row <= grid_cells[0].size() - 1:
-			return grid_cells[column][row]
-			
-	return null
-
-
 func prepare_grid_cells() -> Board:
 	if grid_cells.is_empty():
 		for column in grid_width:
@@ -103,19 +97,19 @@ func prepare_grid_cells() -> Board:
 		_update_grid_cells_neighbours(grid_cells_flattened)
 		
 	return self
-	
-	
+
+
 func _update_grid_cells_neighbours(grid_cells: Array[Match3GridCell]) -> void:
 	if not grid_cells.is_empty():
 		for grid_cell: Match3GridCell in grid_cells:
-			grid_cell.neighbour_up = get_cell(grid_cell.column, grid_cell.row - 1)
-			grid_cell.neighbour_bottom = get_cell(grid_cell.column, grid_cell.row + 1)
-			grid_cell.neighbour_right = get_cell(grid_cell.column + 1, grid_cell.row )
-			grid_cell.neighbour_left = get_cell(grid_cell.column - 1, grid_cell.row)
-			grid_cell.diagonal_neighbour_top_right = get_cell(grid_cell.column + 1, grid_cell.row - 1)
-			grid_cell.diagonal_neighbour_top_left = get_cell(grid_cell.column - 1, grid_cell.row - 1)
-			grid_cell.diagonal_neighbour_bottom_right = get_cell(grid_cell.column + 1, grid_cell.row + 1)
-			grid_cell.diagonal_neighbour_bottom_left = get_cell(grid_cell.column - 1, grid_cell.row + 1)
+			grid_cell.neighbour_up = cell_finder.get_cell(grid_cell.column, grid_cell.row - 1)
+			grid_cell.neighbour_bottom = cell_finder.get_cell(grid_cell.column, grid_cell.row + 1)
+			grid_cell.neighbour_right = cell_finder.get_cell(grid_cell.column + 1, grid_cell.row )
+			grid_cell.neighbour_left = cell_finder.get_cell(grid_cell.column - 1, grid_cell.row)
+			grid_cell.diagonal_neighbour_top_right = cell_finder.get_cell(grid_cell.column + 1, grid_cell.row - 1)
+			grid_cell.diagonal_neighbour_top_left = cell_finder.get_cell(grid_cell.column - 1, grid_cell.row - 1)
+			grid_cell.diagonal_neighbour_bottom_right = cell_finder.get_cell(grid_cell.column + 1, grid_cell.row + 1)
+			grid_cell.diagonal_neighbour_bottom_left = cell_finder.get_cell(grid_cell.column - 1, grid_cell.row + 1)
 
 #endregion
 

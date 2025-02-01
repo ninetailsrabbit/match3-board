@@ -164,21 +164,21 @@ func is_bottom_right_corner() -> bool:
 
 
 func is_top_border() -> bool:
-	return neighbour_up == null \
-  		and neighbour_bottom is Match3GridCell and neighbour_right is Match3GridCell and neighbour_left is Match3GridCell
+	return (is_top_left_corner() or is_top_right_corner()) \
+		or (neighbour_up == null and neighbour_bottom is Match3GridCell and neighbour_right is Match3GridCell and neighbour_left is Match3GridCell)
 		
 
 func is_bottom_border() -> bool:
-	return neighbour_bottom == null \
-  		and neighbour_up is Match3GridCell and neighbour_right is Match3GridCell and neighbour_left is Match3GridCell
+	return (is_bottom_left_corner() or is_bottom_right_corner()) \
+	or (neighbour_bottom == null and neighbour_up is Match3GridCell and neighbour_right is Match3GridCell and neighbour_left is Match3GridCell)
 		
 
 func is_right_border() -> bool:
-	return neighbour_right == null \
-  		and neighbour_up is Match3GridCell and neighbour_bottom is Match3GridCell and neighbour_left is Match3GridCell
+	return (is_top_right_corner() or is_bottom_right_corner()) \
+		or (neighbour_right == null and neighbour_up is Match3GridCell and neighbour_bottom is Match3GridCell and neighbour_left is Match3GridCell)
 					
 	
 func is_left_border() -> bool:
-	return neighbour_left == null \
-  		and neighbour_up is Match3GridCell and neighbour_bottom is Match3GridCell and neighbour_right is Match3GridCell
+	return (is_top_left_corner() or is_bottom_left_corner()) \
+		or (neighbour_left == null and neighbour_up is Match3GridCell and neighbour_bottom is Match3GridCell and neighbour_right is Match3GridCell)
 #endregion
