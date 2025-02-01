@@ -17,6 +17,16 @@ enum BoardState {
 }
 
 
+var min_match: int = 3:
+	set(value):
+		min_match = max(3, value)
+		
+## The maximum amount of pieces a match can have.
+var max_match: int  = 5:
+	set(value):
+		max_match = max(min_match, value)
+
+
 var grid_width: int = 8:
 		set(value):
 			if grid_width != value:
@@ -33,6 +43,13 @@ var grid_cells_flattened: Array[Match3GridCell] = []
 
 var available_moves_on_start: int = 25
 var allow_matches_on_start: bool = false
+var horizontal_shape: bool = true
+## When enabled, vertical matchs between pieces are allowed
+var vertical_shape: bool = true
+## When enabled, TShape matchs between pieces are allowed
+var tshape: bool = true
+## When enabled, LShape  matchs between pieces are allowed
+var lshape: bool = true
 
 var current_state: BoardState = BoardState.WaitForInput:
 	set(new_state):
@@ -73,6 +90,7 @@ var is_locked: bool = false:
 #region Modules
 var piece_generator: Match3PieceGenerator = Match3PieceGenerator.new()
 var cell_finder: Match3BoardCellFinder = Match3BoardCellFinder.new(self)
+var sequence_finder: Match3SequenceFinder = Match3SequenceFinder.new(self)
 #endregion
 
 
@@ -110,7 +128,6 @@ func _update_grid_cells_neighbours(grid_cells: Array[Match3GridCell]) -> void:
 			grid_cell.diagonal_neighbour_top_left = cell_finder.get_cell(grid_cell.column - 1, grid_cell.row - 1)
 			grid_cell.diagonal_neighbour_bottom_right = cell_finder.get_cell(grid_cell.column + 1, grid_cell.row + 1)
 			grid_cell.diagonal_neighbour_bottom_left = cell_finder.get_cell(grid_cell.column - 1, grid_cell.row + 1)
-
 #endregion
 
 #region Piece generator

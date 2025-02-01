@@ -35,7 +35,7 @@ enum BoardFillModes {
 ## The layer value from 1 to 32 that is the amount Godot supports. The inside areas will have this layer value to detect other pieces or be detected.
 @export_range(1, 32, 1) var pieces_collision_layer: int = 8
 ## The swap mode to use on this board, each has its own particularities and can be changed at runtime.
-@export var swap_mode:BoardMovements =BoardMovements.Adjacent:
+@export var swap_mode:BoardMovements = BoardMovements.Adjacent:
 	set(value):
 		if value != swap_mode:
 			changed_swap_mode.emit(swap_mode, value)
