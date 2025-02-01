@@ -12,6 +12,7 @@ enum PieceType {
 var id: StringName
 var type: PieceType = PieceType.Normal
 var shape: StringName = &""
+var color: Color = Color.WHITE
 
 var can_be_swapped: bool = true
 var can_be_moved: bool = true
@@ -32,14 +33,15 @@ var is_locked: bool = false:
 				unlocked.emit()
 
 
-func _init(_id: StringName, _shape: StringName, _type: PieceType = PieceType.Normal) -> void:
+func _init(_id: StringName, _shape: StringName, _color: Color = Color.WHITE, _type: PieceType = PieceType.Normal) -> void:
 	id = _id
 	shape = _shape
+	color = _color
 	type = _type
 
 
 func equals_to(other_piece: Match3Piece) -> bool:
-	return same_type_as(other_piece) and same_shape_as(other_piece)
+	return same_type_as(other_piece) and same_shape_as(other_piece) and same_color_as(other_piece)
 
 
 func same_type_as(other_piece: Match3Piece) -> bool:
@@ -48,6 +50,10 @@ func same_type_as(other_piece: Match3Piece) -> bool:
 
 func same_shape_as(other_piece: Match3Piece) -> bool:
 	return shape == other_piece.shape 
+
+
+func same_color_as(other_piece: Match3Piece) -> bool:
+	return color.is_equal_approx(other_piece.color)
 
 
 #region Behaviour configuration

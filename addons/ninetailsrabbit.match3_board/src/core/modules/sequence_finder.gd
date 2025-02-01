@@ -3,9 +3,29 @@ class_name Match3SequenceFinder extends RefCounted
 
 var board: Board
 
+#region Shapes configuration
+var horizontal_shape: bool = true
+## When enabled, vertical matchs between pieces are allowed
+var vertical_shape: bool = true
+## When enabled, TShape matchs between pieces are allowed
+var tshape: bool = true
+## When enabled, LShape  matchs between pieces are allowed
+var lshape: bool = true
+#endregion
 
-func _init(_board: Board) -> void:
-	board = _board
+
+func _init(
+	_board: Board,
+	 with_horizontal_shape: bool = true,
+	 with_vertical_shape: bool = true,
+	 with_tshape:bool = true,
+	 with_lshape: bool = true
+	) -> void:
+		board = _board
+		horizontal_shape = with_horizontal_shape
+		vertical_shape = with_vertical_shape
+		tshape = with_tshape
+		lshape = with_lshape
 
 
 @warning_ignore("unassigned_variable")
@@ -13,7 +33,7 @@ func find_horizontal_sequences(cells: Array[Match3GridCell]) -> Array[Match3Sequ
 	var sequences: Array[Match3Sequence] = []
 	var current_matches: Array[Match3GridCell] = []
 	
-	if board.horizontal_shape:
+	if horizontal_shape:
 		var valid_cells = cells.filter(func(cell: Match3GridCell): return cell.has_piece())
 		var previous_cell: Match3GridCell
 		
@@ -48,7 +68,7 @@ func find_vertical_sequences(cells: Array[Match3GridCell]) -> Array[Match3Sequen
 	var sequences: Array[Match3Sequence] = []
 	var current_matches: Array[Match3GridCell] = []
 	
-	if board.vertical_shape:
+	if vertical_shape:
 		var valid_cells = cells.filter(func(cell: Match3GridCell): return cell.has_piece())
 		var previous_cell: Match3GridCell
 		
@@ -80,7 +100,7 @@ func find_vertical_sequences(cells: Array[Match3GridCell]) -> Array[Match3Sequen
 
 
 func find_tshape_sequence(sequence_a: Match3Sequence, sequence_b: Match3Sequence):
-	if board.tshape and sequence_a != sequence_b and  sequence_a.is_horizontal_or_vertical_shape() and sequence_b.is_horizontal_or_vertical_shape():
+	if tshape and sequence_a != sequence_b and  sequence_a.is_horizontal_or_vertical_shape() and sequence_b.is_horizontal_or_vertical_shape():
 		var horizontal_sequence: Match3Sequence = sequence_a if sequence_a.is_horizontal_shape() else sequence_b
 		var vertical_sequence: Match3Sequence = sequence_a if sequence_a.is_vertical_shape() else sequence_b
 		
@@ -111,7 +131,7 @@ func find_tshape_sequence(sequence_a: Match3Sequence, sequence_b: Match3Sequence
 
 
 func find_lshape_sequence(sequence_a: Match3Sequence, sequence_b: Match3Sequence):
-	if board.lshape and sequence_a != sequence_b and  sequence_a.is_horizontal_or_vertical_shape() and sequence_b.is_horizontal_or_vertical_shape():
+	if lshape and sequence_a != sequence_b and  sequence_a.is_horizontal_or_vertical_shape() and sequence_b.is_horizontal_or_vertical_shape():
 		var horizontal_sequence: Match3Sequence = sequence_a if sequence_a.is_horizontal_shape() else sequence_b
 		var vertical_sequence: Match3Sequence = sequence_a if sequence_a.is_vertical_shape() else sequence_b
 		

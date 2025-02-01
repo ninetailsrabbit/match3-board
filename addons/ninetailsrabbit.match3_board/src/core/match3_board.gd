@@ -3,6 +3,7 @@ class_name Board extends RefCounted
 const MinGridWidth: int = 3
 const MinGridHeight: int = 3
 
+signal added_piece(piece: Match3Piece)
 signal state_changed(from: BoardState, to: BoardState)
 signal movement_consumed
 signal finished_available_movements
@@ -19,13 +20,12 @@ enum BoardState {
 
 var min_match: int = 3:
 	set(value):
-		min_match = max(3, value)
+		min_match = maxi(3, value)
 		
 ## The maximum amount of pieces a match can have.
-var max_match: int  = 5:
+var max_match: int = 5:
 	set(value):
-		max_match = max(min_match, value)
-
+		max_match = maxi(min_match, value)
 
 var grid_width: int = 8:
 		set(value):
@@ -39,17 +39,12 @@ var grid_height: int = 7:
 # Multidimensional Array to access cells by column & row
 var grid_cells: Array = [] 
 var grid_cells_flattened: Array[Match3GridCell] = []
-
+## Using the Match3Piece.ID as key with the value being a dictionary with the structure { "piece": Match3Piece, "weight": Match3PieceWeight }
+var available_pieces: Dictionary = {}
 
 var available_moves_on_start: int = 25
 var allow_matches_on_start: bool = false
-var horizontal_shape: bool = true
-## When enabled, vertical matchs between pieces are allowed
-var vertical_shape: bool = true
-## When enabled, TShape matchs between pieces are allowed
-var tshape: bool = true
-## When enabled, LShape  matchs between pieces are allowed
-var lshape: bool = true
+
 
 var current_state: BoardState = BoardState.WaitForInput:
 	set(new_state):
@@ -76,7 +71,6 @@ var current_available_moves: int = 0:
 			elif value == 0:
 				finished_available_movements.emit()
 				
-
 var is_locked: bool = false:
 	set(value):
 		if value != is_locked:
@@ -99,7 +93,34 @@ func _init(width: int, height: int, moves_on_start: int = 25, _allow_matches_on_
 	grid_height = height
 	available_moves_on_start = moves_on_start
 	allow_matches_on_start = _allow_matches_on_start
+
+
+func distance() -> int:
+	return grid_width + grid_height
 	
+
+func size() -> int:
+	return grid_width * grid_height
+
+#region Pieces
+func add_pieces(pieces: Array[Dictionary]) -> Board:
+	for piece_data: Dictionary in pieces:
+		if piece_data.has("piece") and piece_data.has("weight"):
+			add_piece(piece_data.piece as Match3Piece, piece_data.weight as Match3PieceWeight)
+	
+	return self
+	
+	
+func add_piece(piece: Match3Piece, weight: Match3PieceWeight) -> Board:
+	assert(not piece.id.is_empty(), "Match3Board: The ID of the piece to add is empty, the piece cannot be added")
+	
+	available_pieces.get_or_add(piece.id, {"piece": piece, "weight": weight})
+	
+	added_piece.emit(piece)
+	
+	return self
+	
+#endregion
 
 #region Grid cells
 func prepare_grid_cells() -> Board:
