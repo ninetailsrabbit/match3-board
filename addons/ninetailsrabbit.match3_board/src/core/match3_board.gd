@@ -71,8 +71,29 @@ var is_locked: bool = false:
 				unlocked.emit()
 
 
+var piece_generator: Match3PieceGenerator = Match3PieceGenerator.new()
+
+
 func _init(width: int, height: int, moves_on_start: int = 25, _allow_matches_on_start: bool = false) -> void:
 	grid_width = width
 	grid_height = height
 	available_moves_on_start = moves_on_start
 	allow_matches_on_start = _allow_matches_on_start
+	
+	
+func prepare_grid_cells() -> Board:
+	if grid_cells.is_empty():
+		for column in grid_width:
+			grid_cells.append([])
+			
+			for row in grid_height:
+				var grid_cell: Match3GridCell = Match3GridCell.new(row, column)
+				grid_cells[column].append(grid_cell)
+		
+		grid_cells_flattened.append_array(Match3BoardPluginUtilities.flatten(grid_cells))
+	
+	return self
+
+
+func generate_random_piece() -> Match3Piece:
+	return piece_generator.roll()

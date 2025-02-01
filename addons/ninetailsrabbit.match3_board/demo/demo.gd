@@ -30,7 +30,11 @@ func _ready() -> void:
 	g2.remove_piece()
 	print("removed g2 piece: ", g2.piece)
 	
-	var board: Board = Board.new(9, 9, 30, true)
+	var board: Board = Board.new(9, 9, 30, true).prepare_grid_cells()
+	
+	for cell in board.grid_cells_flattened:
+		print(cell.board_position())
+	
 	
 	#match_3_board.change_sequence_consumer(DemoSequenceConsumer.new())
 	#match_3_board.state_changed.connect(on_state_changed)
