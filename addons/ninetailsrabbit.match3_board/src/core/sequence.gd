@@ -1,5 +1,7 @@
 class_name Match3Sequence extends RefCounted
 
+signal consumed(pieces: Array[Match3Piece])
+
 enum Shapes {
 	Horizontal,
 	Vertical,
@@ -27,6 +29,36 @@ func _init(sequence_cells: Array[Match3GridCell], _shape: Shapes = Shapes.Irregu
 
 
 #region Pieces
+func consume() -> void:
+	consume_cells(cells)
+	
+	
+func consume_cells(consumable_cells: Array[Match3GridCell], remove_from_sequence: bool = false) -> void:
+	var consumed_pieces: Array[Match3Piece] = []
+	
+	for cell in cells.filter(func(grid_cell: Match3GridCell): return grid_cell.has_piece()):
+		consumed_pieces.append(cell.current_piece)
+		consume_cell(cell, remove_from_sequence)
+	
+	if not consumed_pieces.is_empty():
+		consumed.emit(consumed_pieces)
+	
+
+func consume_cell(consumable_cell: Match3GridCell, remove_from_sequence: bool = false) -> void:
+	if cells.has(consumable_cell) and consumable_cell.has_piece():
+		var removed_piece: Match3Piece = consumable_cell.remove_piece()
+		
+		if is_instance_valid(removed_piece):
+			removed_piece.free()
+		
+			if remove_from_sequence:
+				cells.erase(consumable_cell)
+					
+#
+func consume_normal_cells() -> void:
+	consume_cells(normal_cells())
+
+				
 func pieces() -> Array[Match3Piece]:
 	var current_pieces: Array[Match3Piece] = []
 	current_pieces.assign(Match3BoardPluginUtilities.remove_falsy_values(
@@ -64,13 +96,17 @@ func get_special_pieces() -> Array[Match3Piece]:
 	
 	return special_pieces
 	
-	
-func special_pieces_count() -> int:
-	return get_special_pieces().size()
-	
 #endregion
 
 #region Cell positions
+func normal_cells() -> Array[Match3GridCell]:
+	return cells.filter(func(cell: Match3GridCell): return cell.has_piece() and cell.piece.is_normal())
+	
+	
+func special_cells() -> Array[Match3GridCell]:
+	return cells.filter(func(cell: Match3GridCell): return cell.has_piece() and cell.piece.is_special())
+	
+	
 func middle_cell() -> Match3GridCell:
 	return Match3BoardPluginUtilities.middle_element(cells)
 

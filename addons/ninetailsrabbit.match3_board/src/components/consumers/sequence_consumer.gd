@@ -16,6 +16,7 @@ func _enter_tree() -> void:
 	
 	consumed_sequence.connect(on_consumed_sequence)
 
+
 func prepare_action_queue(sequences: Array[Sequence]) -> void:
 	sequences_to_consume = sequences
 	

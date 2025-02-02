@@ -51,10 +51,16 @@ func assign_piece(new_piece: Match3Piece, replace: bool = false) -> void:
 		piece = new_piece
 		
 		
-func remove_piece() -> void:
+func remove_piece() -> Match3Piece:
 	if has_piece():
+		var removed_piece: Match3Piece = piece
+		
 		removed_piece.emit(piece)
 		piece = null
+		
+		return removed_piece
+		
+	return null
 
 	
 func swap_piece_with_cell(other_cell: Match3GridCell) -> bool:
