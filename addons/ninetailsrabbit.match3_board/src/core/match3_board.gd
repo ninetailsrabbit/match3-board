@@ -114,7 +114,8 @@ func add_pieces(pieces: Array[Dictionary]) -> Board:
 func add_piece(piece: Match3Piece, weight: float = 1.0) -> Board:
 	assert(not piece.id.is_empty(), "Match3Board: The ID of the piece to add is empty, the piece cannot be added")
 	
-	available_pieces.get_or_add(piece.id, {"piece": piece, "weight": Match3PieceWeight.new(piece, weight)})
+	var result: Dictionary = available_pieces.get_or_add(piece.id, {"piece": piece, "weight": Match3PieceWeight.new(piece, weight)})
+	piece_generator.add_piece(result.weight)
 	
 	added_piece.emit(piece)
 	
@@ -151,8 +152,45 @@ func _update_grid_cells_neighbours(grid_cells: Array[Match3GridCell]) -> void:
 			grid_cell.diagonal_neighbour_bottom_left = cell_finder.get_cell(grid_cell.column - 1, grid_cell.row + 1)
 #endregion
 
-#region Piece generator
-func generate_random_piece() -> Match3Piece:
-	return piece_generator.roll()
+#region Pieces
+func prepare_pieces() -> Board:
+	assert(available_pieces.size() > 0, "Match3Board->prepare_pieces(): There is no available pieces to prepare in this board, aborting operation...")
+	
+	for cell in grid_cells_flattened.filter(_filter_cells_that_allow_pieces):
+		cell.assign_piece(generate_random_piece())
+	
+	if not allow_matches_on_start:
+		remove_matches_from_board()
+
+	return self
+
+
+func remove_matches_from_board() -> void:
+	var sequences: Array[Match3Sequence] = sequence_finder.find_board_sequences()
+	
+	while sequences.size() > 0:
+		for sequence: Match3Sequence in sequences:
+			var cells_to_change = sequence.cells.slice(0, (sequence.cells.size() / min_match) + 1)
+			var piece_exceptions: Array[Match3PieceWeight] = []
+			
+			piece_exceptions.assign(Match3BoardPluginUtilities.remove_duplicates(
+				cells_to_change.map(
+					func(cell: GridCellUI): return available_pieces[cell.current_piece.id].weight))
+					)
+	
+			for current_cell: Match3GridCell in cells_to_change:
+				var removed_piece = current_cell.remove_piece()
+				removed_piece.free()
+				current_cell.assign_piece(generate_random_piece(piece_exceptions), true)
+			
+		sequences = sequence_finder.find_board_sequences()
+
+
+func generate_random_piece(piece_exceptions: Array[Match3PieceWeight] = []) -> Match3Piece:
+	return piece_generator.roll(piece_exceptions)
 
 #endregion
+
+
+func _filter_cells_that_allow_pieces(cell: Match3GridCell) -> bool:
+	return cell.can_contain_piece

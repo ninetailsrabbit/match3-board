@@ -51,11 +51,11 @@ func _prepare_weight(pieces: Array[Match3PieceWeight]) -> float:
 
 
 func _roll_piece(pieces: Array[Match3PieceWeight], total_weight: float):
-	var roll_result: float = rng.randf_range(0.0, total_weight)
+	var threshold: float = rng.randf_range(0.0, total_weight)
 	var selected_piece: Match3Piece
 	
 	for piece_weight: Match3PieceWeight in pieces:
-		if roll_result <= piece_weight.total_accum_weight:
+		if threshold <= piece_weight.total_accum_weight:
 			selected_piece = piece_weight.piece
 			break;
 	

@@ -49,8 +49,8 @@ func assign_piece(new_piece: Match3Piece, replace: bool = false) -> void:
 	elif replace and new_piece != piece:
 		replaced_piece.emit(piece, new_piece)
 		piece = new_piece
-		
-		
+
+
 func remove_piece() -> Match3Piece:
 	if has_piece():
 		var removed_piece: Match3Piece = piece

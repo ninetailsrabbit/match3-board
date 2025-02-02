@@ -30,10 +30,19 @@ func _ready() -> void:
 	#g2.remove_piece()
 	#print("removed g2 piece: ", g2.piece)
 	#
-	var board: Board = Board.new(9, 9, 30, true).prepare_grid_cells()
+	var board: Board = Board.new(9, 9, 30, true).prepare_grid_cells().add_pieces(
+		[{"piece": Match3Piece.new("100", "triangle"), "weight": 1.15},
+		{"piece": Match3Piece.new("101", "square"), "weight": 1.1},
+		{"piece": Match3Piece.new("102", "circle"), "weight": 1.05},
+		{"piece": Match3Piece.new("103", "romboid"), "weight": 1.0}
+		]
+	).prepare_pieces()
 	
-	#for cell in board.grid_cells_flattened:
-		#print(cell.neighbours())
+	print_rich(board.available_pieces)
+	
+	
+	for cell in board.grid_cells_flattened:
+		print(cell.board_position(), cell.piece.shape)
 
 	
 	#match_3_board.change_sequence_consumer(DemoSequenceConsumer.new())
