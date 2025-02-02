@@ -6,19 +6,19 @@ const MinGridHeight: int = 3
 ## Piece scenes that contains or inherits the PieceUI script
 @export var available_pieces: Array[Match3PieceConfiguration] = []
 @export_group("Size 🔲")
-@export var grid_width: int = 8:
+@export var grid_width: int = 7:
 		set(value):
 			if grid_width != value:
 				grid_width = maxi(MinGridWidth, value)
 				
-@export var grid_height: int = 7:
+@export var grid_height: int = 8:
 		set(value):
 			if grid_height != value:
 				grid_height = maxi(MinGridHeight, value)
 			
 @export var cell_size: Vector2i = Vector2i(48, 48)
 @export var cell_offset: Vector2i = Vector2i(25, 25)
-
+@export var grid_cell_scene: PackedScene = preload("res://addons/ninetailsrabbit.match3_board/src/ui/match_3_grid_cell_ui.tscn")
 
 
 #region Board movements

@@ -3,10 +3,6 @@ class_name Match3BoardUI extends Node2D
 signal state_changed(from: BoardState, to: BoardState)
 
 @export var configuration: Match3BoardConfiguration
-@export_category("Grid Cells")
-@export var grid_cell_scene: PackedScene = preload("res://addons/ninetailsrabbit.match3_board/src/ui/match_3_grid_cell_ui.tscn")
-@export var cell_size: Vector2i = Vector2i(48, 48)
-@export var cell_offset: Vector2i = Vector2i(25, 25)
 
 
 enum BoardState {
@@ -32,9 +28,8 @@ func _ready() -> void:
 	
 	if configuration.auto_start:
 		draw_cells().draw_pieces()
-	
-
-
+		
+#region Preparation
 func prepare_board() -> Match3BoardUI:
 	assert(configuration != null, "Match3BoardUI: No configuration found, the board cannot be prepared")
 	assert(configuration.available_pieces.size() > 2, "Match3BoardUI: There is less than 3 pieces in the configuration, the board cannot be prepared")
@@ -68,12 +63,27 @@ func prepare_board() -> Match3BoardUI:
 	
 func draw_cells() -> Match3BoardUI:
 	if grid_cells.is_empty():
-		for cell: Match3GridCell in board.grid_cells_flattened:
-			var cell_ui: Match3GridCellUI = grid_cell_scene.instantiate()
-			cell_ui.cell = cell
-			add_child(cell_ui)
-	
+		
+		for column in configuration.grid_width:
+			grid_cells.append([])
+			
+			for row in configuration.grid_height:
+				grid_cells[column].append(draw_cell(board.grid_cells[column][row]))
+			
 	return self
+
+
+func draw_cell(cell: Match3GridCell) -> Match3GridCellUI:
+	var cell_ui: Match3GridCellUI = configuration.grid_cell_scene.instantiate()
+	cell_ui.size = configuration.cell_size
+	cell_ui.cell = cell
+	cell_ui.position = Vector2(configuration.cell_size.x * cell.column, configuration.cell_size.y * cell.row)
+	
+	add_child(cell_ui)
+	
+	grid_cells_flattened.append(cell_ui)
+
+	return cell_ui
 
 
 func draw_pieces() -> Match3BoardUI:
@@ -84,9 +94,9 @@ func draw_pieces() -> Match3BoardUI:
 			var piece: Match3PieceUI = _core_piece_to_ui_piece(cell.piece)
 			add_child(piece)
 	
-	
 	return self
 
+#endregion
 
 func _core_piece_to_ui_piece(piece: Match3Piece) -> Match3PieceUI:
 	var pieces = configuration.available_pieces.filter(
@@ -99,3 +109,12 @@ func _core_piece_to_ui_piece(piece: Match3Piece) -> Match3PieceUI:
 	piece_ui.piece = piece
 	
 	return piece_ui
+
+
+func _core_cell_to_ui_cell(cell: Match3GridCell) -> Match3GridCellUI:
+	var cells = grid_cells_flattened.filter(func(cell_ui: Match3GridCellUI): return cell_ui.cell == cell)
+	
+	if cell.is_empty():
+		return null
+		
+	return cells.front()
