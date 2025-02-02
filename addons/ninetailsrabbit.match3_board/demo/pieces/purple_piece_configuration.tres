@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="Match3PieceConfiguration" load_steps=3 format=3 uid="uid://tncprvn1fkmb"]
+
+[ext_resource type="PackedScene" uid="uid://csbhdectgds2g" path="res://addons/ninetailsrabbit.match3_board/demo/pieces/purple_piece.tscn" id="1_ewhuc"]
+[ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/ui/configurations/piece_configuration.gd" id="2_rhdb5"]
+
+[resource]
+script = ExtResource("2_rhdb5")
+scene = ExtResource("1_ewhuc")
+id = &"purple"
+name = "Purple Gem"
+description = ""
+weight = 1.0
+type = 0
+shape = &"diamond"
+color = Color(0.476003, 0.172398, 0.55708, 1)
+can_be_swapped = true
+can_be_moved = true
+can_be_shuffled = true
+can_be_triggered = false
+can_be_replaced = true
+can_be_consumed = true
+texture_scale = 0.85
+reset_position_on_drag_release = true
+drag_smooth_factor = 20.0

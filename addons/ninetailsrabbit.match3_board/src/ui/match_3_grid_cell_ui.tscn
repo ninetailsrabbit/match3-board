@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://dyxg5roal1gmk"]
+
+[ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/ui/grid_cell_ui.gd" id="1_3uju8"]
+
+[node name="Match3GridCellUI" type="Node2D"]
+script = ExtResource("1_3uju8")

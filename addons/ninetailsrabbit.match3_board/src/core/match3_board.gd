@@ -4,18 +4,10 @@ const MinGridWidth: int = 3
 const MinGridHeight: int = 3
 
 signal added_piece(piece: Match3Piece)
-signal state_changed(from: BoardState, to: BoardState)
 signal movement_consumed
 signal finished_available_movements
 signal locked
 signal unlocked
-
-
-enum BoardState {
-	WaitForInput,
-	Fill,
-	Consume
-}
 
 
 var min_match: int = 3:
@@ -46,12 +38,6 @@ var available_moves_on_start: int = 25
 var allow_matches_on_start: bool = false
 
 
-var current_state: BoardState = BoardState.WaitForInput:
-	set(new_state):
-		if new_state != current_state:
-			var previous_state: BoardState = current_state
-			current_state = new_state
-			state_changed.emit(previous_state, current_state)
 
 ## Set to -1 for infinite moves in the board
 var current_available_moves: int = 0:
@@ -88,7 +74,9 @@ var sequence_finder: Match3SequenceFinder = Match3SequenceFinder.new(self)
 #endregion
 
 
-func _init(width: int, height: int, moves_on_start: int = 25, _allow_matches_on_start: bool = false) -> void:
+func _init(_min_match: int, _max_match: int, width: int, height: int, moves_on_start: int = 25, _allow_matches_on_start: bool = false) -> void:
+	min_match = _min_match
+	max_match = _max_match
 	grid_width = width
 	grid_height = height
 	available_moves_on_start = moves_on_start
