@@ -175,7 +175,7 @@ func remove_matches_from_board() -> void:
 			
 			piece_exceptions.assign(Match3BoardPluginUtilities.remove_duplicates(
 				cells_to_change.map(
-					func(cell: GridCellUI): return available_pieces[cell.current_piece.id].weight))
+					func(cell: Match3GridCell): return available_pieces[cell.current_piece.id].weight))
 					)
 	
 			for current_cell: Match3GridCell in cells_to_change:
