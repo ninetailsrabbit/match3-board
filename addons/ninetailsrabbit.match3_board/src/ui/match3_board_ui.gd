@@ -1,6 +1,8 @@
 class_name Match3BoardUI extends Node2D
 
 signal state_changed(from: BoardState, to: BoardState)
+signal locked
+signal unlocked
 
 @export var configuration: Match3BoardConfiguration
 
@@ -15,6 +17,7 @@ var board: Board
 var grid_cells: Array = [] # Multidimensional to access cells by column & row
 var grid_cells_flattened: Array[Match3GridCellUI] = []
 
+var current_selected_piece: Match3PieceUI
 var current_state: BoardState = BoardState.WaitForInput:
 	set(new_state):
 		if new_state != current_state:
@@ -22,12 +25,30 @@ var current_state: BoardState = BoardState.WaitForInput:
 			current_state = new_state
 			state_changed.emit(previous_state, current_state)
 
+var is_locked: bool = false:
+	set(value):
+		if value != is_locked:
+			is_locked = value
+			
+			if is_locked:
+				locked.emit()
+			else:
+				unlocked.emit()
+
+
+func _enter_tree() -> void:
+	child_entered_tree.connect(on_child_entered_tree)
+
 
 func _ready() -> void:
 	prepare_board()
 	
 	if configuration.auto_start:
 		draw_cells().draw_pieces()
+		
+	locked.connect(on_board_locked)
+	unlocked.connect(on_board_unlocked)
+
 		
 #region Draw
 func prepare_board() -> Match3BoardUI:
@@ -44,7 +65,8 @@ func prepare_board() -> Match3BoardUI:
 					configuration.allow_matches_on_start
 					)
 		
-	board.prepare_grid_cells()
+	board.change_fill_mode(configuration.fill_mode)\
+		.prepare_grid_cells()
 	
 	## We instantiate the piece scenes to create the core board piece with the information
 	for piece_configuration: Match3PieceConfiguration in configuration.available_pieces:
@@ -108,6 +130,88 @@ func draw_piece(cell_ui: Match3GridCellUI) -> Match3PieceUI:
 
 #endregion
 
+
+#region Pieces
+func pieces() -> Array[Match3PieceUI]:
+	var pieces: Array[Match3PieceUI] = []
+	pieces.assign(get_tree().get_nodes_in_group(Match3PieceUI.GroupName))
+
+	return pieces
+
+
+
+func special_pieces() -> Array[Match3PieceUI]:
+	var pieces: Array[Match3PieceUI] = []
+	pieces.assign(get_tree().get_nodes_in_group(Match3PieceUI.SpecialGroupName))
+
+	return pieces
+
+
+func obstacle_pieces() -> Array[Match3PieceUI]:
+	var pieces: Array[Match3PieceUI] = []
+	pieces.assign(get_tree().get_nodes_in_group(Match3PieceUI.ObstacleGroupName))
+
+	return pieces
+
+
+func lock_all_pieces() -> void:
+	for piece: Match3PieceUI in pieces():
+		piece.lock()
+	
+	
+func unlock_all_pieces() -> void:
+	for piece: Match3PieceUI in pieces():
+		piece.unlock()
+	
+#endregion
+
+#region Signal callbacks 
+func on_board_locked() -> void:
+	if is_inside_tree():
+		lock_all_pieces()
+
+
+func on_board_unlocked() -> void:
+	if is_inside_tree():
+		unlock_all_pieces()
+
+
+func on_child_entered_tree(child: Node) -> void:
+	if child is Match3PieceUI:
+		if not child.selected.is_connected(on_selected_piece.bind(child)):
+			child.selected.connect(on_selected_piece.bind(child))
+		
+		if not child.drag_started.is_connected(on_piece_drag_started.bind(child)):
+			child.drag_started.connect(on_piece_drag_started.bind(child))
+			
+		if not child.drag_ended.is_connected(on_piece_drag_ended.bind(child)):
+			child.drag_ended.connect(on_piece_drag_ended.bind(child))
+
+
+func on_selected_piece(piece_ui: Match3PieceUI) -> void:
+	if configuration.click_mode_is_selection():
+		if current_selected_piece == null:
+			current_selected_piece = piece_ui
+		elif current_selected_piece and current_selected_piece != piece_ui:
+			print("swap  %s -> %s " % [current_selected_piece, piece_ui])
+			current_selected_piece = null
+			 ## TODO - DO THE SWAP LOGIC FOR CLICK MODE SELECTION
+
+
+func on_piece_drag_started(piece_ui: Match3PieceUI) -> void:
+	if configuration.click_mode_is_drag():
+		current_selected_piece = piece_ui
+		current_selected_piece.enable_drag()
+
+
+func on_piece_drag_ended(piece_ui: Match3PieceUI) -> void:
+	if configuration.click_mode_is_drag() and current_selected_piece:
+		current_selected_piece.disable_drag()
+
+#endregion
+
+
+#region Private functions
 func _core_piece_to_ui_piece(piece: Match3Piece) -> Match3PieceUI:
 	var pieces = configuration.available_pieces.filter(
 		func(configuration: Match3PieceConfiguration): return configuration.id == piece.id)
@@ -129,3 +233,4 @@ func _core_cell_to_ui_cell(cell: Match3GridCell) -> Match3GridCellUI:
 		return null
 		
 	return cells.front()
+#endregion

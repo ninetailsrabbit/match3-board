@@ -303,7 +303,7 @@ func _prepare_sprite() -> void:
 
 func _prepare_animated_sprite() -> void:
 	if is_inside_tree() and animated_sprite is AnimatedSprite2D:
-		var texture_size = animated_sprite.get_sprite_frames().get_frame(animated_sprite.animation, animated_sprite.get_frame())
+		var texture_size = animated_sprite.get_sprite_frames().get_frame_texture(animated_sprite.animation, animated_sprite.frame)
 		animated_sprite.scale = Vector2(cell_size.x / texture_size.x, cell_size.y / texture_size.y) * texture_scale
 
 

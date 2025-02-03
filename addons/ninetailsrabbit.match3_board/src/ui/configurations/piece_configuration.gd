@@ -16,11 +16,7 @@ class_name Match3PieceConfiguration extends Resource
 @export var can_be_triggered: bool = false
 @export var can_be_replaced: bool = true
 @export var can_be_consumed: bool = true
-@export_group("Visual")
-@export var texture_scale: float = 0.85
-@export_group("Drag&Drop")
-@export var reset_position_on_drag_release: bool = true
-@export var drag_smooth_factor: float = 20.0
+
 
 
 func is_normal() -> bool:

@@ -50,24 +50,15 @@ enum BoardSelectionMode {
 	Drag
 }
 
-enum BoardFillModes {
-	## Pieces fall down to fill the empty cells
-	FallDown,
-	## Pieces still fall down but the empty cell sides are taking into account
-	Side,
-	## Pieces appears in the same place they were removed
-	InPlace
-}
-
 #endregion
 
 @export_group("Modes")
 ## The swap mode to use on this board, each has its own particularities and can be changed at runtime.
 @export var swap_mode: BoardMovements = BoardMovements.Adjacent
 ## The click mode defines if the swap is made by select & click or dragging the piece to the desired place
-@export var click_mode: BoardSelectionMode = BoardSelectionMode.Click
+@export var selection_mode: BoardSelectionMode = BoardSelectionMode.Click
 ## The fill mode defines how the pieces are redrawed into the board.
-@export var fill_mode = BoardFillModes.FallDown
+@export var fill_mode: Board.FillModes = Board.FillModes.FallDown
 
 @export_group("Start")
 @export var auto_start: bool = true
@@ -99,23 +90,23 @@ enum BoardFillModes {
 
 #region Information
 func click_mode_is_selection() -> bool:
-	return click_mode == BoardSelectionMode.Click
+	return selection_mode == BoardSelectionMode.Click
 	
 
 func click_mode_is_drag() -> bool:
-	return click_mode == BoardSelectionMode.Drag
+	return selection_mode == BoardSelectionMode.Drag
 	
 
 func fill_mode_is_fall_down() -> bool:
-	return fill_mode == BoardFillModes.FallDown
+	return fill_mode == Board.FillModes.FallDown
 	
 
 func fill_mode_is_side() -> bool:
-	return fill_mode == BoardFillModes.Side
+	return fill_mode == Board.FillModes.Side
 	
 	
 func fill_mode_is_in_place() -> bool:
-	return fill_mode == BoardFillModes.InPlace
+	return fill_mode == Board.FillModes.InPlace
 	
 
 func swap_mode_is_adjacent() -> bool:

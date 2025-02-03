@@ -9,6 +9,14 @@ signal finished_available_movements
 signal locked
 signal unlocked
 
+enum FillModes {
+	## Pieces fall down to fill the empty cells
+	FallDown,
+	## Pieces still fall down but the empty cell sides are taking into account
+	Side,
+	## Pieces appears in the same place they were removed
+	InPlace
+}
 
 var min_match: int = 3:
 	set(value):
@@ -36,7 +44,7 @@ var available_pieces: Dictionary = {}
 
 var available_moves_on_start: int = 25
 var allow_matches_on_start: bool = false
-
+var fill_mode: FillModes = FillModes.FallDown
 
 
 ## Set to -1 for infinite moves in the board
@@ -89,6 +97,12 @@ func distance() -> int:
 
 func size() -> int:
 	return grid_width * grid_height
+
+
+func change_fill_mode(new_mode: FillModes) -> Board:
+	fill_mode = new_mode
+	
+	return self
 
 #region Pieces
 func add_pieces(pieces: Array[Dictionary]) -> Board:
