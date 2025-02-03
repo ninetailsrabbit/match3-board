@@ -15,7 +15,6 @@ const ObstacleGroupName: StringName = &"obstacle-pieces"
 @export var drag_smooth_factor: float = 20.0
 
 var piece: Match3Piece
-var original_z_index: int = 0
 
 var mouse_region: Button
 var current_position: Vector2 = Vector2.ZERO
@@ -31,6 +30,8 @@ var drag_enabled: bool = false:
 	
 ## Could be Sprite2D or AnimatedSprite2D
 var sprite: Node2D
+var original_z_index: int = 0
+var original_cell_position: Vector2
 
 
 func _enter_tree() -> void:
@@ -46,6 +47,8 @@ func _enter_tree() -> void:
 	name = "%s_%s" % [piece.id, piece.shape]
 	z_index = 10
 	original_z_index = z_index
+	
+	original_cell_position = position
 	
 
 func _ready() -> void:
@@ -129,6 +132,9 @@ func match_with(other_piece: PieceUI) -> bool:
 		
 	return piece.equals_to(other_piece.piece)
 
+## Useful if you want to create animations when coming back to position when drag ended
+func back_to_cell_position() -> void:
+	position = original_cell_position
 #endregion
 
 
@@ -142,14 +148,26 @@ func on_mouse_region_pressed() -> void:
 func on_mouse_region_holded() -> void:
 	if is_locked:
 		return
-		
+	
+	z_index = original_z_index + 100
+	z_as_relative = false
+	
+	## We don't want to enable drag when connecting lines as the pieces needs to be static
+	#if not board.is_swap_mode_connect_line():
+	m_offset = transform.origin - get_global_mouse_position()
 	drag_started.emit()
 
 
 func on_mouse_region_released() -> void:
 	if is_locked:
 		return
-		
+	
+	if reset_position_on_drag_release:
+		back_to_cell_position()
+	
+	z_index = original_z_index
+	z_as_relative = true
+	
 	drag_ended.emit()
 
 #endregion
