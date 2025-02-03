@@ -247,5 +247,5 @@ func find_match_from_cell(cell: Match3GridCell) -> Match3Sequence:
 	return null
 
 
-func _sort_by_size_descending(a: Sequence, b: Sequence) -> bool:
+func _sort_by_size_descending(a: Match3Sequence, b: Match3Sequence) -> bool:
 	return a.size() > b.size()

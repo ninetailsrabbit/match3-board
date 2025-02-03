@@ -228,7 +228,7 @@ func swap_movement_is_valid(from_grid_cell: Match3GridCellUI, to_grid_cell: Matc
 			return from_grid_cell.cell.is_adjacent_to(to_grid_cell.cell)
 			
 		Match3Configuration.BoardMovements.AdjacentWithDiagonals:
-			return from_grid_cell.cell.is_adjacent_to(to_grid_cell.cell, true)
+			return from_grid_cell.cell.is_diagonal_adjacent_to(to_grid_cell.cell, true)
 			
 		Match3Configuration.BoardMovements.AdjacentOnlyDiagonals:
 			return from_grid_cell.cell.in_diagonal_with(to_grid_cell.cell)

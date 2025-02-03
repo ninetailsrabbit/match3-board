@@ -129,6 +129,10 @@ func is_adjacent_to(other_cell: Match3GridCell, check_diagonal: bool = false) ->
 		or is_column_neighbour_of(other_cell) \
 		or (check_diagonal and in_diagonal_with(other_cell))
 	
+	
+func is_diagonal_adjacent_to(other_cell: Match3GridCell) -> bool:
+	return is_adjacent_to(other_cell, true)
+
 
 func in_diagonal_with(other_cell: Match3GridCell) -> bool:
 	var diagonal_top_right: Vector2 = Vector2(row - 1, column + 1)
