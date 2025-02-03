@@ -124,8 +124,8 @@ func _prepare_sprite() -> void:
 	
 
 #region Overridables
-func match_with(other_piece: PieceUI) -> bool:
-	if other_piece.is_obstacle():
+func match_with(other_piece: Match3PieceUI) -> bool:
+	if piece.is_obstacle() or other_piece.piece.is_obstacle():
 		return false
 		
 	return piece.match_with(other_piece.piece)

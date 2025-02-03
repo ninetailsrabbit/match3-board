@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://ccqn6wrassd5a"]
+[gd_scene load_steps=12 format=3 uid="uid://ccqn6wrassd5a"]
 
 [ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/demo/demo.gd" id="1_dqalp"]
 [ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/ui/match3_board_ui.gd" id="2_wxjdv"]
@@ -9,6 +9,7 @@
 [ext_resource type="Resource" uid="uid://cpx8ur2qg3x3n" path="res://addons/ninetailsrabbit.match3_board/demo/pieces/yellow_piece_configuration.tres" id="6_nl6e2"]
 [ext_resource type="Resource" uid="uid://tncprvn1fkmb" path="res://addons/ninetailsrabbit.match3_board/demo/pieces/purple_piece_configuration.tres" id="7_w35it"]
 [ext_resource type="PackedScene" uid="uid://dyxg5roal1gmk" path="res://addons/ninetailsrabbit.match3_board/src/ui/match_3_grid_cell_ui.tscn" id="8_igev1"]
+[ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/ui/modules/match3_animator.gd" id="10_vettc"]
 
 [sub_resource type="Resource" id="Resource_f1ea4"]
 script = ExtResource("3_diwbo")
@@ -18,7 +19,7 @@ grid_height = 7
 cell_size = Vector2i(48, 48)
 cell_offset = Vector2i(25, 25)
 grid_cell_scene = ExtResource("8_igev1")
-swap_mode = 7
+swap_mode = 0
 selection_mode = 0
 fill_mode = 0
 auto_start = true
@@ -41,7 +42,11 @@ offset_right = 581.0
 offset_bottom = 65.0
 text = "STATE"
 
-[node name="Match3BoardUI" type="Node2D" parent="."]
+[node name="Match3BoardUI" type="Node2D" parent="." node_paths=PackedStringArray("animator")]
 position = Vector2(270, 171)
 script = ExtResource("2_wxjdv")
 configuration = SubResource("Resource_f1ea4")
+animator = NodePath("Match3Animator")
+
+[node name="Match3Animator" type="Node" parent="Match3BoardUI"]
+script = ExtResource("10_vettc")

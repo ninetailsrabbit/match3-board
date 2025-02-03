@@ -1,5 +1,7 @@
 class_name Match3BoardUI extends Node2D
 
+const GroupName: StringName = &"match3-board"
+
 signal state_changed(from: BoardState, to: BoardState)
 signal swap_accepted(from: Match3GridCellUI, to: Match3GridCellUI)
 signal swap_rejected(from: Match3GridCellUI, to: Match3GridCellUI)
@@ -7,7 +9,7 @@ signal locked
 signal unlocked
 
 @export var configuration: Match3BoardConfiguration
-
+@export var animator: Match3Animator
 
 enum BoardState {
 	WaitForInput,
@@ -39,20 +41,70 @@ var is_locked: bool = false:
 
 
 func _enter_tree() -> void:
+	add_to_group(GroupName)
+	
 	child_entered_tree.connect(on_child_entered_tree)
 
 
 func _ready() -> void:
-	prepare_board()
+	prepare_animator()\
+		.prepare_board()
 	
 	if configuration.auto_start:
 		draw_cells().draw_pieces()
-		
+	
+	swap_accepted.connect(on_swap_accepted)
+	swap_rejected.connect(on_swap_rejected)
 	locked.connect(on_board_locked)
 	unlocked.connect(on_board_unlocked)
 
+
+func lock() -> void:
+	is_locked = true
+
+
+func unlock() -> void:
+	is_locked = false
+
+
+#region Modules
+func change_animator(new_animator: Match3Animator) -> Match3BoardUI:
+	if animator:
+		animator.queue_free()
+		animator = null
 		
+	animator = new_animator
+	animator.board = self
+	
+	if not animator.is_inside_tree():
+		add_child(animator)
+	
+	if not animator.animation_started.is_connected(on_animator_animation_started):
+		animator.animation_started.connect(on_animator_animation_started)
+		
+		
+	return self
+
+#endregion
+
 #region Draw
+func prepare_animator() -> Match3BoardUI:
+	if animator == null:
+		animator = Match3BoardPluginUtilities.first_node_of_custom_class(self, Match3Animator)
+		
+		if animator:
+			change_animator(animator)
+	else:
+		if not animator.is_inside_tree():
+			animator.board = self
+			add_child(animator)
+	
+	if not animator.animation_started.is_connected(on_animator_animation_started):
+		animator.animation_started.connect(on_animator_animation_started)
+	
+	return self
+	
+
 func prepare_board() -> Match3BoardUI:
 	assert(configuration != null, "Match3BoardUI: No configuration found, the board cannot be prepared")
 	assert(configuration.available_pieces.size() > 2, "Match3BoardUI: There is less than 3 pieces in the configuration, the board cannot be prepared")
@@ -167,6 +219,84 @@ func unlock_all_pieces() -> void:
 	
 #endregion
 
+#region Swap
+func swap_pieces(from_piece: Match3PieceUI, to_piece: Match3PieceUI) -> void:
+	var from_grid_cell: Match3GridCellUI = _grid_cell_ui_from_piece_ui(from_piece)
+	var to_grid_cell: Match3GridCellUI = _grid_cell_ui_from_piece_ui(to_piece)
+	
+	if swap_movement_is_valid(from_grid_cell, to_grid_cell):
+		if animator:
+			await animator.swap_pieces(
+				from_piece, 
+				to_piece, 
+				to_piece.position,
+				from_piece.position
+				)
+		else:
+			from_piece.position = to_piece.position
+			to_piece.position = from_piece.position
+			
+		if from_grid_cell.swap_piece_with(to_grid_cell):
+			swap_accepted.emit(from_grid_cell, to_grid_cell)
+			
+			var matches: Array[Match3Sequence] = []
+			## TODO - FIND MATCHES AFTER SWAP
+			
+			if matches.is_empty():
+				## Do another swap to return the pieces again
+				from_grid_cell.swap_piece_with(to_grid_cell)
+				
+				if animator:
+					## The pieces already come up swapped so we can use the updated original cell position to apply the visual change
+					await animator.swap_rejected_pieces(
+						from_piece, 
+						to_piece, 
+						from_piece.original_cell_position,
+						to_piece.original_cell_position
+						)
+				else:
+					from_piece.position = from_piece.original_cell_position
+					to_piece.position = to_piece.original_cell_position
+				
+				swap_rejected.emit(from_grid_cell, to_grid_cell)
+	else:
+		swap_rejected.emit(from_grid_cell, to_grid_cell)
+			
+
+func swap_movement_is_valid(from_grid_cell: Match3GridCellUI, to_grid_cell: Match3GridCellUI) -> bool:
+	if from_grid_cell.piece_ui.match_with(to_grid_cell.piece_ui):
+		return false
+		
+	match configuration.swap_mode:
+		
+		Match3Configuration.BoardMovements.Adjacent:
+			return from_grid_cell.cell.is_adjacent_to(to_grid_cell.cell)
+			
+		Match3Configuration.BoardMovements.AdjacentWithDiagonals:
+			return from_grid_cell.cell.is_diagonal_adjacent_to(to_grid_cell.cell)
+			
+		Match3Configuration.BoardMovements.AdjacentOnlyDiagonals:
+			return from_grid_cell.cell.in_diagonal_with(to_grid_cell.cell)
+			
+		Match3Configuration.BoardMovements.Free:
+			return true
+			
+		Match3Configuration.BoardMovements.Row:
+			return from_grid_cell.cell.in_same_row_as(to_grid_cell.cell)
+			
+		Match3Configuration.BoardMovements.Column:
+			return from_grid_cell.cell.in_same_column_as(to_grid_cell.cell)
+			
+		Match3Configuration.BoardMovements.Cross:
+			return board.cell_finder.cross_cells_from(from_grid_cell.cell).has(to_grid_cell.cell)
+			
+		Match3Configuration.BoardMovements.CrossDiagonal:
+			return board.cell_finder.cross_diagonal_cells_from(from_grid_cell.cell).has(to_grid_cell.cell)
+		_:
+			return false
+#endregion
+
+
 #region Signal callbacks 
 func on_board_locked() -> void:
 	if is_inside_tree():
@@ -202,55 +332,7 @@ func on_selected_piece(piece_ui: Match3PieceUI) -> void:
 		elif current_selected_piece != piece_ui:
 			swap_pieces(current_selected_piece, piece_ui)
 			current_selected_piece = null
-			
-
-#region Swap
-func swap_pieces(from_piece: Match3PieceUI, to_piece: Match3PieceUI) -> void:
-	var from_grid_cell: Match3GridCellUI = _grid_cell_ui_from_piece_ui(from_piece)
-	var to_grid_cell: Match3GridCellUI = _grid_cell_ui_from_piece_ui(to_piece)
-	
-	if swap_movement_is_valid(from_grid_cell, to_grid_cell) and from_grid_cell.swap_piece_with(to_grid_cell):
-		## TODO - THIS SHOULD BE DOING WITH THE ANIMATOR AND WAIT THE ANIMATION FINISHED SIGNAL
 		
-		## The swap updates the original cell position so we can use them to do the visual change
-		from_grid_cell.piece_ui.position = from_grid_cell.piece_ui.original_cell_position
-		to_grid_cell.piece_ui.position = to_grid_cell.piece_ui.original_cell_position
-	
-		swap_accepted.emit(from_grid_cell, to_grid_cell)
-	else:
-		swap_rejected.emit(from_grid_cell, to_grid_cell)
-			
-
-func swap_movement_is_valid(from_grid_cell: Match3GridCellUI, to_grid_cell: Match3GridCellUI) -> bool:
-	match configuration.swap_mode:
-		
-		Match3Configuration.BoardMovements.Adjacent:
-			return from_grid_cell.cell.is_adjacent_to(to_grid_cell.cell)
-			
-		Match3Configuration.BoardMovements.AdjacentWithDiagonals:
-			return from_grid_cell.cell.is_diagonal_adjacent_to(to_grid_cell.cell, true)
-			
-		Match3Configuration.BoardMovements.AdjacentOnlyDiagonals:
-			return from_grid_cell.cell.in_diagonal_with(to_grid_cell.cell)
-			
-		Match3Configuration.BoardMovements.Free:
-			return true
-			
-		Match3Configuration.BoardMovements.Row:
-			return from_grid_cell.cell.in_same_row_as(to_grid_cell.cell)
-			
-		Match3Configuration.BoardMovements.Column:
-			return from_grid_cell.cell.in_same_column_as(to_grid_cell.cell)
-			
-		Match3Configuration.BoardMovements.Cross:
-			return board.cell_finder.cross_cells_from(from_grid_cell.cell).has(to_grid_cell.cell)
-			
-		Match3Configuration.BoardMovements.CrossDiagonal:
-			return board.cell_finder.cross_diagonal_cells_from(from_grid_cell.cell).has(to_grid_cell.cell)
-		_:
-			return false
-#endregion
-
 
 func on_piece_drag_started(piece_ui: Match3PieceUI) -> void:
 	if configuration.click_mode_is_drag():
@@ -262,6 +344,16 @@ func on_piece_drag_ended(piece_ui: Match3PieceUI) -> void:
 	if configuration.click_mode_is_drag() and current_selected_piece:
 		current_selected_piece.disable_drag()
 
+
+func on_swap_accepted(from: Match3GridCellUI, to: Match3GridCellUI) -> void:
+	lock()
+	
+func on_swap_rejected(from: Match3GridCellUI, to: Match3GridCellUI) -> void:
+	unlock()
+	
+	
+func on_animator_animation_started(_animation_name: StringName) -> void:
+	lock()
 #endregion
 
 
