@@ -1,6 +1,8 @@
 class_name Match3BoardUI extends Node2D
 
 signal state_changed(from: BoardState, to: BoardState)
+signal swap_accepted(from: Match3GridCellUI, to: Match3GridCellUI)
+signal swap_rejected(from: Match3GridCellUI, to: Match3GridCellUI)
 signal locked
 signal unlocked
 
@@ -190,13 +192,33 @@ func on_child_entered_tree(child: Node) -> void:
 
 func on_selected_piece(piece_ui: Match3PieceUI) -> void:
 	if configuration.click_mode_is_selection():
+		
 		if current_selected_piece == null:
 			current_selected_piece = piece_ui
-		elif current_selected_piece and current_selected_piece != piece_ui:
-			print("swap  %s -> %s " % [current_selected_piece, piece_ui])
+		
+		elif current_selected_piece == piece_ui:
 			current_selected_piece = null
-			 ## TODO - DO THE SWAP LOGIC FOR CLICK MODE SELECTION
+			
+		elif current_selected_piece != piece_ui:
+			swap_pieces(current_selected_piece, piece_ui)
+			current_selected_piece = null
+			
 
+func swap_pieces(from_piece: Match3PieceUI, to_piece: Match3PieceUI) -> void:
+	var from_grid_cell: Match3GridCellUI = _grid_cell_ui_from_piece_ui(from_piece)
+	var to_grid_cell: Match3GridCellUI = _grid_cell_ui_from_piece_ui(to_piece)
+			
+	if from_grid_cell.swap_piece_with(to_grid_cell):
+		## TODO - THIS SHOULD BE DOING WITH THE ANIMATOR AND WAIT THE ANIMATION FINISHED SIGNAL
+		
+		## The swap updates the original cell position so we can use them to do the change visually
+		from_grid_cell.piece_ui.position = from_grid_cell.piece_ui.original_cell_position
+		to_grid_cell.piece_ui.position = to_grid_cell.piece_ui.original_cell_position
+	
+		swap_accepted.emit(from_grid_cell, to_grid_cell)
+	else:
+		swap_rejected.emit(from_grid_cell, to_grid_cell)
+			
 
 func on_piece_drag_started(piece_ui: Match3PieceUI) -> void:
 	if configuration.click_mode_is_drag():
@@ -233,4 +255,14 @@ func _core_cell_to_ui_cell(cell: Match3GridCell) -> Match3GridCellUI:
 		return null
 		
 	return cells.front()
+
+
+func _grid_cell_ui_from_piece_ui(piece_ui: Match3PieceUI) -> Match3GridCellUI:
+	var cells: Array[Match3GridCellUI] = grid_cells_flattened.filter(func(cell: Match3GridCellUI): return cell.piece_ui == piece_ui)
+	
+	if cells.is_empty():
+		return null
+		
+	return cells.front()
+	
 #endregion

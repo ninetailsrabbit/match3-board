@@ -47,9 +47,7 @@ func _enter_tree() -> void:
 	name = "%s_%s" % [piece.id, piece.shape]
 	z_index = 10
 	original_z_index = z_index
-	
-	original_cell_position = position
-	
+
 
 func _ready() -> void:
 	_prepare_sprite()

@@ -12,7 +12,12 @@ const GroupName: StringName = "grid_cells"
 @onready var sprite_2d: Sprite2D = $Sprite2D
 
 var cell: Match3GridCell
-var piece_ui: Match3PieceUI
+var piece_ui: Match3PieceUI:
+	set(new_piece):
+		piece_ui = new_piece
+		
+		if new_piece:
+			new_piece.original_cell_position = position
 
 
 func _enter_tree() -> void:
@@ -27,6 +32,24 @@ func _ready() -> void:
 	## TODO - This sprite setup it's done actually in a custom scene that inherits from this cell ui
 	sprite_2d.texture = get_texture()
 	sprite_2d.scale = calculate_scale_texture_based_cell_size(sprite_2d.texture)
+
+
+func can_swap_piece_with(other_cell: Match3GridCellUI) -> bool:
+	return piece_ui and other_cell.piece_ui and cell.can_swap_piece_with_cell(other_cell.cell)
+
+
+func swap_piece_with(other_cell: Match3GridCellUI) -> bool:
+	if piece_ui and other_cell.piece_ui:
+		var swapped: bool = cell.swap_piece_with_cell(other_cell.cell)
+		
+		if swapped:
+			var current_piece_ui: Match3PieceUI = piece_ui
+			piece_ui = other_cell.piece_ui
+			other_cell.piece_ui = current_piece_ui
+			
+			return true
+			
+	return false
 
 
 func calculate_scale_texture_based_cell_size(texture: Texture2D) -> Vector2:
