@@ -29,7 +29,7 @@ func _ready() -> void:
 	if configuration.auto_start:
 		draw_cells().draw_pieces()
 		
-#region Preparation
+#region Draw
 func prepare_board() -> Match3BoardUI:
 	assert(configuration != null, "Match3BoardUI: No configuration found, the board cannot be prepared")
 	assert(configuration.available_pieces.size() > 2, "Match3BoardUI: There is less than 3 pieces in the configuration, the board cannot be prepared")
@@ -89,12 +89,22 @@ func draw_cell(cell: Match3GridCell) -> Match3GridCellUI:
 func draw_pieces() -> Match3BoardUI:
 	assert(configuration.available_pieces.size() > 0, "Match3BoardUI: No available pieces are set for this board, the pieces cannot be drawed")
 	
-	for cell: Match3GridCell in board.grid_cells_flattened:
-		if cell.has_piece():
-			var piece: Match3PieceUI = _core_piece_to_ui_piece(cell.piece)
-			add_child(piece)
+	for cell: Match3GridCellUI in grid_cells_flattened:
+		draw_piece(cell)
 	
 	return self
+
+
+func draw_piece(cell_ui: Match3GridCellUI) -> Match3PieceUI:
+	if cell_ui.cell.has_piece() and cell_ui.piece_ui == null:
+			var piece_ui: Match3PieceUI = _core_piece_to_ui_piece(cell_ui.cell.piece)
+			piece_ui.position = cell_ui.position
+			cell_ui.piece_ui = piece_ui
+			add_child(piece_ui)
+			
+			return piece_ui
+		
+	return null
 
 #endregion
 
@@ -112,7 +122,8 @@ func _core_piece_to_ui_piece(piece: Match3Piece) -> Match3PieceUI:
 
 
 func _core_cell_to_ui_cell(cell: Match3GridCell) -> Match3GridCellUI:
-	var cells = grid_cells_flattened.filter(func(cell_ui: Match3GridCellUI): return cell_ui.cell == cell)
+	var cells = grid_cells_flattened.filter(
+		func(cell_ui: Match3GridCellUI): return cell_ui.cell == cell)
 	
 	if cell.is_empty():
 		return null

@@ -3,13 +3,16 @@ class_name Match3GridCellUI extends Node2D
 const GroupName: StringName = "grid_cells"
 
 @export var size: Vector2i = Vector2i(48, 48)
+@export var texture_scale: float = 1.0
 @export var odd_cell_texture: Texture2D
 @export var even_cell_texture: Texture2D
 @export var empty_cell_texture: Texture2D
 
+## TODO - Extra nodes needs to be defined on a custom scene that inherits from this to avoid dependencies
 @onready var sprite_2d: Sprite2D = $Sprite2D
 
 var cell: Match3GridCell
+var piece_ui: Match3PieceUI
 
 
 func _enter_tree() -> void:
@@ -21,6 +24,7 @@ func _enter_tree() -> void:
 
 
 func _ready() -> void:
+	## TODO - This sprite setup it's done actually in a custom scene that inherits from this cell ui
 	sprite_2d.texture = get_texture()
 	sprite_2d.scale = calculate_scale_texture_based_cell_size(sprite_2d.texture)
 
@@ -28,8 +32,11 @@ func _ready() -> void:
 func calculate_scale_texture_based_cell_size(texture: Texture2D) -> Vector2:
 	var texture_size = texture.get_size()
 	
-	return Vector2(size.x / texture_size.x, size.y / texture_size.y)
+	return Vector2(size.x / texture_size.x, size.y / texture_size.y) * texture_scale
 	
 	
 func get_texture() -> Texture2D:
+	if not cell.can_contain_piece:
+		return empty_cell_texture
+	
 	return even_cell_texture if (cell.column + cell.row) % 2 == 0 else odd_cell_texture
