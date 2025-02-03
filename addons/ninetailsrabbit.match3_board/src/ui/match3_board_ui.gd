@@ -57,6 +57,7 @@ func _ready() -> void:
 	swap_rejected.connect(on_swap_rejected)
 	locked.connect(on_board_locked)
 	unlocked.connect(on_board_unlocked)
+	state_changed.connect(on_board_state_changed)
 
 
 func lock() -> void:
@@ -236,15 +237,20 @@ func swap_pieces(from_piece: Match3PieceUI, to_piece: Match3PieceUI) -> void:
 			from_piece.position = to_piece.position
 			to_piece.position = from_piece.position
 			
-		if from_grid_cell.swap_piece_with(to_grid_cell):
+		if board.swap_pieces(from_grid_cell.cell, to_grid_cell.cell):
 			swap_accepted.emit(from_grid_cell, to_grid_cell)
 			
 			var matches: Array[Match3Sequence] = []
-			## TODO - FIND MATCHES AFTER SWAP
+			var sequence_from: Match3Sequence = board.sequence_finder.find_match_from_cell(from_grid_cell.cell)
+			var sequence_to: Match3Sequence = board.sequence_finder.find_match_from_cell(to_grid_cell.cell)
+
+			matches.assign(Match3BoardPluginUtilities.remove_falsy_values([sequence_from, sequence_to]))
 			
-			if matches.is_empty():
+			if matches.size() > 0:
+				current_state = BoardState.Consume
+			else:
 				## Do another swap to return the pieces again
-				from_grid_cell.swap_piece_with(to_grid_cell)
+				board.swap_pieces(from_grid_cell.cell, to_grid_cell.cell)
 				
 				if animator:
 					## The pieces already come up swapped so we can use the updated original cell position to apply the visual change
@@ -345,12 +351,23 @@ func on_piece_drag_ended(piece_ui: Match3PieceUI) -> void:
 		current_selected_piece.disable_drag()
 
 
-func on_swap_accepted(from: Match3GridCellUI, to: Match3GridCellUI) -> void:
+func on_swap_accepted(_from: Match3GridCellUI, _to: Match3GridCellUI) -> void:
 	lock()
-	
-func on_swap_rejected(from: Match3GridCellUI, to: Match3GridCellUI) -> void:
+
+
+func on_swap_rejected(_from: Match3GridCellUI, _to: Match3GridCellUI) -> void:
 	unlock()
 	
+
+func on_board_state_changed(_from: BoardState, to: BoardState) -> void:
+	match to:
+		BoardState.WaitForInput:
+			unlock()
+		BoardState.Consume:
+			lock()
+		BoardState.Fill:
+			lock()
+			
 	
 func on_animator_animation_started(_animation_name: StringName) -> void:
 	lock()

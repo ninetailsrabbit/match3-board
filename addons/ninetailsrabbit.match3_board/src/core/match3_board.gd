@@ -4,6 +4,8 @@ const MinGridWidth: int = 3
 const MinGridHeight: int = 3
 
 signal added_piece(piece: Match3Piece)
+signal swap_accepted(from_cell: Match3GridCell, to_cell: Match3GridCell)
+signal swap_rejected(from_cell: Match3GridCell, to_cell: Match3GridCell)
 signal movement_consumed
 signal finished_available_movements
 signal locked
@@ -58,7 +60,6 @@ var current_available_moves: int = 0:
 			var previous_moves: int = current_available_moves
 			current_available_moves = clamp(value, 0, available_moves_on_start)
 			
-			
 			if value < previous_moves:
 				movement_consumed.emit()
 			
@@ -89,6 +90,8 @@ func _init(_min_match: int, _max_match: int, width: int, height: int, moves_on_s
 	grid_height = height
 	available_moves_on_start = moves_on_start
 	allow_matches_on_start = _allow_matches_on_start
+	
+	current_available_moves = available_moves_on_start
 
 
 func distance() -> int:
@@ -122,6 +125,17 @@ func add_piece(piece: Match3Piece, weight: float = 1.0) -> Board:
 	added_piece.emit(piece)
 	
 	return self
+	
+
+func swap_pieces(from_grid_cell: Match3GridCell, to_grid_cell: Match3GridCell) -> bool:
+	var swapped: bool =  from_grid_cell.swap_piece_with_cell(to_grid_cell)
+	
+	if swapped:
+		swap_accepted.emit(from_grid_cell, to_grid_cell)
+	else:
+		swap_rejected.emit(from_grid_cell, to_grid_cell)
+	
+	return swapped
 	
 #endregion
 
