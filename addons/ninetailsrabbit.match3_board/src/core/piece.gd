@@ -44,6 +44,10 @@ func _init(_id: StringName, _shape: StringName, _color: Color = Color.WHITE, _ty
 	type = _type
 
 
+func match_with(other_piece: Match3Piece) -> bool:
+	return equals_to(other_piece)
+	
+
 func equals_to(other_piece: Match3Piece) -> bool:
 	return same_type_as(other_piece) and same_shape_as(other_piece) and same_color_as(other_piece)
 

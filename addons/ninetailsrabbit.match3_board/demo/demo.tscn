@@ -13,12 +13,12 @@
 [sub_resource type="Resource" id="Resource_f1ea4"]
 script = ExtResource("3_diwbo")
 available_pieces = Array[ExtResource("3_lxq78")]([ExtResource("4_xuqmf"), ExtResource("5_yyrbf"), ExtResource("6_nl6e2"), ExtResource("7_w35it")])
-grid_width = 7
-grid_height = 8
+grid_width = 8
+grid_height = 7
 cell_size = Vector2i(48, 48)
 cell_offset = Vector2i(25, 25)
 grid_cell_scene = ExtResource("8_igev1")
-swap_mode = 0
+swap_mode = 6
 selection_mode = 0
 fill_mode = 0
 auto_start = true

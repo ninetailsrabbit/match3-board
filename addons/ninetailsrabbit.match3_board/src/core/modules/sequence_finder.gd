@@ -40,7 +40,7 @@ func find_horizontal_sequences(cells: Array[Match3GridCell]) -> Array[Match3Sequ
 		for current_cell: Match3GridCell in valid_cells:
 			
 			if current_matches.is_empty() \
-				or (previous_cell is Match3GridCell and previous_cell.is_row_neighbour_of(current_cell) and current_cell.current_piece.match_with(previous_cell.current_piece)):
+				or (previous_cell is Match3GridCell and previous_cell.is_row_neighbour_of(current_cell) and current_cell.piece.match_with(previous_cell.piece)):
 				current_matches.append(current_cell)
 				
 				if current_matches.size() == board.max_match:
@@ -75,7 +75,7 @@ func find_vertical_sequences(cells: Array[Match3GridCell]) -> Array[Match3Sequen
 		for current_cell: Match3GridCell in valid_cells:
 			
 			if current_matches.is_empty() \
-				or (previous_cell is Match3GridCell and previous_cell.is_column_neighbour_of(current_cell) and current_cell.current_piece.match_with(previous_cell.current_piece)):
+				or (previous_cell is Match3GridCell and previous_cell.is_column_neighbour_of(current_cell) and current_cell.piece.match_with(previous_cell.piece)):
 				current_matches.append(current_cell)
 				
 				if current_matches.size() == board.max_match:

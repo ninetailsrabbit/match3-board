@@ -15,6 +15,15 @@ func get_cell(column: int, row: int) -> Match3GridCell:
 			
 	return null
 
+## For some reason, the .has() method is not valid to detect valid cells in a list
+## so I'll change it instead to do a comparison using the board position value
+#func cells_contains_cell(cells: Array[Match3GridCell], target_cell: Match3GridCell) -> bool:
+	#var found_cells: Array[Match3GridCell] = cells.filter(
+		#func(cell: Match3GridCell): return cell.in_same_position_as(target_cell)
+		#)
+		#
+	#return found_cells.size() > 0
+		#
 
 func grid_cell_from_piece(piece: Match3Piece) -> Match3GridCell:
 	var found_pieces = board.grid_cells_flattened.filter(
@@ -156,16 +165,31 @@ func adjacent_cells_from(origin_cell: Match3GridCell) -> Dictionary:
 
 
 func cross_cells_from(origin_cell: Match3GridCell) -> Array[Match3GridCell]:
-	var cross_cells: Array[Match3GridCell] = []
+	var cross_cells:  Array[Match3GridCell] = []
 	
 	cross_cells.assign(Match3BoardPluginUtilities.remove_duplicates(
-		grid_cells_from_row(origin_cell.row) + grid_cells_from_column(origin_cell.column))
-	)
+			grid_cells_from_row(origin_cell.row) + grid_cells_from_column(origin_cell.column)
+		))
 	
-	cross_cells.erase(origin_cell)
-	
+	#for cell: Match3GridCell in cross_cells:
+		#print("cross cell position ", Vector2(cell.column, cell.row))
+	#
 	return cross_cells
 
+
+func cross_diagonal_cells_from(origin_cell: Match3GridCell) -> Array[Match3GridCell]:
+	var distance: int = board.distance()
+	var cross_diagonal_cells: Array[Match3GridCell] = []
+	
+	cross_diagonal_cells.assign(Match3BoardPluginUtilities.remove_falsy_values(
+		Match3BoardPluginUtilities.remove_duplicates(
+		  	diagonal_top_left_cells_from(origin_cell, distance)\
+		 	+ diagonal_top_right_cells_from(origin_cell, distance)\
+			+ diagonal_bottom_left_cells_from(origin_cell, distance)\
+		 	+ diagonal_bottom_right_cells_from(origin_cell, distance)\
+		)))
+	
+	return cross_diagonal_cells
 
 func empty_cells() -> Array[Match3GridCell]:
 	var cells: Array[Match3GridCell] = []

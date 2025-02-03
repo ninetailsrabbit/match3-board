@@ -132,7 +132,7 @@ func prepare_grid_cells() -> Board:
 			grid_cells.append([])
 			
 			for row in grid_height:
-				var grid_cell: Match3GridCell = Match3GridCell.new(row, column)
+				var grid_cell: Match3GridCell = Match3GridCell.new(column, row)
 				grid_cells[column].append(grid_cell)
 		
 		grid_cells_flattened.append_array(Match3BoardPluginUtilities.flatten(grid_cells))
@@ -177,16 +177,14 @@ func remove_matches_from_board() -> void:
 			
 			piece_exceptions.assign(Match3BoardPluginUtilities.remove_duplicates(
 				cells_to_change.map(
-					func(cell: Match3GridCell): return available_pieces[cell.current_piece.id].weight))
+					func(cell: Match3GridCell): return available_pieces[cell.piece.id].weight))
 					)
 	
 			for current_cell: Match3GridCell in cells_to_change:
 				var removed_piece = current_cell.remove_piece()
-				removed_piece.free()
 				current_cell.assign_piece(generate_random_piece(piece_exceptions), true)
 			
 		sequences = sequence_finder.find_board_sequences()
-
 
 func generate_random_piece(piece_exceptions: Array[Match3PieceWeight] = []) -> Match3Piece:
 	return piece_generator.roll(piece_exceptions)

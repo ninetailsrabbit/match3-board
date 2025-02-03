@@ -128,7 +128,7 @@ func match_with(other_piece: PieceUI) -> bool:
 	if other_piece.is_obstacle():
 		return false
 		
-	return piece.equals_to(other_piece.piece)
+	return piece.match_with(other_piece.piece)
 
 ## Useful if you want to create animations when coming back to position when drag ended
 func back_to_cell_position() -> void:

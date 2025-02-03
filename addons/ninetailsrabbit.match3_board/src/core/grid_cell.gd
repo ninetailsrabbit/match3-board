@@ -53,12 +53,12 @@ func assign_piece(new_piece: Match3Piece, replace: bool = false) -> void:
 
 func remove_piece() -> Match3Piece:
 	if has_piece():
-		var removed_piece: Match3Piece = piece
+		var piece_to_remove: Match3Piece = piece
 		
-		removed_piece.emit(piece)
+		removed_piece.emit(piece_to_remove)
 		piece = null
 		
-		return removed_piece
+		return piece_to_remove
 		
 	return null
 
@@ -86,7 +86,7 @@ func can_swap_piece_with_cell(other_cell: Match3GridCell) -> bool:
 
 #region Grid position
 func board_position() -> Vector2:
-	return Vector2(row, column)
+	return Vector2(column, row)
 
 
 func in_same_row_as(other_cell: Match3GridCell) -> bool:
@@ -123,6 +123,12 @@ func is_column_neighbour_of(other_cell: Match3GridCell) -> bool:
 	return in_same_column_as(other_cell) \
 		and [upper_row, bottom_row].any(func(near_row: int): return other_cell.row == near_row)
 
+
+func is_adjacent_to(other_cell: Match3GridCell, check_diagonal: bool = false) -> bool:
+	return is_row_neighbour_of(other_cell) \
+		or is_column_neighbour_of(other_cell) \
+		or (check_diagonal and in_diagonal_with(other_cell))
+	
 
 func in_diagonal_with(other_cell: Match3GridCell) -> bool:
 	var diagonal_top_right: Vector2 = Vector2(row - 1, column + 1)

@@ -204,14 +204,15 @@ func on_selected_piece(piece_ui: Match3PieceUI) -> void:
 			current_selected_piece = null
 			
 
+#region Swap
 func swap_pieces(from_piece: Match3PieceUI, to_piece: Match3PieceUI) -> void:
 	var from_grid_cell: Match3GridCellUI = _grid_cell_ui_from_piece_ui(from_piece)
 	var to_grid_cell: Match3GridCellUI = _grid_cell_ui_from_piece_ui(to_piece)
-			
-	if from_grid_cell.swap_piece_with(to_grid_cell):
+	
+	if swap_movement_is_valid(from_grid_cell, to_grid_cell) and from_grid_cell.swap_piece_with(to_grid_cell):
 		## TODO - THIS SHOULD BE DOING WITH THE ANIMATOR AND WAIT THE ANIMATION FINISHED SIGNAL
 		
-		## The swap updates the original cell position so we can use them to do the change visually
+		## The swap updates the original cell position so we can use them to do the visual change
 		from_grid_cell.piece_ui.position = from_grid_cell.piece_ui.original_cell_position
 		to_grid_cell.piece_ui.position = to_grid_cell.piece_ui.original_cell_position
 	
@@ -219,6 +220,37 @@ func swap_pieces(from_piece: Match3PieceUI, to_piece: Match3PieceUI) -> void:
 	else:
 		swap_rejected.emit(from_grid_cell, to_grid_cell)
 			
+
+func swap_movement_is_valid(from_grid_cell: Match3GridCellUI, to_grid_cell: Match3GridCellUI) -> bool:
+	match configuration.swap_mode:
+		
+		Match3Configuration.BoardMovements.Adjacent:
+			return from_grid_cell.cell.is_adjacent_to(to_grid_cell.cell)
+			
+		Match3Configuration.BoardMovements.AdjacentWithDiagonals:
+			return from_grid_cell.cell.is_adjacent_to(to_grid_cell.cell, true)
+			
+		Match3Configuration.BoardMovements.AdjacentOnlyDiagonals:
+			return from_grid_cell.cell.in_diagonal_with(to_grid_cell.cell)
+			
+		Match3Configuration.BoardMovements.Free:
+			return true
+			
+		Match3Configuration.BoardMovements.Row:
+			return from_grid_cell.cell.in_same_row_as(to_grid_cell.cell)
+			
+		Match3Configuration.BoardMovements.Column:
+			return from_grid_cell.cell.in_same_column_as(to_grid_cell.cell)
+			
+		Match3Configuration.BoardMovements.Cross:
+			return board.cell_finder.cross_cells_from(from_grid_cell.cell).has(to_grid_cell.cell)
+			
+		Match3Configuration.BoardMovements.CrossDiagonal:
+			return board.cell_finder.cross_diagonal_cells_from(from_grid_cell.cell).has(to_grid_cell.cell)
+		_:
+			return false
+#endregion
+
 
 func on_piece_drag_started(piece_ui: Match3PieceUI) -> void:
 	if configuration.click_mode_is_drag():

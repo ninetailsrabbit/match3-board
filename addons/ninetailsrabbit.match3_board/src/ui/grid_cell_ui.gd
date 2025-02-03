@@ -39,15 +39,12 @@ func can_swap_piece_with(other_cell: Match3GridCellUI) -> bool:
 
 
 func swap_piece_with(other_cell: Match3GridCellUI) -> bool:
-	if piece_ui and other_cell.piece_ui:
-		var swapped: bool = cell.swap_piece_with_cell(other_cell.cell)
+	if piece_ui and other_cell.piece_ui and cell.swap_piece_with_cell(other_cell.cell):
+		var current_piece_ui: Match3PieceUI = piece_ui
+		piece_ui = other_cell.piece_ui
+		other_cell.piece_ui = current_piece_ui
 		
-		if swapped:
-			var current_piece_ui: Match3PieceUI = piece_ui
-			piece_ui = other_cell.piece_ui
-			other_cell.piece_ui = current_piece_ui
-			
-			return true
+		return true
 			
 	return false
 
