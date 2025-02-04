@@ -1,5 +1,34 @@
 class_name Match3SequenceConsumer extends RefCounted
 
+
+var board: Board
+## Dictionary with structure <RuleId, SequenceConsumeRule>
+var rules: Dictionary = {}
+
+
+func _init(_board: Board, consume_rules: Dictionary = {}):
+	board = _board
+	rules = consume_rules
+
+
+func add_sequence_consume_rules(rules: Array[Match3SequenceConsumeRule]) -> Match3SequenceConsumer:
+	for rule: Match3SequenceConsumeRule in rules:
+		add_sequence_consume_rule(rule)
+	
+	return self
+	
+	
+func add_sequence_consume_rule(rule: Match3SequenceConsumeRule) -> Match3SequenceConsumer:
+	rules.get_or_add(rule.id, rule)
+	
+	return self
+
+
+func consume_sequence(sequence: Match3Sequence) -> void:
+	pass
+
+
+#region Data container classes
 class Match3SequenceConsumeResult:
 	var sequence_size: int
 	var combos: Array[Match3SequenceConsumeCombo]
@@ -30,29 +59,4 @@ class Match3SequenceConsumeCombo:
 		size = combo_size
 		special_piece_to_spawn = special_piece
 
-
-var board: Board
-## Dictionary with structure <RuleId, SequenceConsumeRule>
-var rules: Dictionary = {}
-
-
-func _init(_board: Board, consume_rules: Dictionary = {}):
-	board = _board
-	rules = consume_rules
-
-
-func add_sequence_consume_rules(rules: Array[Match3SequenceConsumeRule]) -> Match3SequenceConsumer:
-	for rule: Match3SequenceConsumeRule in rules:
-		add_sequence_consume_rule(rule)
-	
-	return self
-	
-	
-func add_sequence_consume_rule(rule: Match3SequenceConsumeRule) -> Match3SequenceConsumer:
-	rules.get_or_add(rule.id, rule)
-	
-	return self
-
-
-func consume_sequence(sequence: Match3Sequence) -> void:
-	pass
+#endregion

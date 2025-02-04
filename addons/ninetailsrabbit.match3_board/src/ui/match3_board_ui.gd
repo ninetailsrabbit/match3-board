@@ -132,8 +132,18 @@ func prepare_board() -> Match3BoardUI:
 				piece_configuration.type)
 				
 		board.add_piece(board_piece, piece_configuration.weight)
+		
+	for piece_configuration: Match3PieceConfiguration in configuration.available_special_pieces:
+		var board_piece: Match3Piece = Match3Piece.new(
+				piece_configuration.id, 
+				piece_configuration.shape, 
+				piece_configuration.color, 
+				piece_configuration.type)
+				
+		board.add_special_piece(board_piece)
 	
-	board.prepare_pieces().prepare_sequence_consumer()
+	board.prepare_pieces()\
+		.prepare_sequence_consumer(_map_sequence_rules_to_core_sequence_rules())
 	
 	return self
 	
@@ -405,5 +415,27 @@ func _grid_cell_ui_from_piece_ui(piece_ui: Match3PieceUI) -> Match3GridCellUI:
 		return null
 		
 	return cells.front()
+	
+	
+func _map_sequence_rules_to_core_sequence_rules() -> Array[Match3SequenceConsumeRule]:
+	var rules: Array[Match3SequenceConsumeRule] = []
+
+	for sequence_rule: SequenceConsumeRule in configuration.sequence_rules:
+		var pieces: Array[Match3Piece] = []
+		pieces.assign(
+			sequence_rule.target_pieces.map(
+				func(piece: Match3PieceConfiguration): return board.available_pieces[piece.id].piece)
+			)
+	
+		rules.append(
+				Match3SequenceConsumeRule.new(
+				sequence_rule.id, 
+				sequence_rule.shapes,
+				pieces,
+				board.available_special_pieces[sequence_rule.piece_to_spawn.id].piece
+				)
+			)
+	
+	return rules
 	
 #endregion

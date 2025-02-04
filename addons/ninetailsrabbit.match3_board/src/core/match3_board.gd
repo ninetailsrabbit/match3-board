@@ -222,7 +222,8 @@ func generate_random_normal_piece(piece_exceptions: Array[Match3PieceWeight] = [
 #endregion
 
 #region Sequences
-func prepare_sequence_consumer(rules: Array[Match3SequenceConsumeRule] = []) -> Board:
+func prepare_sequence_consumer(rules: Array[Match3SequenceConsumeRule]) -> Board:
+	print(rules)
 	if sequence_consumer == null:
 		var sequence_consume_rules: Dictionary = {}
 		

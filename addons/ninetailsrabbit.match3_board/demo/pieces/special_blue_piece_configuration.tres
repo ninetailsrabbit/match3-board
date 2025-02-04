@@ -6,7 +6,7 @@
 [resource]
 script = ExtResource("2_55er4")
 scene = ExtResource("1_utxkk")
-id = &"special-blue"
+id = &"special-blue-triangle"
 name = "Special Blue Gem"
 description = ""
 weight = 1.05

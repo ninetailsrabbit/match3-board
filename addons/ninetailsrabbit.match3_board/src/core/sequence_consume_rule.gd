@@ -24,17 +24,11 @@ func meet_conditions(sequence: Match3Sequence) -> bool:
 	if sequence_pieces.size() != target_pieces.size():
 		return false
 	
-	#match shape:
-		#[Match3Sequence.Shapes.Horizontal, Match3Sequence.Shapes.Vertical]:
-			#for index: int in target_pieces.size():
-				#if sequence_pieces[index].equals_to(target_pieces[index]):
-					#return false
-					#
-		#[Match3Sequence.Shapes.TShape, Match3Sequence.Shapes.LShape]:
-			#return sequence_pieces.filter(
-				#func(piece: Match3Piece): return target_pieces.has(piece)
-				#).size() == target_pieces.size()
-		#_:
-			#return false
-			#
-	return true
+	var contain_all_pieces: bool = true
+	
+	for piece: Match3Piece in sequence_pieces:
+		if not target_pieces.has(piece):
+			contain_all_pieces = false
+			break
+		
+	return contain_all_pieces
