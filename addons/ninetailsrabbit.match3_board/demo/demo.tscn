@@ -16,9 +16,9 @@
 [sub_resource type="Resource" id="Resource_gjd77"]
 script = ExtResource("11_tuwog")
 id = &"special-blue-triangle"
-shapes = Array[int]([])
+shapes = Array[int]([0, 1])
 piece_to_spawn = ExtResource("8_ja6f8")
-target_pieces = Array[ExtResource("3_lxq78")]([])
+target_pieces = Array[ExtResource("3_lxq78")]([ExtResource("4_xuqmf"), ExtResource("4_xuqmf"), ExtResource("4_xuqmf")])
 
 [sub_resource type="Resource" id="Resource_f1ea4"]
 script = ExtResource("3_diwbo")

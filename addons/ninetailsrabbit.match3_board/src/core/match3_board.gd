@@ -223,19 +223,32 @@ func generate_random_normal_piece(piece_exceptions: Array[Match3PieceWeight] = [
 
 #region Sequences
 func prepare_sequence_consumer(rules: Array[Match3SequenceConsumeRule]) -> Board:
-	print(rules)
 	if sequence_consumer == null:
-		var sequence_consume_rules: Dictionary = {}
+		var sequence_consumer_rules: Dictionary = {}
 		
 		for rule: Match3SequenceConsumeRule in rules:
-			sequence_consume_rules.get_or_add(rule.id, rules)
+			sequence_consumer_rules.get_or_add(rule.id, rule)
 			
-		sequence_consumer = Match3SequenceConsumer.new(self, sequence_consume_rules)
+		sequence_consumer = Match3SequenceConsumer.new(self, sequence_consumer_rules)
 	else:
 		sequence_consumer.add_sequence_consume_rules(rules)
 	
 	return self
-
+	
+	
+func sequences_to_combo_rules() -> Array[Match3SequenceConsumer.Match3SequenceConsumeResult]:
+	var matches: Array[Match3Sequence] = sequence_finder.find_board_sequences()
+	
+	if matches.is_empty():
+		return []
+	
+	var combos: Array[Match3SequenceConsumer.Match3SequenceConsumeResult] = []
+	
+	for sequence: Match3Sequence in matches:
+		combos.append(sequence_consumer.consume_sequence(sequence))
+		
+	return combos
+	
 #endregion
 
 

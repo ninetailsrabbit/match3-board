@@ -28,6 +28,11 @@ func _init(sequence_cells: Array[Match3GridCell], _shape: Shapes = Shapes.Irregu
 	shape = _detect_shape() if _shape == Shapes.Irregular else _shape
 
 
+func all_pieces_are_the_same() -> bool:
+	var sequence_pieces: Array[Match3Piece] = pieces()
+	
+	return sequence_pieces.all(func(piece: Match3Piece): return piece.match_with(sequence_pieces.front()))
+
 #region Pieces
 func consume() -> void:
 	consume_cells(cells)
@@ -62,10 +67,10 @@ func consume_normal_cells() -> void:
 func pieces() -> Array[Match3Piece]:
 	var current_pieces: Array[Match3Piece] = []
 	current_pieces.assign(Match3BoardPluginUtilities.remove_falsy_values(
-		cells.map(func(cell: Match3GridCell): return cell.current_piece))
+		cells.map(func(cell: Match3GridCell): return cell.piece))
 		)
 	
-	return current_pieces.filter(func(piece: PieceUI): return is_instance_valid(piece))
+	return current_pieces
 
 
 func normal_pieces() -> Array[Match3Piece]:

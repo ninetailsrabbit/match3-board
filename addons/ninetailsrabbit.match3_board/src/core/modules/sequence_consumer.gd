@@ -24,9 +24,23 @@ func add_sequence_consume_rule(rule: Match3SequenceConsumeRule) -> Match3Sequenc
 	return self
 
 
-func consume_sequence(sequence: Match3Sequence) -> void:
-	pass
+func consume_sequence(sequence: Match3Sequence) -> Match3SequenceConsumeResult:
+	var found_rule: Match3SequenceConsumeRule = null
+	
+	for rule: Match3SequenceConsumeRule in rules.values():
+		if rule.meet_conditions(sequence):
+			found_rule = rule
+			break
+	
+	if found_rule:
+		var result: Match3SequenceConsumeResult = null
 
+		if sequence.all_pieces_are_the_same():
+			return Match3SequenceConsumeResult.new([
+				Match3SequenceConsumeCombo.new(sequence, found_rule.piece_to_spawn)
+				])
+		
+	return null
 
 #region Data container classes
 class Match3SequenceConsumeResult:
@@ -34,7 +48,7 @@ class Match3SequenceConsumeResult:
 	var combos: Array[Match3SequenceConsumeCombo]
 	
 	func _init(sequence_combos: Array[Match3SequenceConsumeCombo]) -> void:
-		sequence_size = sequence_combos.reduce(func(accum, combo): return accum + combo.size, 0)
+		sequence_size = sequence_combos.reduce(func(accum, combo): return accum + combo.size(), 0)
 		combos = sequence_combos
 	
 	
@@ -50,13 +64,16 @@ class Match3SequenceConsumeResult:
 
 
 class Match3SequenceConsumeCombo:
-	var piece: Match3Piece
-	var size: int
+	var sequence: Match3Sequence
 	var special_piece_to_spawn: Match3Piece
 	
-	func _init(_piece: Match3Piece, combo_size: int, special_piece: Match3Piece) -> void:
-		piece = _piece
-		size = combo_size
-		special_piece_to_spawn = special_piece
+	
+	func _init(_sequence: Match3Sequence, piece_to_spawn: Match3Piece) -> void:
+		sequence = _sequence
+		special_piece_to_spawn = piece_to_spawn
+	
+	
+	func size() -> int:
+		return sequence.size()
 
 #endregion

@@ -375,6 +375,10 @@ func on_board_state_changed(_from: BoardState, to: BoardState) -> void:
 			unlock()
 		BoardState.Consume:
 			lock()
+		
+			var combos: Array[Match3SequenceConsumer.Match3SequenceConsumeResult] = board.sequences_to_combo_rules()
+			print(combos)
+			
 		BoardState.Fill:
 			lock()
 			
