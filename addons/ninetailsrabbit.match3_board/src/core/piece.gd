@@ -31,7 +31,8 @@ var is_locked: bool = false:
 				locked.emit()
 			else:
 				unlocked.emit()
-
+				
+## Properties only usable by special pieces
 var triggered: bool = false
 var priority: int = 0:
 	set(value):

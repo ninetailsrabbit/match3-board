@@ -1,6 +1,6 @@
 class_name Match3GridCellUI extends Node2D
 
-const GroupName: StringName = "grid_cells"
+const GroupName: StringName = &"grid_cells"
 
 @export var size: Vector2i = Vector2i(48, 48)
 @export var texture_scale: float = 1.0

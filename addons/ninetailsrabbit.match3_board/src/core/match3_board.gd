@@ -4,6 +4,7 @@ const MinGridWidth: int = 3
 const MinGridHeight: int = 3
 
 signal added_piece(piece: Match3Piece)
+signal added_consume_rule(rule: Match3SequenceConsumeRule)
 signal swap_accepted(from_cell: Match3GridCell, to_cell: Match3GridCell)
 signal swap_rejected(from_cell: Match3GridCell, to_cell: Match3GridCell)
 signal movement_consumed
@@ -43,6 +44,7 @@ var grid_cells: Array = []
 var grid_cells_flattened: Array[Match3GridCell] = []
 ## Using the Match3Piece.ID as key with the value being a dictionary with the structure { "piece": Match3Piece, "weight": Match3PieceWeight }
 var available_pieces: Dictionary = {}
+var available_special_pieces: Dictionary = {}
 
 var available_moves_on_start: int = 25
 var allow_matches_on_start: bool = false
@@ -80,6 +82,7 @@ var is_locked: bool = false:
 var piece_generator: Match3PieceGenerator = Match3PieceGenerator.new()
 var cell_finder: Match3BoardCellFinder = Match3BoardCellFinder.new(self)
 var sequence_finder: Match3SequenceFinder = Match3SequenceFinder.new(self)
+var sequence_consumer: Match3SequenceConsumer
 #endregion
 
 
@@ -107,6 +110,7 @@ func change_fill_mode(new_mode: FillModes) -> Board:
 	
 	return self
 
+
 #region Pieces
 func add_pieces(pieces: Array[Dictionary]) -> Board:
 	for piece_data: Dictionary in pieces:
@@ -117,7 +121,7 @@ func add_pieces(pieces: Array[Dictionary]) -> Board:
 	
 	
 func add_piece(piece: Match3Piece, weight: float = 1.0) -> Board:
-	assert(not piece.id.is_empty(), "Match3Board: The ID of the piece to add is empty, the piece cannot be added")
+	assert(not piece.id.is_empty(), "Match3Board->add_piece: The ID of the piece to add is empty, the piece cannot be added")
 	
 	var result: Dictionary = available_pieces.get_or_add(piece.id, {"piece": piece, "weight": Match3PieceWeight.new(piece, weight)})
 	piece_generator.add_piece(result.weight)
@@ -125,7 +129,18 @@ func add_piece(piece: Match3Piece, weight: float = 1.0) -> Board:
 	added_piece.emit(piece)
 	
 	return self
+
+## The special pieces are not added into the piece generator, they need to be spawned from consuming sequences
+func add_special_piece(piece: Match3Piece) -> Board:
+	assert(not piece.id.is_empty(), "Match3Board->add_special_piece: The ID of the special piece to add is empty, the piece cannot be added")
+	assert(piece.is_special(), "Match3Board->add_special_piece: The piece is not of type special, the piece cannot be added")
 	
+	available_special_pieces.get_or_add(piece.id, {"piece": piece, "weight": null})
+	
+	added_piece.emit(piece)
+	
+	return self
+
 
 func swap_pieces(from_grid_cell: Match3GridCell, to_grid_cell: Match3GridCell) -> bool:
 	var swapped: bool =  from_grid_cell.swap_piece_with_cell(to_grid_cell)
@@ -173,7 +188,7 @@ func prepare_pieces() -> Board:
 	assert(available_pieces.size() > 0, "Match3Board->prepare_pieces(): There is no available pieces to prepare in this board, aborting operation...")
 	
 	for cell in grid_cells_flattened.filter(_filter_cells_that_allow_pieces):
-		cell.assign_piece(generate_random_piece())
+		cell.assign_piece(generate_random_normal_piece())
 	
 	if not allow_matches_on_start:
 		remove_matches_from_board()
@@ -196,12 +211,29 @@ func remove_matches_from_board() -> void:
 	
 			for current_cell: Match3GridCell in cells_to_change:
 				var removed_piece = current_cell.remove_piece()
-				current_cell.assign_piece(generate_random_piece(piece_exceptions), true)
+				current_cell.assign_piece(generate_random_normal_piece(piece_exceptions), true)
 			
 		sequences = sequence_finder.find_board_sequences()
 
-func generate_random_piece(piece_exceptions: Array[Match3PieceWeight] = []) -> Match3Piece:
+
+func generate_random_normal_piece(piece_exceptions: Array[Match3PieceWeight] = []) -> Match3Piece:
 	return piece_generator.roll(piece_exceptions)
+
+#endregion
+
+#region Sequences
+func prepare_sequence_consumer(rules: Array[Match3SequenceConsumeRule] = []) -> Board:
+	if sequence_consumer == null:
+		var sequence_consume_rules: Dictionary = {}
+		
+		for rule: Match3SequenceConsumeRule in rules:
+			sequence_consume_rules.get_or_add(rule.id, rules)
+			
+		sequence_consumer = Match3SequenceConsumer.new(self, sequence_consume_rules)
+	else:
+		sequence_consumer.add_sequence_consume_rules(rules)
+	
+	return self
 
 #endregion
 

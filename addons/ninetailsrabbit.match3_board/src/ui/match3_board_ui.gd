@@ -133,7 +133,7 @@ func prepare_board() -> Match3BoardUI:
 				
 		board.add_piece(board_piece, piece_configuration.weight)
 	
-	board.prepare_pieces()
+	board.prepare_pieces().prepare_sequence_consumer()
 	
 	return self
 	
