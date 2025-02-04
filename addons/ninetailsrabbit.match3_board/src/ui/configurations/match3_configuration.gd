@@ -3,24 +3,6 @@ class_name Match3BoardConfiguration extends Resource
 const MinGridWidth: int = 3
 const MinGridHeight: int = 3
 
-## Piece scenes that contains or inherits the PieceUI script
-@export var available_pieces: Array[Match3PieceConfiguration] = []
-@export_group("Size 🔲")
-@export var grid_width: int = 7:
-		set(value):
-			if grid_width != value:
-				grid_width = maxi(MinGridWidth, value)
-				
-@export var grid_height: int = 8:
-		set(value):
-			if grid_height != value:
-				grid_height = maxi(MinGridHeight, value)
-			
-@export var cell_size: Vector2i = Vector2i(48, 48)
-@export var cell_offset: Vector2i = Vector2i(25, 25)
-@export var grid_cell_scene: PackedScene = preload("res://addons/ninetailsrabbit.match3_board/src/ui/match_3_grid_cell_ui.tscn")
-
-
 #region Board movements
 enum BoardMovements {
 	## Piece can be moved on adjacent pieces (not diagonals)
@@ -52,6 +34,24 @@ enum BoardSelectionMode {
 
 #endregion
 
+## Piece scenes that contains or inherits the PieceUI script
+@export var available_pieces: Array[Match3PieceConfiguration] = []
+@export var available_special_pieces: Array[Match3PieceConfiguration] = []
+@export_group("Size 🔲")
+@export var grid_width: int = 7:
+		set(value):
+			if grid_width != value:
+				grid_width = maxi(MinGridWidth, value)
+				
+@export var grid_height: int = 8:
+		set(value):
+			if grid_height != value:
+				grid_height = maxi(MinGridHeight, value)
+			
+@export var cell_size: Vector2i = Vector2i(48, 48)
+@export var cell_offset: Vector2i = Vector2i(25, 25)
+@export var grid_cell_scene: PackedScene = preload("res://addons/ninetailsrabbit.match3_board/src/ui/match_3_grid_cell_ui.tscn")
+
 @export_group("Modes")
 ## The swap mode to use on this board, each has its own particularities and can be changed at runtime.
 @export var swap_mode: BoardMovements = BoardMovements.Adjacent
@@ -76,6 +76,7 @@ enum BoardSelectionMode {
 @export var allow_matches_on_start: bool = false
 
 @export_group("Sequences")
+@export var sequence_rules: Array[SequenceConsumeRule] = []
 ## When enabled, horizontal matchs between pieces are allowed
 @export var horizontal_shape: bool = true
 ## When enabled, vertical matchs between pieces are allowed

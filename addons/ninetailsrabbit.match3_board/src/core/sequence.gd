@@ -70,7 +70,11 @@ func pieces() -> Array[Match3Piece]:
 
 func normal_pieces() -> Array[Match3Piece]:
 	return pieces().filter(func(piece: Match3Piece): return piece.is_normal())
-	
+
+
+func normal_pieces_ids() -> Array[StringName]:
+	return normal_pieces().map(func(piece: Match3Piece): return piece.id)
+
 
 func contains_special_piece() -> bool:
 	return pieces().any(func(piece: Match3Piece): return piece.is_special())

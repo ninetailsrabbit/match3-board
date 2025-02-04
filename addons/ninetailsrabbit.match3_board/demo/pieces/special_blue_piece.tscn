@@ -1,0 +1,14 @@
+[gd_scene load_steps=4 format=3 uid="uid://n1gjjyowue3q"]
+
+[ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/ui/piece_ui.gd" id="1_bxdsx"]
+[ext_resource type="Texture2D" uid="uid://ctiniq36c2dh7" path="res://addons/ninetailsrabbit.match3_board/src/debug_ui/preview_pieces/blue_gem.png" id="2_3lxrl"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_sm7co"]
+blend_mode = 1
+
+[node name="SpecialBlueGemPieceUI" type="Node2D"]
+script = ExtResource("1_bxdsx")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+material = SubResource("CanvasItemMaterial_sm7co")
+texture = ExtResource("2_3lxrl")
