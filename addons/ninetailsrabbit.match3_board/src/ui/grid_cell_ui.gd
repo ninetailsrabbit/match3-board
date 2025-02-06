@@ -11,7 +11,14 @@ const GroupName: StringName = &"grid_cells"
 ## TODO - Extra nodes needs to be defined on a custom scene that inherits from this to avoid dependencies
 @onready var sprite_2d: Sprite2D = $Sprite2D
 
-var cell: Match3GridCell
+var cell: Match3GridCell:
+	set(value):
+		if value != cell:
+			cell = value
+			
+			if cell:
+				cell.removed_piece.connect(on_removed_core_piece)
+			
 var piece_ui: Match3PieceUI:
 	set(new_piece):
 		piece_ui = new_piece
@@ -60,3 +67,8 @@ func get_texture() -> Texture2D:
 		return empty_cell_texture
 	
 	return even_cell_texture if (cell.column + cell.row) % 2 == 0 else odd_cell_texture
+
+
+func on_removed_core_piece(piece: Match3Piece) -> void:
+	if is_instance_valid(piece_ui) and piece_ui.piece.id == piece.id and not piece_ui.is_queued_for_deletion():
+		piece_ui.queue_free()

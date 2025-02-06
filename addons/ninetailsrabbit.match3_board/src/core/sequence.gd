@@ -41,8 +41,8 @@ func consume() -> void:
 func consume_cells(consumable_cells: Array[Match3GridCell], remove_from_sequence: bool = false) -> void:
 	var consumed_pieces: Array[Match3Piece] = []
 	
-	for cell in cells.filter(func(grid_cell: Match3GridCell): return grid_cell.has_piece()):
-		consumed_pieces.append(cell.current_piece)
+	for cell: Match3GridCell in cells.filter(func(grid_cell: Match3GridCell): return grid_cell.has_piece()):
+		consumed_pieces.append(cell.piece)
 		consume_cell(cell, remove_from_sequence)
 	
 	if not consumed_pieces.is_empty():
@@ -51,15 +51,12 @@ func consume_cells(consumable_cells: Array[Match3GridCell], remove_from_sequence
 
 func consume_cell(consumable_cell: Match3GridCell, remove_from_sequence: bool = false) -> void:
 	if cells.has(consumable_cell) and consumable_cell.has_piece():
-		var removed_piece: Match3Piece = consumable_cell.remove_piece()
+		consumable_cell.remove_piece()
 		
-		if is_instance_valid(removed_piece):
-			removed_piece.free()
-		
-			if remove_from_sequence:
-				cells.erase(consumable_cell)
-					
-#
+		if remove_from_sequence:
+			cells.erase(consumable_cell)
+
+
 func consume_normal_cells() -> void:
 	consume_cells(normal_cells())
 

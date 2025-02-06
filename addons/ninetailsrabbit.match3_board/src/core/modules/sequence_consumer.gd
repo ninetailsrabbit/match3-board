@@ -34,13 +34,13 @@ func consume_sequence(sequence: Match3Sequence) -> Match3SequenceConsumeResult:
 	
 	if found_rule:
 		var result: Match3SequenceConsumeResult = null
-
+		## TODO - SEE HOW TO SPLIT COMBOS WHEN THE SEQUENCE IS MORE COMPLEX THAN SIMILAR PIECES
 		if sequence.all_pieces_are_the_same():
 			return Match3SequenceConsumeResult.new([
 				Match3SequenceConsumeCombo.new(sequence, found_rule.piece_to_spawn)
 				])
 		
-	return null
+	return  Match3SequenceConsumeResult.new([Match3SequenceConsumeCombo.new(sequence)])
 
 #region Data container classes
 class Match3SequenceConsumeResult:
@@ -68,7 +68,7 @@ class Match3SequenceConsumeCombo:
 	var special_piece_to_spawn: Match3Piece
 	
 	
-	func _init(_sequence: Match3Sequence, piece_to_spawn: Match3Piece) -> void:
+	func _init(_sequence: Match3Sequence, piece_to_spawn: Match3Piece = null) -> void:
 		sequence = _sequence
 		special_piece_to_spawn = piece_to_spawn
 	

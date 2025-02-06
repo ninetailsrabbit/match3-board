@@ -247,7 +247,7 @@ func swap_pieces(from_piece: Match3PieceUI, to_piece: Match3PieceUI) -> void:
 			from_piece.position = to_piece.position
 			to_piece.position = from_piece.position
 			
-		if board.swap_pieces(from_grid_cell.cell, to_grid_cell.cell):
+		if from_grid_cell.swap_piece_with(to_grid_cell):
 			swap_accepted.emit(from_grid_cell, to_grid_cell)
 			
 			var matches: Array[Match3Sequence] = []
@@ -376,11 +376,21 @@ func on_board_state_changed(_from: BoardState, to: BoardState) -> void:
 		BoardState.Consume:
 			lock()
 		
-			var combos: Array[Match3SequenceConsumer.Match3SequenceConsumeResult] = board.sequences_to_combo_rules()
-			print(combos)
+			var sequences_result: Array[Match3SequenceConsumer.Match3SequenceConsumeResult] = board.sequences_to_combo_rules()
+			
+			for sequence_result in sequences_result:
+				for combo: Match3SequenceConsumer.Match3SequenceConsumeCombo in sequence_result.combos:
+					## TODO - TEMPORARY FOR TEST, THIS NEEDS TO RUN THE ANIMATOR FIRST, DETECT SPECIAL PIECES, ETC
+					combo.sequence.consume()
+			
+			current_state = BoardState.Fill
 			
 		BoardState.Fill:
 			lock()
+			
+			print("empty cells ", board.cell_finder.empty_cells())
+			
+			current_state = BoardState.WaitForInput
 			
 	
 func on_animator_animation_started(_animation_name: StringName) -> void:
