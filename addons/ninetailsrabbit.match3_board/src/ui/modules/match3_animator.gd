@@ -70,7 +70,7 @@ func consume_sequence(sequence: Match3Sequence) -> void:
 		var tween: Tween = create_tween().set_parallel(true)
 		
 		for piece_ui: Match3PieceUI in pieces:
-			tween.tween_property(piece_ui, "scale", Vector2.ZERO, 0.15).set_ease(Tween.EASE_OUT)
+			tween.tween_property(piece_ui, "scale", Vector2.ZERO, 0.2).set_ease(Tween.EASE_OUT)
 		
 		await tween.finished
 	

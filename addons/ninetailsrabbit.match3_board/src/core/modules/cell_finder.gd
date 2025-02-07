@@ -14,6 +14,7 @@ func get_cell(column: int, row: int) -> Match3GridCell:
 			return board.grid_cells[column][row]
 			
 	return null
+	
 
 ## For some reason, the .has() method is not valid to detect valid cells in a list
 ## so I'll change it instead to do a comparison using the board position value
