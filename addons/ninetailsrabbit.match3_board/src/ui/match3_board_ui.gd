@@ -369,50 +369,52 @@ func on_swap_rejected(_from: Match3GridCellUI, _to: Match3GridCellUI) -> void:
 	unlock()
 	
 
+	
+func consume_sequences() -> void:
+	var sequences_result: Array[Match3SequenceConsumer.Match3SequenceConsumeResult] = board.sequences_to_combo_rules()
+	
+	if animator:
+		var animations_finished: Array[bool] = []
+		
+		for sequence_result in sequences_result:
+			for combo: Match3SequenceConsumer.Match3SequenceConsumeCombo in sequence_result.combos:
+				
+				animator.animation_finished.connect(func(anim_name: StringName):
+					if anim_name == animator.ConsumeSequenceAnimation:
+						animations_finished.append(true)
+						combo.sequence.consume()
+						
+						if animations_finished.size() == sequences_result.size():
+							current_state = BoardState.Fill
+					,CONNECT_ONE_SHOT)
+						
+				animator.consume_sequence(combo.sequence)
+				
+		animations_finished.clear()
+	else:
+		for sequence_result in sequences_result:
+			for combo: Match3SequenceConsumer.Match3SequenceConsumeCombo in sequence_result.combos:
+				combo.sequence.consume()
+			
+		current_state = BoardState.Fill
+			
+
 func on_board_state_changed(_from: BoardState, to: BoardState) -> void:
 	match to:
 		BoardState.WaitForInput:
 			unlock()
 		BoardState.Consume:
 			lock()
-		
-			var sequences_result: Array[Match3SequenceConsumer.Match3SequenceConsumeResult] = board.sequences_to_combo_rules()
-			
-			if animator:
-				var animations_finished: Array[bool] = []
-				print("result size ", sequences_result.size())
-				for sequence_result in sequences_result:
-					for combo: Match3SequenceConsumer.Match3SequenceConsumeCombo in sequence_result.combos:
-						
-						animator.animation_finished.connect(
-							func(anim_name: StringName):
-								if anim_name == animator.ConsumeSequenceAnimation:
-									animations_finished.append(true)
-									combo.sequence.consume()
-									print("animations done ", animations_finished)
-									
-									if animations_finished.size() == sequences_result.size():
-										current_state = BoardState.Fill
-										
-								CONNECT_ONE_SHOT)
-								
-						animator.consume_sequence(combo.sequence)
-			else:
-				for sequence_result in sequences_result:
-					for combo: Match3SequenceConsumer.Match3SequenceConsumeCombo in sequence_result.combos:
-						## TODO - TEMPORARY FOR TEST, THIS NEEDS TO RUN THE ANIMATOR FIRST, DETECT SPECIAL PIECES, ETC
-						combo.sequence.consume()
-						
-				current_state = BoardState.Fill
+			consume_sequences()
 			
 		BoardState.Fill:
 			lock()
-		
 			current_state = BoardState.WaitForInput
-			
-	
+
+
 func on_animator_animation_started(_animation_name: StringName) -> void:
 	lock()
+	
 #endregion
 
 
@@ -436,6 +438,14 @@ func core_pieces_to_ui_pieces(pieces: Array[Match3Piece]) -> Array[Match3PieceUI
 	pieces_ui.assign(Match3BoardPluginUtilities.remove_falsy_values(pieces_ui))
 	
 	return pieces_ui
+	
+	
+func ui_pieces_from_sequence(sequence: Match3Sequence) -> Array[Match3PieceUI]:
+	var cells: Array[Match3GridCellUI] = core_cells_to_ui_cells(sequence.cells)
+	var pieces: Array[Match3PieceUI] = []
+	pieces.assign(cells.map(func(cell: Match3GridCellUI): return cell.piece_ui))
+	
+	return pieces
 
 
 func core_cell_to_ui_cell(cell: Match3GridCell) -> Match3GridCellUI:

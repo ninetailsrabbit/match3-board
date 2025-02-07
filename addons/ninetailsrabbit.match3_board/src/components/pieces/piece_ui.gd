@@ -12,9 +12,9 @@ signal mouse_exited
 signal focus_entered
 signal focus_exited
 
-const GroupName: String = "pieces"
-const SpecialGroupName: StringName = "special-pieces"
-const ObstacleGroupName: StringName = "obstacle-pieces"
+const GroupName: StringName = &"pieces"
+const SpecialGroupName: StringName = &"special-pieces"
+const ObstacleGroupName: StringName = &"obstacle-pieces"
 
 ## The sprite that represents a texture piece
 @export var sprite: Sprite2D

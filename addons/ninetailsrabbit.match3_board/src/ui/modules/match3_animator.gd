@@ -64,13 +64,12 @@ func swap_rejected_pieces(from_piece: Match3PieceUI, to_piece: Match3PieceUI, fr
 func consume_sequence(sequence: Match3Sequence) -> void:
 	animation_started.emit(ConsumeSequenceAnimation)
 	
-	var pieces: Array[Match3PieceUI] = board.core_pieces_to_ui_pieces(sequence.normal_pieces())
+	var pieces: Array[Match3PieceUI] = board.ui_pieces_from_sequence(sequence)
 	
 	if pieces.size() > 0:
 		var tween: Tween = create_tween().set_parallel(true)
 		
 		for piece_ui: Match3PieceUI in pieces:
-			print("tween on piece ", piece_ui.name)
 			tween.tween_property(piece_ui, "scale", Vector2.ZERO, 0.15).set_ease(Tween.EASE_OUT)
 		
 		await tween.finished

@@ -4,9 +4,9 @@ signal selected
 signal drag_started
 signal drag_ended
 
-const GroupName: StringName = &"pieces"
-const SpecialGroupName: StringName = &"special-pieces"
-const ObstacleGroupName: StringName = &"obstacle-pieces"
+const GroupName: StringName = &"match3-pieces"
+const SpecialGroupName: StringName = &"match3-special-pieces"
+const ObstacleGroupName: StringName = &"match3-obstacle-pieces"
 
 ## Priority tt the time of its special effect or when it is consumed
 @export var priority: int = 0:

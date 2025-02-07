@@ -13,7 +13,7 @@ class FallMovement:
 		
 const MinGridWidth: int = 3
 const MinGridHeight: int = 3
-const BoardGroupName: String = "match3-board"
+const BoardGroupName: StringName = &"match3-board"
 
 signal swapped_pieces(from: PieceUI, to: PieceUI, matches: Array[Sequence])
 signal swap_requested(from: PieceUI, to: PieceUI)
