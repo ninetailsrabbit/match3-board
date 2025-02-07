@@ -8,13 +8,23 @@ const GroupName: StringName = &"pieces"
 const SpecialGroupName: StringName = &"special-pieces"
 const ObstacleGroupName: StringName = &"obstacle-pieces"
 
+## Priority tt the time of its special effect or when it is consumed
+@export var priority: int = 0:
+	set(value):
+		priority = maxi(0, value)
 @export_category("Visual")
 @export var texture_scale: float = 0.85
 @export_category("Drag&Drop")
 @export var reset_position_on_drag_release: bool = true
 @export var drag_smooth_factor: float = 20.0
 
-var piece: Match3Piece
+var piece: Match3Piece:
+	set(value):
+		if value != piece:
+			piece = value
+			
+			if piece:
+				piece.priority = priority
 
 var mouse_region: Button
 var current_position: Vector2 = Vector2.ZERO
@@ -38,6 +48,8 @@ func _enter_tree() -> void:
 	assert(piece != null, "Match3PieceUI: The Piece UI needs the core piece to get the information to be usable")
 	
 	add_to_group(GroupName)
+	
+	piece.priority = priority
 	
 	if piece.is_special():
 		add_to_group(SpecialGroupName)

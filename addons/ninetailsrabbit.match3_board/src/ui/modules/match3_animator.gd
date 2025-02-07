@@ -3,6 +3,7 @@ class_name Match3Animator extends Node
 #region Animation names
 const SwapPiecesAnimation: StringName = &"swap-pieces"
 const SwapRejectedPiecesAnimation: StringName = &"swap-pieces"
+const ConsumeSequenceAnimation: StringName = &"consume-sequence"
 #endregion
 
 signal animation_started(animation_name: StringName)
@@ -59,6 +60,23 @@ func swap_rejected_pieces(from_piece: Match3PieceUI, to_piece: Match3PieceUI, fr
 	
 	animation_finished.emit(SwapRejectedPiecesAnimation)
 	
+	
+func consume_sequence(sequence: Match3Sequence) -> void:
+	animation_started.emit(ConsumeSequenceAnimation)
+	
+	var pieces: Array[Match3PieceUI] = board.core_pieces_to_ui_pieces(sequence.normal_pieces())
+	
+	if pieces.size() > 0:
+		var tween: Tween = create_tween().set_parallel(true)
+		
+		for piece_ui: Match3PieceUI in pieces:
+			print("tween on piece ", piece_ui.name)
+			tween.tween_property(piece_ui, "scale", Vector2.ZERO, 0.15).set_ease(Tween.EASE_OUT)
+		
+		await tween.finished
+	
+	animation_finished.emit(ConsumeSequenceAnimation)
+
 	
 func on_animation_started(animation_name: StringName) -> void:
 	current_animation = animation_name

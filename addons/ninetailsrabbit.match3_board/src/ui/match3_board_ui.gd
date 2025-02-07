@@ -143,7 +143,7 @@ func prepare_board() -> Match3BoardUI:
 		board.add_special_piece(board_piece)
 	
 	board.prepare_pieces()\
-		.prepare_sequence_consumer(_map_sequence_rules_to_core_sequence_rules())
+		.prepare_sequence_consumer(map_sequence_rules_to_core_sequence_rules())
 	
 	return self
 	
@@ -184,7 +184,7 @@ func draw_pieces() -> Match3BoardUI:
 
 func draw_piece(cell_ui: Match3GridCellUI) -> Match3PieceUI:
 	if cell_ui.cell.has_piece() and cell_ui.piece_ui == null:
-			var piece_ui: Match3PieceUI = _core_piece_to_ui_piece(cell_ui.cell.piece)
+			var piece_ui: Match3PieceUI = core_piece_to_ui_piece(cell_ui.cell.piece)
 			piece_ui.position = cell_ui.position
 			cell_ui.piece_ui = piece_ui
 			add_child(piece_ui)
@@ -232,8 +232,8 @@ func unlock_all_pieces() -> void:
 
 #region Swap
 func swap_pieces(from_piece: Match3PieceUI, to_piece: Match3PieceUI) -> void:
-	var from_grid_cell: Match3GridCellUI = _grid_cell_ui_from_piece_ui(from_piece)
-	var to_grid_cell: Match3GridCellUI = _grid_cell_ui_from_piece_ui(to_piece)
+	var from_grid_cell: Match3GridCellUI = grid_cell_ui_from_piece_ui(from_piece)
+	var to_grid_cell: Match3GridCellUI = grid_cell_ui_from_piece_ui(to_piece)
 	
 	if swap_movement_is_valid(from_grid_cell, to_grid_cell):
 		if animator:
@@ -260,7 +260,7 @@ func swap_pieces(from_piece: Match3PieceUI, to_piece: Match3PieceUI) -> void:
 				current_state = BoardState.Consume
 			else:
 				## Do another swap to return the pieces again
-				board.swap_pieces(from_grid_cell.cell, to_grid_cell.cell)
+				from_grid_cell.swap_piece_with(to_grid_cell)
 				
 				if animator:
 					## The pieces already come up swapped so we can use the updated original cell position to apply the visual change
@@ -378,18 +378,36 @@ func on_board_state_changed(_from: BoardState, to: BoardState) -> void:
 		
 			var sequences_result: Array[Match3SequenceConsumer.Match3SequenceConsumeResult] = board.sequences_to_combo_rules()
 			
-			for sequence_result in sequences_result:
-				for combo: Match3SequenceConsumer.Match3SequenceConsumeCombo in sequence_result.combos:
-					## TODO - TEMPORARY FOR TEST, THIS NEEDS TO RUN THE ANIMATOR FIRST, DETECT SPECIAL PIECES, ETC
-					combo.sequence.consume()
-			
-			current_state = BoardState.Fill
+			if animator:
+				var animations_finished: Array[bool] = []
+				print("result size ", sequences_result.size())
+				for sequence_result in sequences_result:
+					for combo: Match3SequenceConsumer.Match3SequenceConsumeCombo in sequence_result.combos:
+						
+						animator.animation_finished.connect(
+							func(anim_name: StringName):
+								if anim_name == animator.ConsumeSequenceAnimation:
+									animations_finished.append(true)
+									combo.sequence.consume()
+									print("animations done ", animations_finished)
+									
+									if animations_finished.size() == sequences_result.size():
+										current_state = BoardState.Fill
+										
+								CONNECT_ONE_SHOT)
+								
+						animator.consume_sequence(combo.sequence)
+			else:
+				for sequence_result in sequences_result:
+					for combo: Match3SequenceConsumer.Match3SequenceConsumeCombo in sequence_result.combos:
+						## TODO - TEMPORARY FOR TEST, THIS NEEDS TO RUN THE ANIMATOR FIRST, DETECT SPECIAL PIECES, ETC
+						combo.sequence.consume()
+						
+				current_state = BoardState.Fill
 			
 		BoardState.Fill:
 			lock()
-			
-			print("empty cells ", board.cell_finder.empty_cells())
-			
+		
 			current_state = BoardState.WaitForInput
 			
 	
@@ -398,8 +416,8 @@ func on_animator_animation_started(_animation_name: StringName) -> void:
 #endregion
 
 
-#region Private functions
-func _core_piece_to_ui_piece(piece: Match3Piece) -> Match3PieceUI:
+#region Mapper functions
+func core_piece_to_ui_piece(piece: Match3Piece) -> Match3PieceUI:
 	var pieces = configuration.available_pieces.filter(
 		func(configuration: Match3PieceConfiguration): return configuration.id == piece.id)
 	
@@ -412,7 +430,15 @@ func _core_piece_to_ui_piece(piece: Match3Piece) -> Match3PieceUI:
 	return piece_ui
 
 
-func _core_cell_to_ui_cell(cell: Match3GridCell) -> Match3GridCellUI:
+func core_pieces_to_ui_pieces(pieces: Array[Match3Piece]) -> Array[Match3PieceUI]:
+	var pieces_ui: Array[Match3PieceUI] = []
+	pieces_ui.assign(pieces.map(core_piece_to_ui_piece))
+	pieces_ui.assign(Match3BoardPluginUtilities.remove_falsy_values(pieces_ui))
+	
+	return pieces_ui
+
+
+func core_cell_to_ui_cell(cell: Match3GridCell) -> Match3GridCellUI:
 	var cells = grid_cells_flattened.filter(
 		func(cell_ui: Match3GridCellUI): return cell_ui.cell == cell)
 	
@@ -422,7 +448,15 @@ func _core_cell_to_ui_cell(cell: Match3GridCell) -> Match3GridCellUI:
 	return cells.front()
 
 
-func _grid_cell_ui_from_piece_ui(piece_ui: Match3PieceUI) -> Match3GridCellUI:
+func core_cells_to_ui_cells(cells: Array[Match3GridCell]) -> Array[Match3GridCellUI]:
+	var cells_ui: Array[Match3GridCellUI] = []
+	cells_ui.assign(cells.map(core_cell_to_ui_cell))
+	cells_ui.assign(Match3BoardPluginUtilities.remove_falsy_values(cells_ui))
+	
+	return cells_ui
+
+
+func grid_cell_ui_from_piece_ui(piece_ui: Match3PieceUI) -> Match3GridCellUI:
 	var cells: Array[Match3GridCellUI] = grid_cells_flattened.filter(func(cell: Match3GridCellUI): return cell.piece_ui == piece_ui)
 	
 	if cells.is_empty():
@@ -431,7 +465,7 @@ func _grid_cell_ui_from_piece_ui(piece_ui: Match3PieceUI) -> Match3GridCellUI:
 	return cells.front()
 	
 	
-func _map_sequence_rules_to_core_sequence_rules() -> Array[Match3SequenceConsumeRule]:
+func map_sequence_rules_to_core_sequence_rules() -> Array[Match3SequenceConsumeRule]:
 	var rules: Array[Match3SequenceConsumeRule] = []
 
 	for sequence_rule: SequenceConsumeRule in configuration.sequence_rules:
