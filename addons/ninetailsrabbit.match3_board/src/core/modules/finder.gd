@@ -1,4 +1,4 @@
-class_name Match3BoardCellFinder extends RefCounted
+class_name Match3BoardFinder extends RefCounted
 
 
 var board: Board
@@ -8,6 +8,7 @@ func _init(_board: Board) -> void:
 	board = _board
 
 
+#region Cells
 func get_cell(column: int, row: int) -> Match3GridCell:
 	if not board.grid_cells.is_empty() and column >= 0 and row >= 0:
 		if column <= board.grid_cells.size() - 1 and row <= board.grid_cells[0].size() - 1:
@@ -15,16 +16,6 @@ func get_cell(column: int, row: int) -> Match3GridCell:
 			
 	return null
 	
-
-## For some reason, the .has() method is not valid to detect valid cells in a list
-## so I'll change it instead to do a comparison using the board position value
-#func cells_contains_cell(cells: Array[Match3GridCell], target_cell: Match3GridCell) -> bool:
-	#var found_cells: Array[Match3GridCell] = cells.filter(
-		#func(cell: Match3GridCell): return cell.in_same_position_as(target_cell)
-		#)
-		#
-	#return found_cells.size() > 0
-		#
 
 func grid_cell_from_piece(piece: Match3Piece) -> Match3GridCell:
 	var found_pieces = board.grid_cells_flattened.filter(
@@ -55,7 +46,7 @@ func grid_cells_from_column(column: int) -> Array[Match3GridCell]:
 			cells.append(board.grid_cells[column][row])
 	
 	return cells
-
+	
 
 func top_cells_from(origin_cell: Match3GridCell) -> Array[Match3GridCell]:
 	var cells: Array[Match3GridCell] = []
@@ -226,3 +217,24 @@ func first_fallable_cell_with_piece_on_column(column: int):
 
 func _is_empty_cell(cell: Match3GridCell) -> bool:
 	return cell.can_contain_piece and cell.is_empty()
+	
+	
+#region Pieces
+	
+func pieces_from_row(row: int) -> Array[Match3Piece]:
+	var pieces: Array[Match3Piece] = []
+	
+	pieces.assign(grid_cells_from_row(row).filter(func(cell: Match3GridCell): return cell.has_piece())\
+		.map(func(cell: Match3GridCell): return cell.piece))
+	
+	return pieces
+
+
+func pieces_from_column(column: int) -> Array[Match3Piece]:
+	var pieces: Array[Match3Piece] = []
+	
+	pieces.assign(grid_cells_from_column(column).filter(func(cell: Match3GridCell): return cell.has_piece())\
+		.map(func(cell: Match3GridCell): return cell.piece))
+		
+	return pieces
+#endregion

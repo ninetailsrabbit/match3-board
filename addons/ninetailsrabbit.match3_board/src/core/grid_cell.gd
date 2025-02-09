@@ -64,10 +64,10 @@ func remove_piece() -> Match3Piece:
 
 func unlink_piece() -> Match3Piece:
 	if has_piece():
-		var piece_to_remove: Match3Piece = piece
+		var piece_to_unlink: Match3Piece = piece
 		piece = null
 		
-		return piece_to_remove
+		return piece_to_unlink
 	
 	return null
 

@@ -80,7 +80,7 @@ var is_locked: bool = false:
 
 #region Modules
 var piece_generator: Match3PieceGenerator = Match3PieceGenerator.new()
-var cell_finder: Match3BoardCellFinder = Match3BoardCellFinder.new(self)
+var finder: Match3BoardFinder = Match3BoardFinder.new(self)
 var sequence_finder: Match3SequenceFinder = Match3SequenceFinder.new(self)
 var sequence_consumer: Match3SequenceConsumer
 var fall_mover: Match3FallMover = Match3FallMover.new(self)
@@ -159,7 +159,7 @@ func fall_pieces() -> void:
 
 
 func fill_empty_cells() -> Array[Match3GridCell]:
-	var empty_cells: Array[Match3GridCell] = cell_finder.empty_cells()
+	var empty_cells: Array[Match3GridCell] = finder.empty_cells()
 	var last_pieces: Array[Match3Piece] = []
 	
 	for cell: Match3GridCell in empty_cells:
@@ -204,17 +204,27 @@ func assign_random_piece_on_cell(cell: Match3GridCell, overwrite: bool = false) 
 func _update_grid_cells_neighbours(grid_cells: Array[Match3GridCell]) -> void:
 	if not grid_cells.is_empty():
 		for grid_cell: Match3GridCell in grid_cells:
-			grid_cell.neighbour_up = cell_finder.get_cell(grid_cell.column, grid_cell.row - 1)
-			grid_cell.neighbour_bottom = cell_finder.get_cell(grid_cell.column, grid_cell.row + 1)
-			grid_cell.neighbour_right = cell_finder.get_cell(grid_cell.column + 1, grid_cell.row )
-			grid_cell.neighbour_left = cell_finder.get_cell(grid_cell.column - 1, grid_cell.row)
-			grid_cell.diagonal_neighbour_top_right = cell_finder.get_cell(grid_cell.column + 1, grid_cell.row - 1)
-			grid_cell.diagonal_neighbour_top_left = cell_finder.get_cell(grid_cell.column - 1, grid_cell.row - 1)
-			grid_cell.diagonal_neighbour_bottom_right = cell_finder.get_cell(grid_cell.column + 1, grid_cell.row + 1)
-			grid_cell.diagonal_neighbour_bottom_left = cell_finder.get_cell(grid_cell.column - 1, grid_cell.row + 1)
+			grid_cell.neighbour_up = finder.get_cell(grid_cell.column, grid_cell.row - 1)
+			grid_cell.neighbour_bottom = finder.get_cell(grid_cell.column, grid_cell.row + 1)
+			grid_cell.neighbour_right = finder.get_cell(grid_cell.column + 1, grid_cell.row )
+			grid_cell.neighbour_left = finder.get_cell(grid_cell.column - 1, grid_cell.row)
+			grid_cell.diagonal_neighbour_top_right = finder.get_cell(grid_cell.column + 1, grid_cell.row - 1)
+			grid_cell.diagonal_neighbour_top_left = finder.get_cell(grid_cell.column - 1, grid_cell.row - 1)
+			grid_cell.diagonal_neighbour_bottom_right = finder.get_cell(grid_cell.column + 1, grid_cell.row + 1)
+			grid_cell.diagonal_neighbour_bottom_left = finder.get_cell(grid_cell.column - 1, grid_cell.row + 1)
 #endregion
 
 #region Pieces
+func pieces() -> Array[Match3Piece]:
+	var pieces: Array[Match3Piece] = []
+	pieces.assign(grid_cells_flattened\
+		.filter(func(cell: Match3GridCell): return cell.has_piece())\
+		.map(func(cell: Match3GridCell): return cell.piece)
+		)
+	
+	return pieces
+
+
 func prepare_pieces() -> Board:
 	assert(available_pieces.size() > 0, "Match3Board->prepare_pieces(): There is no available pieces to prepare in this board, aborting operation...")
 	

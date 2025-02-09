@@ -19,11 +19,11 @@ func fall_pieces() -> Array[FallMovement]:
 
 
 func calculate_fall_movements_on_column(column: int) -> Array[FallMovement]:
-	var cells: Array[Match3GridCell] = board.cell_finder.grid_cells_from_column(column)
+	var cells: Array[Match3GridCell] = board.finder.grid_cells_from_column(column)
 	var movements: Array[FallMovement] = []
 	
-	var from_cell: Match3GridCell = board.cell_finder.first_fallable_cell_with_piece_on_column(column)
-	var to_cell: Match3GridCell = board.cell_finder.last_empty_cell_on_column(column)
+	var from_cell: Match3GridCell = board.finder.first_fallable_cell_with_piece_on_column(column)
+	var to_cell: Match3GridCell = board.finder.last_empty_cell_on_column(column)
 	
 	if from_cell and from_cell.has_piece() and to_cell.is_empty():
 		movements.append(FallMovement.new(from_cell, to_cell, from_cell.piece))

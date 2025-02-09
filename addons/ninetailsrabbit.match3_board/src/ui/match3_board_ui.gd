@@ -305,10 +305,10 @@ func swap_movement_is_valid(from_grid_cell: Match3GridCellUI, to_grid_cell: Matc
 			return from_grid_cell.cell.in_same_column_as(to_grid_cell.cell)
 			
 		Match3Configuration.BoardMovements.Cross:
-			return board.cell_finder.cross_cells_from(from_grid_cell.cell).has(to_grid_cell.cell)
+			return board.finder.cross_cells_from(from_grid_cell.cell).has(to_grid_cell.cell)
 			
 		Match3Configuration.BoardMovements.CrossDiagonal:
-			return board.cell_finder.cross_diagonal_cells_from(from_grid_cell.cell).has(to_grid_cell.cell)
+			return board.finder.cross_diagonal_cells_from(from_grid_cell.cell).has(to_grid_cell.cell)
 		_:
 			return false
 #endregion
@@ -375,7 +375,6 @@ func consume_sequences() -> void:
 	## TODO - IT MISS THE LOGIC TO SPAWN AND TRIGGER SPECIAL PIECES
 	var sequences_result: Array[Match3SequenceConsumer.Match3SequenceConsumeResult] = board.sequences_to_combo_rules()
 	
-	print(sequences_result.size())
 	
 	if animator:
 		var animations_finished: Array[bool] = []
@@ -387,8 +386,9 @@ func consume_sequences() -> void:
 					if anim_name == animator.ConsumeSequenceAnimation:
 						animations_finished.append(true)
 						combo.sequence.consume()
+						await get_tree().process_frame
 						
-						if animations_finished.size() == sequences_result.size():
+						if animations_finished.size() >= sequences_result.size():
 							animations_finished.clear()
 							current_state = BoardState.Fill
 					, CONNECT_ONE_SHOT)
@@ -432,11 +432,9 @@ func fill_pieces() -> void:
 func on_board_state_changed(_from: BoardState, to: BoardState) -> void:
 	match to:
 		BoardState.WaitForInput:
-			await get_tree().process_frame
 			unlock()
 		BoardState.Consume:
 			lock()
-			await get_tree().process_frame
 			consume_sequences()
 			
 		BoardState.Fill:

@@ -79,7 +79,7 @@ func _process(delta: float) -> void:
 
 func lock() -> void:
 	is_locked = true
-
+	
 
 func unlock() -> void:
 	is_locked = false
@@ -102,7 +102,7 @@ func calculate_texture_scale(texture: Texture2D, size: Vector2i = Vector2i(48, 4
 func _create_mouse_region_button() -> void:
 	if mouse_region == null:
 		mouse_region = Button.new()
-		mouse_region.self_modulate.a8 = 0 ## TODO - CHANGE TO 0 WHEN FINISH DEBUG
+		mouse_region.self_modulate.a8 = 100 ## TODO - CHANGE TO 0 WHEN FINISH DEBUG
 	
 	var sprite = Match3BoardPluginUtilities.first_node_of_type(self, Sprite2D.new())
 	

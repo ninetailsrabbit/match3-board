@@ -84,7 +84,7 @@ func fall_piece(movement: Match3FallMover.FallMovement) -> void:
 	var piece_ui: Match3PieceUI = board.match3_mapper.ui_piece_from_core_piece(movement.piece)
 	var empty_cell_ui: Match3GridCellUI = board.match3_mapper.core_cell_to_ui_cell(movement.to_cell)
 	
-	if is_instance_valid(piece_ui):
+	if is_instance_valid(piece_ui) and is_instance_valid(empty_cell_ui):
 		var tween: Tween = create_tween()
 		
 		tween.tween_property(piece_ui, "position", empty_cell_ui.position, 0.2)\
@@ -102,13 +102,13 @@ func fall_pieces(movements: Array[Match3FallMover.FallMovement]) -> void:
 		var tween: Tween = create_tween().set_parallel(true)
 		
 		for movement in movements:
-				var piece_ui: Match3PieceUI = board.match3_mapper.ui_piece_from_core_piece(movement.piece)
-				var empty_cell_ui: Match3GridCellUI = board.match3_mapper.core_cell_to_ui_cell(movement.to_cell)
+			var piece_ui: Match3PieceUI = board.match3_mapper.ui_piece_from_core_piece(movement.piece)
+			var empty_cell_ui: Match3GridCellUI = board.match3_mapper.core_cell_to_ui_cell(movement.to_cell)
+			
+			if is_instance_valid(piece_ui) and is_instance_valid(empty_cell_ui):
+				tween.tween_property(piece_ui, "position", empty_cell_ui.position, 0.15)\
+					.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_LINEAR)
 				
-				if is_instance_valid(piece_ui):
-					tween.tween_property(piece_ui, "position", empty_cell_ui.position, 0.15)\
-						.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_LINEAR)
-					
 		await tween.finished
 	
 	animation_finished.emit(FallPiecesAnimation)

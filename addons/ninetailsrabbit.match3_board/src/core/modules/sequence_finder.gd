@@ -111,7 +111,7 @@ func find_tshape_sequence(sequence_a: Match3Sequence, sequence_b: Match3Sequence
 			var horizontal_middle_cell: Match3GridCell = horizontal_sequence.middle_cell()
 			var vertical_middle_cell: Match3GridCell = vertical_sequence.middle_cell()
 
-			var intersection_cell: Match3GridCell = board.cell_finder.get_cell(horizontal_middle_cell.row, vertical_middle_cell.column)
+			var intersection_cell: Match3GridCell = board.finder.get_cell(horizontal_middle_cell.row, vertical_middle_cell.column)
 			if intersection_cell in horizontal_sequence.cells and intersection_cell in vertical_sequence.cells and not (
 				(left_edge_cell.in_same_position_as(intersection_cell) and top_edge_cell.in_same_position_as(intersection_cell)) \
 				or (left_edge_cell.in_same_position_as(intersection_cell) and bottom_edge_cell.in_same_position_as(intersection_cell)) \
@@ -200,7 +200,7 @@ func find_horizontal_board_sequences() -> Array[Match3Sequence]:
 	var horizontal_sequences: Array[Match3Sequence] = []
 	
 	for row in board.grid_height:
-		horizontal_sequences.append_array(find_horizontal_sequences(board.cell_finder.grid_cells_from_row(row)))
+		horizontal_sequences.append_array(find_horizontal_sequences(board.finder.grid_cells_from_row(row)))
 	
 	return horizontal_sequences
 
@@ -209,13 +209,13 @@ func find_vertical_board_sequences() -> Array[Match3Sequence]:
 	var vertical_sequences: Array[Match3Sequence] = []
 	
 	for column in board.grid_width:
-		vertical_sequences.append_array(find_vertical_sequences(board.cell_finder.grid_cells_from_column(column)))
+		vertical_sequences.append_array(find_vertical_sequences(board.finder.grid_cells_from_column(column)))
 	
 	return vertical_sequences
 
 
 func find_match_from_piece(piece: Match3Piece) -> Match3Sequence:
-	return find_match_from_cell(board.cell_finder.grid_cell_from_piece(piece))
+	return find_match_from_cell(board.finder.grid_cell_from_piece(piece))
 	
 	
 func find_match_from_cell(cell: Match3GridCell) -> Match3Sequence:
