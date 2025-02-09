@@ -20,6 +20,7 @@ enum BoardState {
 var board: Board
 var grid_cells: Array = [] # Multidimensional to access cells by column & row
 var grid_cells_flattened: Array[Match3GridCellUI] = []
+var match3_mapper: Match3Mapper = Match3Mapper.new(self)
 
 var current_selected_piece: Match3PieceUI
 var current_state: BoardState = BoardState.WaitForInput:
@@ -143,7 +144,7 @@ func prepare_board() -> Match3BoardUI:
 		board.add_special_piece(board_piece)
 	
 	board.prepare_pieces()\
-		.prepare_sequence_consumer(map_sequence_rules_to_core_sequence_rules())
+		.prepare_sequence_consumer(match3_mapper.sequence_rules_to_core_sequence_rules())
 		
 	if board.allow_matches_on_start:
 		current_state = BoardState.Consume
@@ -188,7 +189,7 @@ func draw_pieces() -> Match3BoardUI:
 
 func draw_piece(cell_ui: Match3GridCellUI) -> Match3PieceUI:
 	if cell_ui.cell.has_piece() and cell_ui.is_empty():
-		var piece_ui: Match3PieceUI = create_ui_piece_from_core_piece(cell_ui.cell.piece)
+		var piece_ui: Match3PieceUI = match3_mapper.create_ui_piece_from_core_piece(cell_ui.cell.piece)
 		piece_ui.position = cell_ui.position
 		cell_ui.piece_ui = piece_ui
 		add_child(piece_ui)
@@ -236,8 +237,8 @@ func unlock_all_pieces() -> void:
 
 #region Swap
 func swap_pieces(from_piece: Match3PieceUI, to_piece: Match3PieceUI) -> void:
-	var from_grid_cell: Match3GridCellUI = grid_cell_ui_from_piece_ui(from_piece)
-	var to_grid_cell: Match3GridCellUI = grid_cell_ui_from_piece_ui(to_piece)
+	var from_grid_cell: Match3GridCellUI = match3_mapper.grid_cell_ui_from_piece_ui(from_piece)
+	var to_grid_cell: Match3GridCellUI = match3_mapper.grid_cell_ui_from_piece_ui(to_piece)
 	
 	if swap_movement_is_valid(from_grid_cell, to_grid_cell):
 		if animator:
@@ -414,12 +415,13 @@ func on_board_state_changed(_from: BoardState, to: BoardState) -> void:
 			lock()
 			await get_tree().process_frame
 			
+			## TODO - FALL MOVEMENTS BEFORE FILL
 			#if animator:
 				#pass
 			#else:
 			
 			var filled_cells : Array[Match3GridCell] = board.fill_empty_cells()
-			var filled_cells_ui: Array[Match3GridCellUI] = core_cells_to_ui_cells(filled_cells)
+			var filled_cells_ui: Array[Match3GridCellUI] = match3_mapper.core_cells_to_ui_cells(filled_cells)
 			
 			for cell_ui: Match3GridCellUI in filled_cells_ui:
 				draw_piece(cell_ui)
@@ -432,101 +434,5 @@ func on_board_state_changed(_from: BoardState, to: BoardState) -> void:
 			
 func on_animator_animation_started(_animation_name: StringName) -> void:
 	lock()
-	
-#endregion
-
-
-#region Mapper functions
-func create_ui_piece_from_core_piece(piece: Match3Piece) -> Match3PieceUI:
-	var pieces = configuration.available_pieces.filter(
-		func(configuration: Match3PieceConfiguration): return configuration.id == piece.id)
-	
-	if pieces.is_empty():
-		return null
-		
-	var piece_ui: Match3PieceUI = pieces.front().scene.instantiate()
-	piece_ui.piece = piece
-	
-	return piece_ui
-
-
-func create_ui_pieces_from_core_pieces(pieces: Array[Match3Piece]) -> Array[Match3PieceUI]:
-	var pieces_ui: Array[Match3PieceUI] = []
-	pieces_ui.assign(pieces.map(create_ui_piece_from_core_piece))
-	pieces_ui.assign(Match3BoardPluginUtilities.remove_falsy_values(pieces_ui))
-	
-	return pieces_ui
-
-
-func ui_pieces_from_core_pieces(pieces: Array[Match3Piece]) -> Array[Match3PieceUI]:
-	var pieces_ui: Array[Match3PieceUI] = []
-	pieces_ui.assign(pieces.map(func(piece: Match3Piece): return ui_piece_from_core_piece(piece)))
-	pieces_ui.assign(Match3BoardPluginUtilities.remove_falsy_values(pieces_ui))
-	
-	return pieces_ui
-
-
-func ui_piece_from_core_piece(piece: Match3Piece) -> Match3PieceUI:
-	var cell_ui: Match3GridCellUI = core_cell_to_ui_cell(board.cell_finder.grid_cell_from_piece(piece))
-	
-	return cell_ui.piece_ui
-	
-
-func ui_pieces_from_sequence(sequence: Match3Sequence) -> Array[Match3PieceUI]:
-	var cells: Array[Match3GridCellUI] = core_cells_to_ui_cells(sequence.cells)
-	var pieces: Array[Match3PieceUI] = []
-	pieces.assign(cells.map(func(cell: Match3GridCellUI): return cell.piece_ui))
-	
-	return pieces
-
-
-func core_cell_to_ui_cell(cell: Match3GridCell) -> Match3GridCellUI:
-	var cells: Array[Match3GridCellUI] = grid_cells_flattened.filter(
-		func(cell_ui: Match3GridCellUI): return cell_ui.cell == cell
-		)
-	
-	if cells.is_empty():
-		return null
-		
-	return cells.front()
-
-
-func core_cells_to_ui_cells(cells: Array[Match3GridCell]) -> Array[Match3GridCellUI]:
-	var cells_ui: Array[Match3GridCellUI] = []
-	cells_ui.assign(cells.map(core_cell_to_ui_cell))
-	cells_ui.assign(Match3BoardPluginUtilities.remove_falsy_values(cells_ui))
-	
-	return cells_ui
-
-
-func grid_cell_ui_from_piece_ui(piece_ui: Match3PieceUI) -> Match3GridCellUI:
-	var cells: Array[Match3GridCellUI] = grid_cells_flattened.filter(func(cell: Match3GridCellUI): return cell.piece_ui == piece_ui)
-	
-	if cells.is_empty():
-		return null
-		
-	return cells.front()
-	
-	
-func map_sequence_rules_to_core_sequence_rules() -> Array[Match3SequenceConsumeRule]:
-	var rules: Array[Match3SequenceConsumeRule] = []
-
-	for sequence_rule: SequenceConsumeRule in configuration.sequence_rules:
-		var pieces: Array[Match3Piece] = []
-		pieces.assign(
-			sequence_rule.target_pieces.map(
-				func(piece: Match3PieceConfiguration): return board.available_pieces[piece.id].piece)
-			)
-	
-		rules.append(
-				Match3SequenceConsumeRule.new(
-				sequence_rule.id, 
-				sequence_rule.shapes,
-				pieces,
-				board.available_special_pieces[sequence_rule.piece_to_spawn.id].piece
-				)
-			)
-	
-	return rules
 	
 #endregion

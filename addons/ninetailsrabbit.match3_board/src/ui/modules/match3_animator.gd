@@ -64,7 +64,7 @@ func swap_rejected_pieces(from_piece: Match3PieceUI, to_piece: Match3PieceUI, fr
 func consume_sequence(sequence: Match3Sequence) -> void:
 	animation_started.emit(ConsumeSequenceAnimation)
 	
-	var pieces: Array[Match3PieceUI] = board.ui_pieces_from_sequence(sequence)
+	var pieces: Array[Match3PieceUI] = board.match3_mapper.ui_pieces_from_sequence(sequence)
 	
 	if pieces.size() > 0:
 		var tween: Tween = create_tween().set_parallel(true)
