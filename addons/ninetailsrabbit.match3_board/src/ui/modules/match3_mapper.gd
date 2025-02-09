@@ -38,9 +38,13 @@ func ui_pieces_from_core_pieces(pieces: Array[Match3Piece]) -> Array[Match3Piece
 
 
 func ui_piece_from_core_piece(piece: Match3Piece) -> Match3PieceUI:
-	var cell_ui: Match3GridCellUI = core_cell_to_ui_cell(match3_board_ui.board.cell_finder.grid_cell_from_piece(piece))
+	var pieces_ui = match3_board_ui.pieces()\
+		.filter(func(piece_ui: Match3PieceUI): return piece_ui.piece == piece)
 	
-	return cell_ui.piece_ui
+	if pieces_ui.size() > 0:
+		return pieces_ui.front()
+		
+	return null
 	
 
 func ui_pieces_from_sequence(sequence: Match3Sequence) -> Array[Match3PieceUI]:
@@ -71,7 +75,8 @@ func core_cells_to_ui_cells(cells: Array[Match3GridCell]) -> Array[Match3GridCel
 
 
 func grid_cell_ui_from_piece_ui(piece_ui: Match3PieceUI) -> Match3GridCellUI:
-	var cells: Array[Match3GridCellUI] = match3_board_ui.grid_cells_flattened.filter(func(cell: Match3GridCellUI): return cell.piece_ui == piece_ui)
+	var cells: Array[Match3GridCellUI] = match3_board_ui.grid_cells_flattened\
+		.filter(func(cell: Match3GridCellUI): return cell.piece_ui == piece_ui)
 	
 	if cells.is_empty():
 		return null
@@ -86,7 +91,8 @@ func sequence_rules_to_core_sequence_rules() -> Array[Match3SequenceConsumeRule]
 		var pieces: Array[Match3Piece] = []
 		pieces.assign(
 			sequence_rule.target_pieces.map(
-				func(piece: Match3PieceConfiguration): return match3_board_ui.board.available_pieces[piece.id].piece)
+				func(piece: Match3PieceConfiguration): 
+					return match3_board_ui.board.available_pieces[piece.id].piece)
 			)
 	
 		rules.append(

@@ -83,6 +83,7 @@ var piece_generator: Match3PieceGenerator = Match3PieceGenerator.new()
 var cell_finder: Match3BoardCellFinder = Match3BoardCellFinder.new(self)
 var sequence_finder: Match3SequenceFinder = Match3SequenceFinder.new(self)
 var sequence_consumer: Match3SequenceConsumer
+var fall_mover: Match3FallMover = Match3FallMover.new(self)
 #endregion
 
 

@@ -208,5 +208,21 @@ func last_empty_cell_on_column(column: int) -> Match3GridCell:
 	return null
 
 
+func first_fallable_cell_with_piece_on_column(column: int):
+	var cells: Array[Match3GridCell] = grid_cells_from_column(column)
+	cells.reverse()
+	
+	var movable_cells = cells.filter(
+		func(cell: Match3GridCell): 
+			return cell.has_piece() \
+				and cell.piece.can_be_moved and (cell.neighbour_bottom and cell.neighbour_bottom.is_empty())
+			)
+	
+	if movable_cells.size() > 0:
+		return movable_cells.front()
+	
+	return null
+
+
 func _is_empty_cell(cell: Match3GridCell) -> bool:
 	return cell.can_contain_piece and cell.is_empty()

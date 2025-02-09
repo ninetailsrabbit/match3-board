@@ -207,8 +207,7 @@ func pieces() -> Array[Match3PieceUI]:
 	pieces.assign(get_tree().get_nodes_in_group(Match3PieceUI.GroupName))
 
 	return pieces
-
-
+	
 
 func special_pieces() -> Array[Match3PieceUI]:
 	var pieces: Array[Match3PieceUI] = []
@@ -399,6 +398,52 @@ func consume_sequences() -> void:
 			
 		current_state = BoardState.Fill
 			
+			
+func fall_pieces() -> void:
+	while board.grid_cells_flattened.any(func(cell: Match3GridCell):
+		return cell.has_piece() \
+			and cell.piece.can_be_moved \
+			and (cell.neighbour_bottom and cell.neighbour_bottom.can_contain_piece and cell.neighbour_bottom.is_empty())
+		):
+			
+		var fall_movements: Array[Match3FallMover.FallMovement] = board.fall_mover.fall_pieces()
+			
+		for movement in fall_movements:
+			var cell_ui = match3_mapper.core_cell_to_ui_cell(movement.to_cell)
+			cell_ui.piece_ui = match3_mapper.ui_piece_from_core_piece(movement.piece)
+		
+		if animator:
+			#animator.animation_finished.connect(func(anim_name: StringName): 
+				#if anim_name == Match3Animator.FallPiecesAnimation:
+					#if board.sequence_finder.find_board_sequences().is_empty():
+						#current_state = BoardState.WaitForInput
+					#else:
+						#current_state = BoardState.Consume
+					#, CONNECT_ONE_SHOT)
+			#
+			animator.fall_pieces(fall_movements)
+			
+			#var filled_cells : Array[Match3GridCell] = board.fill_empty_cells()
+			#var filled_cells_ui: Array[Match3GridCellUI] = match3_mapper.core_cells_to_ui_cells(filled_cells)
+			#
+			## TODO - FILL ANIMATIONS
+			
+		else:
+			for movement in fall_movements:
+				var piece_ui: Match3PieceUI = match3_mapper.ui_piece_from_core_piece(movement.piece)
+				piece_ui.position = piece_ui.original_cell_position
+				
+			var filled_cells : Array[Match3GridCell] = board.fill_empty_cells()
+			var filled_cells_ui: Array[Match3GridCellUI] = match3_mapper.core_cells_to_ui_cells(filled_cells)
+
+			for cell_ui: Match3GridCellUI in filled_cells_ui:
+				draw_piece(cell_ui)
+		
+		if board.sequence_finder.find_board_sequences().is_empty():
+			current_state = BoardState.WaitForInput
+		else:
+			current_state = BoardState.Consume
+
 
 func on_board_state_changed(_from: BoardState, to: BoardState) -> void:
 	match to:
@@ -408,30 +453,14 @@ func on_board_state_changed(_from: BoardState, to: BoardState) -> void:
 		BoardState.Consume:
 			lock()
 			await get_tree().process_frame
-			
 			consume_sequences()
 			
 		BoardState.Fill:
 			lock()
 			await get_tree().process_frame
+			fall_pieces()
 			
-			## TODO - FALL MOVEMENTS BEFORE FILL
-			#if animator:
-				#pass
-			#else:
-			
-			var filled_cells : Array[Match3GridCell] = board.fill_empty_cells()
-			var filled_cells_ui: Array[Match3GridCellUI] = match3_mapper.core_cells_to_ui_cells(filled_cells)
-			
-			for cell_ui: Match3GridCellUI in filled_cells_ui:
-				draw_piece(cell_ui)
-			
-			if board.sequence_finder.find_board_sequences().is_empty():
-				current_state = BoardState.WaitForInput
-			else:
-				current_state = BoardState.Consume
-			
-			
+					
 func on_animator_animation_started(_animation_name: StringName) -> void:
 	lock()
 	
