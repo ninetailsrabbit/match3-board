@@ -7,6 +7,7 @@ class_name Match3GridCell extends RefCounted
 signal assigned_new_piece(piece: Match3Piece)
 signal replaced_piece(previous_piece: Match3Piece, piece: Match3Piece)
 signal removed_piece(piece: Match3Piece)
+signal unlinked_piece(piece: Match3Piece)
 
 
 var column: int
@@ -53,16 +54,24 @@ func assign_piece(new_piece: Match3Piece, replace: bool = false) -> void:
 
 func remove_piece() -> Match3Piece:
 	if has_piece():
-		var piece_to_remove: Match3Piece = piece
-		
+		var piece_to_remove: Match3Piece = unlink_piece()
 		removed_piece.emit(piece_to_remove)
-		piece = null
 		
 		return piece_to_remove
 		
 	return null
-
 	
+
+func unlink_piece() -> Match3Piece:
+	if has_piece():
+		var piece_to_remove: Match3Piece = piece
+		piece = null
+		
+		return piece_to_remove
+	
+	return null
+
+
 func swap_piece_with_cell(other_cell: Match3GridCell) -> bool:
 	if can_swap_piece_with_cell(other_cell):
 		var current_piece: Match3Piece = piece
