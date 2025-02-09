@@ -159,10 +159,23 @@ func fall_pieces() -> void:
 
 func fill_empty_cells() -> Array[Match3GridCell]:
 	var empty_cells: Array[Match3GridCell] = cell_finder.empty_cells()
+	var last_pieces: Array[Match3Piece] = []
 	
 	for cell: Match3GridCell in empty_cells:
 		assign_random_piece_on_cell(cell)
-	
+		
+		## This logic avoids to create a third similar piece from the previous ones to avoid matches when filling
+		if last_pieces.is_empty() or last_pieces.size() == 1 and cell.piece.match_with(last_pieces.front()):
+			last_pieces.append(cell.piece)
+		elif last_pieces.size() == 2:
+			while last_pieces.size() == 2 and cell.piece.match_with(last_pieces.back()):
+				assign_random_piece_on_cell(cell, true)
+				
+				if not cell.piece.match_with(last_pieces.back()):
+					last_pieces.clear()
+			
+			last_pieces.clear()
+			
 	return empty_cells
 
 #endregion

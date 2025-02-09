@@ -405,8 +405,8 @@ func on_board_state_changed(_from: BoardState, to: BoardState) -> void:
 			unlock()
 		BoardState.Consume:
 			lock()
-			
 			await get_tree().process_frame
+			
 			consume_sequences()
 			
 		BoardState.Fill:
@@ -423,7 +423,10 @@ func on_board_state_changed(_from: BoardState, to: BoardState) -> void:
 			for cell_ui: Match3GridCellUI in filled_cells_ui:
 				draw_piece(cell_ui)
 			
-			current_state = BoardState.WaitForInput
+			if board.sequence_finder.find_board_sequences().is_empty():
+				current_state = BoardState.WaitForInput
+			else:
+				current_state = BoardState.Consume
 			
 			
 func on_animator_animation_started(_animation_name: StringName) -> void:
