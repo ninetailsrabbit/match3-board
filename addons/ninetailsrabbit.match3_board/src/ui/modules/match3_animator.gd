@@ -6,6 +6,7 @@ const SwapRejectedPiecesAnimation: StringName = &"swap-pieces"
 const ConsumeSequenceAnimation: StringName = &"consume-sequence"
 const FallPieceAnimation: StringName = &"fall-piece"
 const FallPiecesAnimation: StringName = &"fall-pieces"
+const SpawnPiecesAnimation: StringName = &"spawn-pieces"
 #endregion
 
 signal animation_started(animation_name: StringName)
@@ -112,6 +113,26 @@ func fall_pieces(movements: Array[Match3FallMover.FallMovement]) -> void:
 		await tween.finished
 	
 	animation_finished.emit(FallPiecesAnimation)
+	
+
+func spawn_pieces(cells: Array[Match3GridCellUI]) -> void:
+	animation_started.emit(SpawnPiecesAnimation)
+	
+	if cells.size() > 0:
+		var tween: Tween = create_tween().set_parallel(true)
+		
+		for cell_ui: Match3GridCellUI in cells.filter(func(cell: Match3GridCellUI): return cell.has_piece()):
+			var piece = cell_ui.piece_ui
+			
+			var fall_distance = board.configuration.cell_size.y * board.configuration.grid_height
+			piece.hide()
+			tween.tween_property(piece, "visible", true, 0.1)
+			tween.tween_property(piece, "position", cell_ui.position, 0.25)\
+				.set_trans(Tween.TRANS_QUAD).from(Vector2(cell_ui.position.x, cell_ui.position.y - fall_distance))
+			
+		await tween.finished
+	
+	animation_finished.emit(SpawnPiecesAnimation)
 	
 	
 func on_animation_started(animation_name: StringName) -> void:

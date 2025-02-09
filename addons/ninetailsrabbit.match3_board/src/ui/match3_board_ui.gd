@@ -84,7 +84,6 @@ func change_animator(new_animator: Match3Animator) -> Match3BoardUI:
 	if not animator.animation_started.is_connected(on_animator_animation_started):
 		animator.animation_started.connect(on_animator_animation_started)
 		
-		
 	return self
 
 #endregion
@@ -369,12 +368,10 @@ func on_swap_accepted(_from: Match3GridCellUI, _to: Match3GridCellUI) -> void:
 func on_swap_rejected(_from: Match3GridCellUI, _to: Match3GridCellUI) -> void:
 	unlock()
 	
-
 	
 func consume_sequences() -> void:
 	## TODO - IT MISS THE LOGIC TO SPAWN AND TRIGGER SPECIAL PIECES
 	var sequences_result: Array[Match3SequenceConsumer.Match3SequenceConsumeResult] = board.sequences_to_combo_rules()
-	
 	
 	if animator:
 		var animations_finished: Array[bool] = []
@@ -389,7 +386,6 @@ func consume_sequences() -> void:
 						await get_tree().process_frame
 						
 						if animations_finished.size() >= sequences_result.size():
-							animations_finished.clear()
 							current_state = BoardState.Fill
 					, CONNECT_ONE_SHOT)
 						
@@ -419,14 +415,14 @@ func fall_pieces() -> void:
 		
 			
 func fill_pieces() -> void:
-	if animator:
-		pass
-	else:
-		var filled_cells : Array[Match3GridCell] = board.fill_empty_cells()
-		var filled_cells_ui: Array[Match3GridCellUI] = match3_mapper.core_cells_to_ui_cells(filled_cells)
+	var filled_cells : Array[Match3GridCell] = board.fill_empty_cells()
+	var filled_cells_ui: Array[Match3GridCellUI] = match3_mapper.core_cells_to_ui_cells(filled_cells)
 
-		for cell_ui: Match3GridCellUI in filled_cells_ui:
-			draw_piece(cell_ui)
+	for cell_ui: Match3GridCellUI in filled_cells_ui:
+		draw_piece(cell_ui)
+		
+	if animator:
+		await animator.spawn_pieces(filled_cells_ui)
 
 
 func on_board_state_changed(_from: BoardState, to: BoardState) -> void:
@@ -443,7 +439,9 @@ func on_board_state_changed(_from: BoardState, to: BoardState) -> void:
 			
 			fall_pieces()
 			await get_tree().process_frame
-			#fill_pieces()
+			fill_pieces()
+			
+			await get_tree().process_frame
 			
 			if board.sequence_finder.find_board_sequences().is_empty():
 				current_state = BoardState.WaitForInput
