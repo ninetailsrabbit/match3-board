@@ -249,6 +249,14 @@ func remove_matches_from_board() -> void:
 
 func generate_random_normal_piece(piece_exceptions: Array[Match3PieceWeight] = []) -> Match3Piece:
 	return piece_generator.roll(piece_exceptions)
+	
+	
+func pieces_can_fall() -> bool:
+	return grid_cells_flattened.any(func(cell: Match3GridCell):
+		return cell.has_piece() \
+			and cell.piece.can_be_moved \
+			and (cell.neighbour_bottom and cell.neighbour_bottom.can_contain_piece and cell.neighbour_bottom.is_empty())
+		)
 
 #endregion
 
