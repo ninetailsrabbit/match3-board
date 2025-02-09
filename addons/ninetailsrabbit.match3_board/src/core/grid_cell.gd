@@ -102,7 +102,7 @@ func in_same_position_as(other_cell: Match3GridCell) -> bool:
 
 
 func in_same_grid_position_as(grid_position: Vector2) -> bool:
-	return grid_position.x == row and grid_position.y == column
+	return grid_position.x == column and grid_position.y == row
 
 #endregion
 

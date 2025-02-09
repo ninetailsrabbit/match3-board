@@ -257,15 +257,6 @@ func swap_pieces(from_piece: Match3PieceUI, to_piece: Match3PieceUI) -> void:
 			await get_tree().process_frame
 			
 			var matches: Array[Match3Sequence] = board.sequence_finder.find_board_sequences()
-			
-			print("MATCHES AFTER SWAP ", matches)
-			
-			for ma in matches:
-				var pieces = ma.pieces()
-				var ui = ui_pieces_from_core_pieces(pieces)
-				
-				for p in ui:
-					print("sequence piece ", p.name)
 					
 			if matches.size() > 0:
 				current_state = BoardState.Consume
