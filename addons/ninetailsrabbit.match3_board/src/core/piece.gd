@@ -38,6 +38,11 @@ var priority: int = 0:
 	set(value):
 		priority = maxi(0, value)
 
+
+static func from_piece(template_piece: Match3Piece) -> Match3Piece:
+	return Match3Piece.new(template_piece.id, template_piece.shape, template_piece.color, template_piece.type)
+
+
 func _init(_id: StringName, _shape: StringName, _color: Color = Color.WHITE, _type: PieceType = PieceType.Normal) -> void:
 	id = _id
 	shape = _shape

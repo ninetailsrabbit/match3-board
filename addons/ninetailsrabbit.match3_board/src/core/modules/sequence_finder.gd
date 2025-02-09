@@ -93,7 +93,6 @@ func find_vertical_sequences(cells: Array[Match3GridCell]) -> Array[Match3Sequen
 				
 			previous_cell = current_cell
 	
-	
 	sequences.sort_custom(_sort_by_size_descending)
 	
 	return sequences

@@ -52,7 +52,7 @@ func _ready() -> void:
 	
 	if configuration.auto_start:
 		draw_cells().draw_pieces()
-	
+			
 	swap_accepted.connect(on_swap_accepted)
 	swap_rejected.connect(on_swap_rejected)
 	locked.connect(on_board_locked)
@@ -144,6 +144,10 @@ func prepare_board() -> Match3BoardUI:
 	
 	board.prepare_pieces()\
 		.prepare_sequence_consumer(map_sequence_rules_to_core_sequence_rules())
+		
+	if board.allow_matches_on_start:
+		current_state = BoardState.Consume
+	
 	
 	return self
 	
@@ -250,12 +254,19 @@ func swap_pieces(from_piece: Match3PieceUI, to_piece: Match3PieceUI) -> void:
 		if from_grid_cell.swap_piece_with(to_grid_cell):
 			swap_accepted.emit(from_grid_cell, to_grid_cell)
 			
-			var matches: Array[Match3Sequence] = []
-			var sequence_from: Match3Sequence = board.sequence_finder.find_match_from_cell(from_grid_cell.cell)
-			var sequence_to: Match3Sequence = board.sequence_finder.find_match_from_cell(to_grid_cell.cell)
-
-			matches.assign(Match3BoardPluginUtilities.remove_falsy_values([sequence_from, sequence_to]))
+			await get_tree().process_frame
 			
+			var matches: Array[Match3Sequence] = board.sequence_finder.find_board_sequences()
+			
+			print("MATCHES AFTER SWAP ", matches)
+			
+			for ma in matches:
+				var pieces = ma.pieces()
+				var ui = ui_pieces_from_core_pieces(pieces)
+				
+				for p in ui:
+					print("sequence piece ", p.name)
+					
 			if matches.size() > 0:
 				current_state = BoardState.Consume
 			else:
@@ -284,7 +295,6 @@ func swap_movement_is_valid(from_grid_cell: Match3GridCellUI, to_grid_cell: Matc
 		return false
 		
 	match configuration.swap_mode:
-		
 		Match3Configuration.BoardMovements.Adjacent:
 			return from_grid_cell.cell.is_adjacent_to(to_grid_cell.cell)
 			
@@ -480,10 +490,11 @@ func ui_pieces_from_sequence(sequence: Match3Sequence) -> Array[Match3PieceUI]:
 
 
 func core_cell_to_ui_cell(cell: Match3GridCell) -> Match3GridCellUI:
-	var cells = grid_cells_flattened.filter(
-		func(cell_ui: Match3GridCellUI): return cell_ui.cell == cell)
+	var cells: Array[Match3GridCellUI] = grid_cells_flattened.filter(
+		func(cell_ui: Match3GridCellUI): return cell_ui.cell == cell
+		)
 	
-	if cell.is_empty():
+	if cells.is_empty():
 		return null
 		
 	return cells.front()
