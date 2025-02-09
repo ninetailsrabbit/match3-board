@@ -41,6 +41,14 @@ func _ready() -> void:
 	sprite_2d.scale = calculate_scale_texture_based_cell_size(sprite_2d.texture)
 
 
+func has_piece() -> bool:
+	return piece_ui != null
+	
+
+func is_empty() -> bool:
+	return piece_ui == null
+
+
 func can_swap_piece_with(other_cell: Match3GridCellUI) -> bool:
 	return piece_ui and other_cell.piece_ui and cell.can_swap_piece_with_cell(other_cell.cell)
 

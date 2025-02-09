@@ -151,7 +151,20 @@ func swap_pieces(from_grid_cell: Match3GridCell, to_grid_cell: Match3GridCell) -
 		swap_rejected.emit(from_grid_cell, to_grid_cell)
 	
 	return swapped
+
+
+func fall_pieces() -> void:
+	pass
+
+
+func fill_empty_cells() -> Array[Match3GridCell]:
+	var empty_cells: Array[Match3GridCell] = cell_finder.empty_cells()
 	
+	for cell: Match3GridCell in empty_cells:
+		assign_random_piece_on_cell(cell)
+	
+	return empty_cells
+
 #endregion
 
 #region Grid cells
@@ -169,6 +182,10 @@ func prepare_grid_cells() -> Board:
 		
 	return self
 
+
+func assign_random_piece_on_cell(cell: Match3GridCell, overwrite: bool = false) -> void:
+	cell.assign_piece(generate_random_normal_piece(), overwrite)
+	
 
 func _update_grid_cells_neighbours(grid_cells: Array[Match3GridCell]) -> void:
 	if not grid_cells.is_empty():

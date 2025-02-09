@@ -183,13 +183,13 @@ func draw_pieces() -> Match3BoardUI:
 
 
 func draw_piece(cell_ui: Match3GridCellUI) -> Match3PieceUI:
-	if cell_ui.cell.has_piece() and cell_ui.piece_ui == null:
-			var piece_ui: Match3PieceUI = create_ui_piece_from_core_piece(cell_ui.cell.piece)
-			piece_ui.position = cell_ui.position
-			cell_ui.piece_ui = piece_ui
-			add_child(piece_ui)
-			
-			return piece_ui
+	if cell_ui.cell.has_piece() and cell_ui.is_empty():
+		var piece_ui: Match3PieceUI = create_ui_piece_from_core_piece(cell_ui.cell.piece)
+		piece_ui.position = cell_ui.position
+		cell_ui.piece_ui = piece_ui
+		add_child(piece_ui)
+		
+		return piece_ui
 		
 	return null
 
@@ -371,6 +371,7 @@ func on_swap_rejected(_from: Match3GridCellUI, _to: Match3GridCellUI) -> void:
 
 	
 func consume_sequences() -> void:
+	## TODO - IT MISS THE LOGIC TO SPAWN AND TRIGGER SPECIAL PIECES
 	var sequences_result: Array[Match3SequenceConsumer.Match3SequenceConsumeResult] = board.sequences_to_combo_rules()
 	
 	if animator:
@@ -386,11 +387,9 @@ func consume_sequences() -> void:
 						
 						if animations_finished.size() == sequences_result.size():
 							current_state = BoardState.Fill
-					,CONNECT_ONE_SHOT)
+					, CONNECT_ONE_SHOT)
 						
 				animator.consume_sequence(combo.sequence)
-				
-		animations_finished.clear()
 	else:
 		for sequence_result in sequences_result:
 			for combo: Match3SequenceConsumer.Match3SequenceConsumeCombo in sequence_result.combos:
@@ -402,13 +401,28 @@ func consume_sequences() -> void:
 func on_board_state_changed(_from: BoardState, to: BoardState) -> void:
 	match to:
 		BoardState.WaitForInput:
+			await get_tree().process_frame
 			unlock()
 		BoardState.Consume:
 			lock()
+			
+			await get_tree().process_frame
 			consume_sequences()
 			
 		BoardState.Fill:
 			lock()
+			await get_tree().process_frame
+			
+			#if animator:
+				#pass
+			#else:
+			
+			var filled_cells : Array[Match3GridCell] = board.fill_empty_cells()
+			var filled_cells_ui: Array[Match3GridCellUI] = core_cells_to_ui_cells(filled_cells)
+			
+			for cell_ui: Match3GridCellUI in filled_cells_ui:
+				draw_piece(cell_ui)
+			
 			current_state = BoardState.WaitForInput
 			
 			

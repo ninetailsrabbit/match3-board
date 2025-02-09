@@ -48,7 +48,7 @@ class Match3SequenceConsumeResult:
 	var combos: Array[Match3SequenceConsumeCombo]
 	
 	func _init(sequence_combos: Array[Match3SequenceConsumeCombo]) -> void:
-		sequence_size = sequence_combos.reduce(func(accum, combo): return accum + combo.size(), 0)
+		sequence_size = sequence_combos.reduce(func(accum, combo: Match3SequenceConsumeCombo): return accum + combo.size(), 0)
 		combos = sequence_combos
 	
 	
@@ -66,7 +66,6 @@ class Match3SequenceConsumeResult:
 class Match3SequenceConsumeCombo:
 	var sequence: Match3Sequence
 	var special_piece_to_spawn: Match3Piece
-	
 	
 	func _init(_sequence: Match3Sequence, piece_to_spawn: Match3Piece = null) -> void:
 		sequence = _sequence
