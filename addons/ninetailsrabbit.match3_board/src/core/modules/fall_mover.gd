@@ -8,12 +8,12 @@ func _init(_board: Board) -> void:
 	board = _board
 
 
-
 func fall_pieces() -> Array[FallMovement]:
 	var movements: Array[FallMovement] = []
 	
-	for column in board.grid_width:
-		movements.append_array(calculate_fall_movements_on_column(column))
+	while board.pieces_can_fall():
+		for column in board.grid_width:
+			movements.append_array(calculate_fall_movements_on_column(column))
 	
 	return movements
 

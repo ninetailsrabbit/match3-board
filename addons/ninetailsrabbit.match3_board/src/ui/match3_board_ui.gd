@@ -374,46 +374,32 @@ func consume_sequences() -> void:
 	var sequences_result: Array[Match3SequenceConsumer.Match3SequenceConsumeResult] = board.sequences_to_combo_rules()
 	
 	if animator:
-		var animations_finished: Array[bool] = []
-		
-		for sequence_result in sequences_result:
-			for combo: Match3SequenceConsumer.Match3SequenceConsumeCombo in sequence_result.combos:
-				
-				animator.animation_finished.connect(func(anim_name: StringName):
-					if anim_name == animator.ConsumeSequenceAnimation:
-						animations_finished.append(true)
-						combo.sequence.consume()
-						await get_tree().process_frame
-						
-						if animations_finished.size() >= sequences_result.size():
-							current_state = BoardState.Fill
-					, CONNECT_ONE_SHOT)
-						
-				animator.consume_sequence(combo.sequence)
+		await animator.consume_sequences(sequences_result)
+		current_state = BoardState.Fill
 	else:
 		for sequence_result in sequences_result:
 			for combo: Match3SequenceConsumer.Match3SequenceConsumeCombo in sequence_result.combos:
 				combo.sequence.consume()
+				await get_tree().process_frame
 			
 		current_state = BoardState.Fill
 			
 			
 func fall_pieces() -> void:
-	while board.pieces_can_fall():
-		var fall_movements: Array[Match3FallMover.FallMovement] = board.fall_mover.fall_pieces()
-			
+	var fall_movements: Array[Match3FallMover.FallMovement] = board.fall_mover.fall_pieces()
+		
+	for movement in fall_movements:
+		var cell_ui = match3_mapper.core_cell_to_ui_cell(movement.to_cell)
+		cell_ui.piece_ui = match3_mapper.ui_piece_from_core_piece(movement.piece)
+	
+	if animator:
+		await animator.fall_pieces(fall_movements)
+	else:
 		for movement in fall_movements:
 			var cell_ui = match3_mapper.core_cell_to_ui_cell(movement.to_cell)
-			cell_ui.piece_ui = match3_mapper.ui_piece_from_core_piece(movement.piece)
+			cell_ui.piece_ui.position = cell_ui.piece_ui.original_cell_position
+	
 		
-		if animator:
-			animator.fall_pieces(fall_movements)
-		else:
-			for movement in fall_movements:
-				var cell_ui = match3_mapper.core_cell_to_ui_cell(movement.to_cell)
-				cell_ui.piece_ui.position = cell_ui.piece_ui.original_cell_position
-		
-			
 func fill_pieces() -> void:
 	var filled_cells : Array[Match3GridCell] = board.fill_empty_cells()
 	var filled_cells_ui: Array[Match3GridCellUI] = match3_mapper.core_cells_to_ui_cells(filled_cells)
@@ -435,10 +421,7 @@ func on_board_state_changed(_from: BoardState, to: BoardState) -> void:
 			
 		BoardState.Fill:
 			lock()
-			await get_tree().process_frame
-			
 			fall_pieces()
-			await get_tree().process_frame
 			fill_pieces()
 			
 			await get_tree().process_frame

@@ -154,10 +154,6 @@ func swap_pieces(from_grid_cell: Match3GridCell, to_grid_cell: Match3GridCell) -
 	return swapped
 
 
-func fall_pieces() -> void:
-	pass
-
-
 func fill_empty_cells() -> Array[Match3GridCell]:
 	var empty_cells: Array[Match3GridCell] = finder.empty_cells()
 	var last_pieces: Array[Match3Piece] = []

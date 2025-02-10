@@ -4,6 +4,7 @@ class_name Match3Animator extends Node
 const SwapPiecesAnimation: StringName = &"swap-pieces"
 const SwapRejectedPiecesAnimation: StringName = &"swap-pieces"
 const ConsumeSequenceAnimation: StringName = &"consume-sequence"
+const ConsumeSequencesAnimation: StringName = &"consume-sequences"
 const FallPieceAnimation: StringName = &"fall-piece"
 const FallPiecesAnimation: StringName = &"fall-pieces"
 const SpawnPiecesAnimation: StringName = &"spawn-pieces"
@@ -78,6 +79,24 @@ func consume_sequence(sequence: Match3Sequence) -> void:
 		await tween.finished
 	
 	animation_finished.emit(ConsumeSequenceAnimation)
+
+
+func consume_sequences(sequences: Array[Match3SequenceConsumer.Match3SequenceConsumeResult]) -> void:
+	animation_started.emit(ConsumeSequencesAnimation)
+	
+	if sequences.size() > 0:
+		var tween: Tween = create_tween().set_parallel(true)
+		
+		for sequence in sequences:
+			for combo: Match3SequenceConsumer.Match3SequenceConsumeCombo in sequence.combos:
+				var pieces: Array[Match3PieceUI] = board.match3_mapper.ui_pieces_from_sequence(combo.sequence)
+				
+				for piece_ui: Match3PieceUI in pieces:
+					tween.tween_property(piece_ui, "scale", Vector2.ZERO, 0.2).set_ease(Tween.EASE_OUT)
+		
+		await tween.finished
+		
+	animation_finished.emit(ConsumeSequencesAnimation)
 
 
 func fall_piece(movement: Match3FallMover.FallMovement) -> void:

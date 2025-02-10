@@ -17,6 +17,7 @@ enum Shapes {
 
 
 var cells: Array[Match3GridCell] = []
+var pieces: Array[Match3Piece] = []
 var shape: Shapes = Shapes.Irregular
 
 
@@ -24,14 +25,16 @@ func _init(sequence_cells: Array[Match3GridCell], _shape: Shapes = Shapes.Irregu
 	cells.assign(Match3BoardPluginUtilities.remove_duplicates(sequence_cells.filter(
 		func(cell: Match3GridCell): return is_instance_valid(cell) and cell.can_contain_piece and cell.has_piece()))
 		)
-		
+	
+	pieces.assign(Match3BoardPluginUtilities.remove_falsy_values(
+		cells.map(func(cell: Match3GridCell): return cell.piece))
+		)
+	
 	shape = _detect_shape() if _shape == Shapes.Irregular else _shape
 
 
 func all_pieces_are_the_same() -> bool:
-	var sequence_pieces: Array[Match3Piece] = pieces()
-	
-	return sequence_pieces.all(func(piece: Match3Piece): return piece.match_with(sequence_pieces.front()))
+	return pieces.all(func(piece: Match3Piece): return piece.match_with(pieces.front()))
 
 #region Pieces
 func consume() -> void:
@@ -60,18 +63,10 @@ func consume_cell(consumable_cell: Match3GridCell, remove_from_sequence: bool = 
 func consume_normal_cells() -> void:
 	consume_cells(normal_cells())
 
-				
-func pieces() -> Array[Match3Piece]:
-	var current_pieces: Array[Match3Piece] = []
-	current_pieces.assign(Match3BoardPluginUtilities.remove_falsy_values(
-		cells.map(func(cell: Match3GridCell): return cell.piece))
-		)
-	
-	return current_pieces
-
+			
 
 func normal_pieces() -> Array[Match3Piece]:
-	return pieces().filter(func(piece: Match3Piece): return piece.is_normal())
+	return pieces.filter(func(piece: Match3Piece): return piece.is_normal())
 
 
 func normal_pieces_ids() -> Array[StringName]:
@@ -79,7 +74,7 @@ func normal_pieces_ids() -> Array[StringName]:
 
 
 func contains_special_piece() -> bool:
-	return pieces().any(func(piece: Match3Piece): return piece.is_special())
+	return pieces.any(func(piece: Match3Piece): return piece.is_special())
 
 
 func get_special_piece():
@@ -93,7 +88,7 @@ func get_special_piece():
 
 
 func get_special_pieces() -> Array[Match3Piece]:
-	var special_pieces: Array[Match3Piece] = pieces().filter(
+	var special_pieces: Array[Match3Piece] = pieces.filter(
 		func(piece: Match3Piece): return piece.is_special() and not piece.triggered
 		)
 	

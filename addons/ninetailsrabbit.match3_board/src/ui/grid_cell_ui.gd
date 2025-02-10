@@ -22,10 +22,12 @@ var cell: Match3GridCell:
 			
 var piece_ui: Match3PieceUI:
 	set(new_piece):
-		piece_ui = new_piece
-		
-		if new_piece:
-			new_piece.original_cell_position = position
+		if piece_ui != new_piece:
+			piece_ui = new_piece
+			
+			if new_piece:
+				new_piece.original_cell_position = position
+				new_piece.tree_exited.connect(func(): piece_ui = null, CONNECT_ONE_SHOT)
 
 
 func _enter_tree() -> void:
@@ -81,8 +83,6 @@ func get_texture() -> Texture2D:
 func on_removed_core_piece(piece: Match3Piece) -> void:
 	if is_instance_valid(piece_ui) and piece_ui.piece.id == piece.id and not piece_ui.is_queued_for_deletion():
 		piece_ui.queue_free()
-	
-	piece_ui = null
 
 
 func on_unlinked_core_piece(piece: Match3Piece) -> void:
