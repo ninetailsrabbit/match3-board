@@ -2,6 +2,12 @@ class_name Match3GridCellUI extends Node2D
 
 const GroupName: StringName = &"grid_cells"
 
+signal assigned_new_piece(piece: Match3Piece)
+signal replaced_piece(previous_piece: Match3Piece, piece: Match3Piece)
+signal removed_piece(piece: Match3Piece)
+signal unlinked_piece(piece: Match3Piece)
+
+
 @export var size: Vector2i = Vector2i(48, 48)
 @export var texture_scale: float = 1.0
 @export var odd_cell_texture: Texture2D
@@ -17,8 +23,17 @@ var cell: Match3GridCell:
 			cell = value
 			
 			if cell:
-				cell.removed_piece.connect(on_removed_core_piece)
-				cell.unlinked_piece.connect(on_unlinked_core_piece)
+				if not cell.assigned_new_piece.is_connected(on_assigned_new_core_piece):
+					cell.assigned_new_piece.connect(on_assigned_new_core_piece)
+				
+				if not cell.replaced_piece.is_connected(on_replaced_core_piece):
+					cell.replaced_piece.connect(on_replaced_core_piece)
+					
+				if not cell.unlinked_piece.is_connected(on_unlinked_core_piece):
+					cell.unlinked_piece.connect(on_unlinked_core_piece)
+			
+				if not cell.removed_piece.is_connected(on_removed_core_piece):
+					cell.removed_piece.connect(on_removed_core_piece)
 			
 var piece_ui: Match3PieceUI:
 	set(new_piece):
@@ -80,10 +95,20 @@ func get_texture() -> Texture2D:
 	return even_cell_texture if (cell.column + cell.row) % 2 == 0 else odd_cell_texture
 
 
+#region Signal callbacks
+func on_assigned_new_core_piece(piece: Match3Piece) -> void:
+	assigned_new_piece.emit(piece)
+
+
+func on_replaced_core_piece(previous_piece: Match3Piece, piece: Match3Piece) -> void:
+	replaced_piece.emit(previous_piece, piece)
+	
+	
 func on_removed_core_piece(piece: Match3Piece) -> void:
-	if is_instance_valid(piece_ui) and piece_ui.piece.id == piece.id and not piece_ui.is_queued_for_deletion():
-		piece_ui.queue_free()
+	removed_piece.emit(piece)
 
 
 func on_unlinked_core_piece(piece: Match3Piece) -> void:
-	piece_ui = null
+	unlinked_piece.emit(piece)
+	
+#endregion

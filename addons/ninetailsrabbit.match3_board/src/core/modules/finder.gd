@@ -31,7 +31,7 @@ func grid_cell_from_piece(piece: Match3Piece) -> Match3GridCell:
 func grid_cells_from_row(row: int) -> Array[Match3GridCell]:
 	var cells: Array[Match3GridCell] = []
 	
-	if board.grid_cells.size() > 0 and Match3BoardPluginUtilities.value_is_between(row, 0, board.grid_height):
+	if board.grid_cells.size() > 0 and Match3BoardPluginUtilities.value_is_between(row, 0, board.grid_height - 1):
 		for column: int in board.grid_width:
 			cells.append(board.grid_cells[column][row])
 	
@@ -41,7 +41,7 @@ func grid_cells_from_row(row: int) -> Array[Match3GridCell]:
 func grid_cells_from_column(column: int) -> Array[Match3GridCell]:
 	var cells: Array[Match3GridCell] = []
 		
-	if board.grid_cells.size() > 0 and Match3BoardPluginUtilities.value_is_between(column, 0, board.grid_width):
+	if board.grid_cells.size() > 0 and Match3BoardPluginUtilities.value_is_between(column, 0, board.grid_width - 1):
 		for row: int in board.grid_height:
 			cells.append(board.grid_cells[column][row])
 	
@@ -185,34 +185,7 @@ func empty_cells() -> Array[Match3GridCell]:
 	cells.assign(board.grid_cells_flattened.filter(_is_empty_cell))
 	
 	return cells
-	
-	
-func last_empty_cell_on_column(column: int) -> Match3GridCell:
-	var column_cells: Array[Match3GridCell] = grid_cells_from_column(column)
-	column_cells.reverse()
-	
-	var current_empty_cells = column_cells.filter(_is_empty_cell)
-	
-	if current_empty_cells.size() > 0:
-		return current_empty_cells.front()
-	
-	return null
 
-
-func first_fallable_cell_with_piece_on_column(column: int):
-	var cells: Array[Match3GridCell] = grid_cells_from_column(column)
-	cells.reverse()
-	
-	var movable_cells = cells.filter(
-		func(cell: Match3GridCell): 
-			return cell.has_piece() \
-				and cell.piece.can_be_moved and (cell.neighbour_bottom and cell.neighbour_bottom.is_empty())
-			)
-	
-	if movable_cells.size() > 0:
-		return movable_cells.front()
-	
-	return null
 
 
 func _is_empty_cell(cell: Match3GridCell) -> bool:

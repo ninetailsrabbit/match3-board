@@ -56,9 +56,10 @@ class Match3SequenceConsumeResult:
 		var pieces: Array[Match3Piece] = []
 		
 		for combo: Match3SequenceConsumeCombo in combos:
+			if pieces.any(func(piece: Match3Piece): return piece.id == combo.piece.id):
+				continue
+				
 			pieces.append(combo.piece)
-		
-		pieces.assign(Match3BoardPluginUtilities.remove_duplicates(pieces))
 		
 		return pieces
 

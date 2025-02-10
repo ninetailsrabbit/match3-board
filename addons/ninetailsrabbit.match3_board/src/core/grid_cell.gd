@@ -16,7 +16,7 @@ var can_contain_piece: bool = true
 var piece: Match3Piece
 
 #region Cached neighbours
-## The Match3Board assign this values when preparing the cell so that they are always available as a cache.
+## The Match3Board assign this values when preparing the cells so that they are always available as a cache.
 var neighbour_up: Match3GridCell
 var neighbour_bottom: Match3GridCell
 var neighbour_right: Match3GridCell
@@ -43,9 +43,9 @@ func is_empty() -> bool:
 		
 
 func assign_piece(new_piece: Match3Piece, replace: bool = false) -> void:
-	if not has_piece():
-		piece = new_piece
+	if is_empty():
 		assigned_new_piece.emit(piece)
+		piece = new_piece
 		
 	elif replace and new_piece != piece:
 		replaced_piece.emit(piece, new_piece)
@@ -88,6 +88,8 @@ func can_swap_piece_with_cell(other_cell: Match3GridCell) -> bool:
 		and has_piece() \
 		and other_cell.has_piece() \
 		and piece != other_cell.piece \
+		and piece.can_be_swapped \
+		and other_cell.piece.can_be_swapped \
 		and not piece.is_locked \
 		and not other_cell.piece.is_locked
 

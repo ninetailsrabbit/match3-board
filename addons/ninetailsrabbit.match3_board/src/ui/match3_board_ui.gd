@@ -233,7 +233,49 @@ func lock_all_pieces() -> void:
 func unlock_all_pieces() -> void:
 	for piece: Match3PieceUI in pieces():
 		piece.unlock()
+
+
 	
+func consume_sequences() -> void:
+	## TODO - IT MISS THE LOGIC TO SPAWN AND TRIGGER SPECIAL PIECES
+	var sequences_result: Array[Match3SequenceConsumer.Match3SequenceConsumeResult] = board.sequences_to_combo_rules()
+	
+	if animator:
+		await animator.consume_sequences(sequences_result)
+		
+	for sequence_result in sequences_result:
+		for combo: Match3SequenceConsumer.Match3SequenceConsumeCombo in sequence_result.combos:
+			combo.sequence.consume()
+			await get_tree().process_frame
+
+	current_state = BoardState.Fill
+			
+			
+func fall_pieces() -> void:
+	var fall_movements: Array[Match3FallMover.FallMovement] = board.fall_mover.fall_pieces()
+	
+	for movement in fall_movements:
+		var to_cell_ui = match3_mapper.core_cell_to_ui_cell(movement.to_cell)
+		to_cell_ui.piece_ui = match3_mapper.ui_piece_from_core_piece(movement.piece)
+	
+	if animator:
+		await animator.fall_pieces(fall_movements)
+	else:
+		for movement in fall_movements:
+			var to_cell_ui = match3_mapper.core_cell_to_ui_cell(movement.to_cell)
+			to_cell_ui.piece_ui.position = to_cell_ui.piece_ui.original_cell_position
+	
+		
+func fill_pieces() -> void:
+	var filled_cells : Array[Match3GridCell] = board.fill_empty_cells()
+	var filled_cells_ui: Array[Match3GridCellUI] = match3_mapper.core_cells_to_ui_cells(filled_cells)
+
+	for cell_ui: Match3GridCellUI in filled_cells_ui:
+		draw_piece(cell_ui)
+		
+	if animator:
+		await animator.spawn_pieces(filled_cells_ui)
+
 #endregion
 
 #region Swap
@@ -337,6 +379,44 @@ func on_child_entered_tree(child: Node) -> void:
 			
 		if not child.drag_ended.is_connected(on_piece_drag_ended.bind(child)):
 			child.drag_ended.connect(on_piece_drag_ended.bind(child))
+			
+	elif child is Match3GridCellUI:
+		if not child.assigned_new_piece.is_connected(on_assigned_new_piece_to_cell.bind(child)):
+			child.assigned_new_piece.connect(on_assigned_new_piece_to_cell.bind(child))
+			
+		if not child.replaced_piece.is_connected(on_replaced_piece_to_cell.bind(child)):
+			child.replaced_piece.connect(on_replaced_piece_to_cell.bind(child))
+			
+		if not child.unlinked_piece.is_connected(on_unlinked_piece_to_cell.bind(child)):
+			child.unlinked_piece.connect(on_unlinked_piece_to_cell.bind(child))
+
+		if not child.removed_piece.is_connected(on_remove_piece_to_cell.bind(child)):
+			child.removed_piece.connect(on_remove_piece_to_cell.bind(child))
+
+
+func on_assigned_new_piece_to_cell(piece: Match3Piece, cell: Match3GridCellUI) -> void:
+	var piece_ui: Match3PieceUI = match3_mapper.ui_piece_from_core_piece(piece)
+	
+	if is_instance_valid(piece_ui) and not piece_ui.is_queued_for_deletion():
+		cell.piece_ui = match3_mapper.ui_piece_from_core_piece(piece)
+
+
+func on_replaced_piece_to_cell(_previous_piece: Match3Piece, piece: Match3Piece, cell: Match3GridCellUI) -> void:
+	var piece_ui: Match3PieceUI = match3_mapper.ui_piece_from_core_piece(piece)
+	
+	if is_instance_valid(piece_ui) and not piece_ui.is_queued_for_deletion():
+		cell.piece_ui = match3_mapper.ui_piece_from_core_piece(piece)
+
+	
+func on_remove_piece_to_cell(piece: Match3Piece, cell: Match3GridCellUI) -> void:
+	var piece_ui: Match3PieceUI = match3_mapper.ui_piece_from_core_piece(piece)
+	
+	if is_instance_valid(piece_ui) and not piece_ui.is_queued_for_deletion():
+		piece_ui.queue_free()
+
+
+func on_unlinked_piece_to_cell(piece: Match3Piece, cell: Match3GridCellUI) -> void:
+	cell.piece_ui = null
 
 
 func on_selected_piece(piece_ui: Match3PieceUI) -> void:
@@ -371,47 +451,6 @@ func on_swap_accepted(_from: Match3GridCellUI, _to: Match3GridCellUI) -> void:
 func on_swap_rejected(_from: Match3GridCellUI, _to: Match3GridCellUI) -> void:
 	unlock()
 	
-	
-func consume_sequences() -> void:
-	## TODO - IT MISS THE LOGIC TO SPAWN AND TRIGGER SPECIAL PIECES
-	var sequences_result: Array[Match3SequenceConsumer.Match3SequenceConsumeResult] = board.sequences_to_combo_rules()
-	
-	if animator:
-		await animator.consume_sequences(sequences_result)
-		
-	for sequence_result in sequences_result:
-		for combo: Match3SequenceConsumer.Match3SequenceConsumeCombo in sequence_result.combos:
-			combo.sequence.consume()
-			await get_tree().process_frame
-
-	current_state = BoardState.Fill
-			
-			
-func fall_pieces() -> void:
-	var fall_movements: Array[Match3FallMover.FallMovement] = board.fall_mover.fall_pieces()
-	
-	for movement in fall_movements:
-		var cell_ui = match3_mapper.core_cell_to_ui_cell(movement.to_cell)
-		cell_ui.piece_ui = match3_mapper.ui_piece_from_core_piece(movement.piece)
-	
-	if animator:
-		await animator.fall_pieces(fall_movements)
-	else:
-		for movement in fall_movements:
-			var cell_ui = match3_mapper.core_cell_to_ui_cell(movement.to_cell)
-			cell_ui.piece_ui.position = cell_ui.piece_ui.original_cell_position
-	
-		
-func fill_pieces() -> void:
-	var filled_cells : Array[Match3GridCell] = board.fill_empty_cells()
-	var filled_cells_ui: Array[Match3GridCellUI] = match3_mapper.core_cells_to_ui_cells(filled_cells)
-
-	for cell_ui: Match3GridCellUI in filled_cells_ui:
-		draw_piece(cell_ui)
-		
-	if animator:
-		await animator.spawn_pieces(filled_cells_ui)
-
 
 func on_board_state_changed(_from: BoardState, to: BoardState) -> void:
 	match to:
@@ -424,7 +463,7 @@ func on_board_state_changed(_from: BoardState, to: BoardState) -> void:
 		BoardState.Fill:
 			lock()
 			fall_pieces()
-			fill_pieces()
+			#fill_pieces()
 			
 			await get_tree().process_frame
 			
