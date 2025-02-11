@@ -53,7 +53,7 @@ func consume_cells(consumable_cells: Array[Match3GridCellUI], remove_from_sequen
 	
 
 func consume_cell(consumable_cell: Match3GridCellUI, remove_from_sequence: bool = false) -> void:
-	if cells.has(consumable_cell) and consumable_cell.has_piece():
+	if cells.has(consumable_cell):
 		consumable_cell.remove_piece()
 		
 		if remove_from_sequence:

@@ -6,7 +6,7 @@
 
 [sub_resource type="Resource" id="Resource_qdyyv"]
 script = ExtResource("3_g1a1x")
-weight = 1.0
+value = 1.0
 
 [resource]
 script = ExtResource("2_55er4")
@@ -18,6 +18,7 @@ weight = SubResource("Resource_qdyyv")
 type = 1
 shape = &"special-triangle"
 color = Color(0.00509031, 0.188667, 0.832808, 1)
+priority = 0
 can_be_swapped = true
 can_be_moved = true
 can_be_shuffled = true

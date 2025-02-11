@@ -36,8 +36,9 @@ var piece: Match3PieceUI:
 			
 			if new_piece:
 				new_piece.cell = self
-				new_piece.tree_exited.connect(func(): piece = null, CONNECT_ONE_SHOT)
-			
+
+var original_texture: Texture2D
+
 
 func _enter_tree() -> void:
 	add_to_group(GroupName)
@@ -58,6 +59,7 @@ func _prepare_sprite() -> void:
 	if sprite_2d is Sprite2D:
 		sprite_2d.texture = get_texture()
 		sprite_2d.scale = calculate_scale_texture_based_on_cell_size(sprite_2d.texture)
+		original_texture = sprite_2d.texture
 	elif sprite_2d is AnimatedSprite2D:
 		sprite_2d.scale = calculate_scale_texture_based_on_cell_size(sprite_2d.get_sprite_2d_frames().get_frame(sprite_2d.animation, sprite_2d.get_frame()))
 	
@@ -76,6 +78,8 @@ func remove_piece(queued: bool = false) -> void:
 			piece.queue_free()
 		else:
 			piece.free()
+			
+		piece = null
 		
 
 func can_swap_piece_with_cell(other_cell: Match3GridCellUI) -> bool:
@@ -194,6 +198,18 @@ func neighbours() -> Dictionary:
 		"diagonal_bottom_right": diagonal_neighbour_bottom_right,
 		"diagonal_bottom_left": diagonal_neighbour_bottom_left,
 	}
+
+## Return cells that can contain pieces and is not empty
+func usable_neighbours() -> Dictionary:
+	var current_neighbours: Dictionary = neighbours()
+	
+	for position_key: String in current_neighbours:
+		var cell = current_neighbours[position_key]
+		
+		if cell and (not cell.can_contain_piece or cell.is_empty()):
+			current_neighbours[position_key] = null
+	
+	return current_neighbours
 	
 
 func is_top_left_corner() -> bool:

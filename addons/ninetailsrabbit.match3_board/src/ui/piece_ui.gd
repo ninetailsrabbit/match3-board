@@ -261,7 +261,7 @@ func on_mouse_region_holded() -> void:
 	#if not board.is_swap_mode_connect_line():
 	m_offset = transform.origin - get_global_mouse_position()
 	drag_started.emit()
-
+	
 
 func on_mouse_region_released() -> void:
 	if is_locked:

@@ -1,5 +1,7 @@
 class_name Match3Animator extends Node
 
+## TODO - LEAVE THIS CLASS TO OVERRIDE THE METHODS
+
 #region Animation names
 const SwapPiecesAnimation: StringName = &"swap-pieces"
 const SwapRejectedPiecesAnimation: StringName = &"swap-pieces"
@@ -13,7 +15,8 @@ const SpawnPiecesAnimation: StringName = &"spawn-pieces"
 signal animation_started(animation_name: StringName)
 signal animation_finished(animation_name: StringName)
 
-var board: Match3BoardUI
+@export var board: Match3BoardUI
+
 var current_animation: StringName = &""
 
 

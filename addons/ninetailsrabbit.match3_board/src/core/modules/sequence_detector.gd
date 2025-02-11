@@ -215,7 +215,7 @@ func find_vertical_board_sequences() -> Array[Match3Sequence]:
 
 
 func find_match_from_piece(piece: Match3PieceUI) -> Match3Sequence:
-	return find_match_from_cell(board.finder.grid_cell_from_piece(piece))
+	return find_match_from_cell(piece.cell)
 	
 	
 func find_match_from_cell(cell: Match3GridCellUI) -> Match3Sequence:

@@ -5,6 +5,10 @@ const GroupName: StringName = &"match3-board"
 signal state_changed(from: BoardState, to: BoardState)
 signal swap_accepted(from: Match3GridCellUI, to: Match3GridCellUI)
 signal swap_rejected(from: Match3GridCellUI, to: Match3GridCellUI)
+signal selected_piece(piece: Match3PieceUI)
+signal unselected_piece(piece: Match3PieceUI)
+signal piece_drag_started(piece: Match3PieceUI)
+signal piece_drag_ended(piece: Match3PieceUI)
 signal locked
 signal unlocked
 signal movement_consumed
@@ -12,6 +16,7 @@ signal finished_available_movements
 
 @export var configuration: Match3BoardConfiguration
 @export var animator: Match3Animator
+@export var highlighter: Match3Highlighter
 
 enum BoardState {
 	WaitForInput,
@@ -23,6 +28,7 @@ var grid_cells: Array = [] # Multidimensional to access cells by column & row
 var grid_cells_flattened: Array[Match3GridCellUI] = []
 var finder: Match3BoardFinder = Match3BoardFinder.new(self)
 var sequence_detector: Match3SequenceDetector = Match3SequenceDetector.new(self)
+var sequence_consumer: Match3SequenceConsumer
 var piece_generator: Match3PieceGenerator = Match3PieceGenerator.new()
 
 var current_available_moves: int = 0:
@@ -41,7 +47,18 @@ var current_available_moves: int = 0:
 			elif value == 0:
 				finished_available_movements.emit()
 
-var current_selected_piece: Match3PieceUI
+var current_selected_piece: Match3PieceUI:
+	set(new_piece):
+		if new_piece != current_selected_piece:
+			var previous_piece := current_selected_piece
+			current_selected_piece = new_piece
+			
+			if current_selected_piece == null:
+				unselected_piece.emit(previous_piece)
+			else:
+				selected_piece.emit(current_selected_piece)
+	
+			
 var current_state: BoardState = BoardState.WaitForInput:
 	set(new_state):
 		if new_state != current_state:
@@ -68,6 +85,7 @@ func _enter_tree() -> void:
 func _ready() -> void:
 	assert(configuration != null, "Match3BoardUI: This board needs a configuration")
 	
+	sequence_consumer = Match3SequenceConsumer.new(self, configuration.sequence_rules)
 	current_available_moves = configuration.available_moves_on_start
 	
 	add_pieces_to_generator(configuration.available_pieces)
@@ -78,11 +96,19 @@ func _ready() -> void:
 	if not configuration.allow_matches_on_start:
 		remove_matches_from_board()
 		
-	#swap_accepted.connect(on_swap_accepted)
-	#swap_rejected.connect(on_swap_rejected)
-	#locked.connect(on_board_locked)
-	#unlocked.connect(on_board_unlocked)
-	#state_changed.connect(on_board_state_changed)
+	swap_accepted.connect(on_swap_accepted)
+	swap_rejected.connect(on_swap_rejected)
+	locked.connect(on_board_locked)
+	unlocked.connect(on_board_unlocked)
+	state_changed.connect(on_board_state_changed)
+
+
+func distance() -> int:
+	return configuration.grid_width + configuration.grid_height
+	
+
+func size() -> int:
+	return configuration.grid_width * configuration.grid_height
 
 
 func lock() -> void:
@@ -320,22 +346,20 @@ func unlock_all_pieces() -> void:
 		piece.unlock()
 
 
+func consume_sequences() -> void:
+	## TODO - IT MISS THE LOGIC TO SPAWN AND TRIGGER SPECIAL PIECES
+	var sequences_result: Array[Match3SequenceConsumer.Match3SequenceConsumeResult] = sequence_consumer.sequences_to_combo_rules()
 	
-#func consume_sequences() -> void:
-	### TODO - IT MISS THE LOGIC TO SPAWN AND TRIGGER SPECIAL PIECES
-	#var sequences_result: Array[Match3SequenceConsumer.Match3SequenceConsumeResult] = board.sequences_to_combo_rules()
-	#
-	#if animator:
-		#await animator.consume_sequences(sequences_result)
-		#
-	#for sequence_result in sequences_result:
-		#for combo: Match3SequenceConsumer.Match3SequenceConsumeCombo in sequence_result.combos:
-			#combo.sequence.consume()
-			#await get_tree().process_frame
-#
-	#current_state = BoardState.Fill
-			#
-			#
+	if animator:
+		await animator.consume_sequences(sequences_result)
+		
+	for sequence_result in sequences_result:
+		for combo: Match3SequenceConsumer.Match3SequenceConsumeCombo in sequence_result.combos:
+			combo.sequence.consume()
+
+	current_state = BoardState.Fill
+			
+			
 #func fall_pieces() -> void:
 	#var fall_movements: Array[Match3FallMover.FallMovement] = board.fall_mover.fall_pieces()
 	#
@@ -478,17 +502,19 @@ func on_selected_piece(piece_ui: Match3PieceUI) -> void:
 		elif current_selected_piece != piece_ui:
 			swap_pieces(current_selected_piece, piece_ui)
 			current_selected_piece = null
-		#
+		
 
 func on_piece_drag_started(piece_ui: Match3PieceUI) -> void:
 	if configuration.click_mode_is_drag():
 		current_selected_piece = piece_ui
 		current_selected_piece.enable_drag()
+		piece_drag_started.emit(current_selected_piece)
 
 
 func on_piece_drag_ended(piece_ui: Match3PieceUI) -> void:
 	if configuration.click_mode_is_drag() and current_selected_piece:
 		current_selected_piece.disable_drag()
+		piece_drag_ended.emit(current_selected_piece)
 
 
 func on_swap_accepted(_from: Match3GridCellUI, _to: Match3GridCellUI) -> void:
@@ -499,28 +525,29 @@ func on_swap_rejected(_from: Match3GridCellUI, _to: Match3GridCellUI) -> void:
 	unlock()
 	
 
-#func on_board_state_changed(_from: BoardState, to: BoardState) -> void:
-	#match to:
-		#BoardState.WaitForInput:
-			#unlock()
-		#BoardState.Consume:
-			#lock()
-			#consume_sequences()
-			#
-		#BoardState.Fill:
-			#lock()
+func on_board_state_changed(_from: BoardState, to: BoardState) -> void:
+	match to:
+		BoardState.WaitForInput:
+			unlock()
+		BoardState.Consume:
+			lock()
+			consume_sequences()
+			await get_tree().process_frame
+			current_state = BoardState.WaitForInput
+		BoardState.Fill:
+			lock()
 			#fall_pieces()
-			##fill_pieces()
-			#
+			#fill_pieces()
+			
 			#await get_tree().process_frame
 			#
 			#if board.sequence_detector.find_board_sequences().is_empty():
 				#current_state = BoardState.WaitForInput
 			#else:
 				#current_state = BoardState.Consume
-				#
-					#
-#func on_animator_animation_started(_animation_name: StringName) -> void:
-	#lock()
-	#
+				
+					
+func on_animator_animation_started(_animation_name: StringName) -> void:
+	lock()
+	
 ##endregion
