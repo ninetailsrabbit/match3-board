@@ -70,23 +70,34 @@ func is_empty() -> bool:
 	return piece == null
 
 
-func remove_piece() -> void:
+func remove_piece(queued: bool = false) -> void:
 	if has_piece():
-		piece.free()
+		if queued:
+			piece.queue_free()
+		else:
+			piece.free()
 		
-#func can_swap_piece_with(other_cell: Match3GridCellUI) -> bool:
-	#return piece and other_cell.piece and cell.can_swap_piece_with_cell(other_cell.cell)
-#
-#
-#func swap_piece_with(other_cell: Match3GridCellUI) -> bool:
-	#if has_piece() and other_cell.has_piece() and cell.swap_piece_with_cell(other_cell.cell):
-		#var current_piece: Match3PieceUI = piece
-		#piece = other_cell.piece
-		#other_cell.piece = current_piece
-		#
-		#return true
-			#
-	#return false
+
+func can_swap_piece_with_cell(other_cell: Match3GridCellUI) -> bool:
+	return other_cell != self \
+		and has_piece() \
+		and other_cell.has_piece() \
+		and piece != other_cell.piece \
+		and piece.can_be_swapped \
+		and other_cell.piece.can_be_swapped \
+		and not piece.is_locked \
+		and not other_cell.piece.is_locked
+
+
+func swap_piece_with_cell(other_cell: Match3GridCellUI) -> bool:
+	if can_swap_piece_with_cell(other_cell):
+		var current_piece: Match3PieceUI = piece
+		piece = other_cell.piece
+		other_cell.piece = current_piece
+		
+		return true
+			
+	return false
 #
 #
 func calculate_scale_texture_based_on_cell_size(texture: Texture2D) -> Vector2:

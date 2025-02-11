@@ -7,6 +7,8 @@ signal swap_accepted(from: Match3GridCellUI, to: Match3GridCellUI)
 signal swap_rejected(from: Match3GridCellUI, to: Match3GridCellUI)
 signal locked
 signal unlocked
+signal movement_consumed
+signal finished_available_movements
 
 @export var configuration: Match3BoardConfiguration
 @export var animator: Match3Animator
@@ -22,6 +24,22 @@ var grid_cells_flattened: Array[Match3GridCellUI] = []
 var finder: Match3BoardFinder = Match3BoardFinder.new(self)
 var sequence_detector: Match3SequenceDetector = Match3SequenceDetector.new(self)
 var piece_generator: Match3PieceGenerator = Match3PieceGenerator.new()
+
+var current_available_moves: int = 0:
+	set(value):
+		if value != current_available_moves:
+			if value == -1:
+				current_available_moves = value
+				return
+				
+			var previous_moves: int = current_available_moves
+			current_available_moves = clamp(value, 0, configuration.available_moves_on_start)
+			
+			if value < previous_moves:
+				movement_consumed.emit()
+			
+			elif value == 0:
+				finished_available_movements.emit()
 
 var current_selected_piece: Match3PieceUI
 var current_state: BoardState = BoardState.WaitForInput:
@@ -44,12 +62,13 @@ var is_locked: bool = false:
 
 func _enter_tree() -> void:
 	add_to_group(GroupName)
-	
-	#child_entered_tree.connect(on_child_entered_tree)
+	child_entered_tree.connect(on_child_entered_tree)
 
 
 func _ready() -> void:
 	assert(configuration != null, "Match3BoardUI: This board needs a configuration")
+	
+	current_available_moves = configuration.available_moves_on_start
 	
 	add_pieces_to_generator(configuration.available_pieces)
 	
@@ -270,38 +289,38 @@ func remove_matches_from_board() -> void:
 			
 		sequences = sequence_detector.find_board_sequences()
 
-#func pieces() -> Array[Match3PieceUI]:
-	#var pieces: Array[Match3PieceUI] = []
-	#pieces.assign(get_tree().get_nodes_in_group(Match3PieceUI.GroupName))
-#
-	#return pieces
-	#
-#
-#func special_pieces() -> Array[Match3PieceUI]:
-	#var pieces: Array[Match3PieceUI] = []
-	#pieces.assign(get_tree().get_nodes_in_group(Match3PieceUI.SpecialGroupName))
-#
-	#return pieces
-#
-#
-#func obstacle_pieces() -> Array[Match3PieceUI]:
-	#var pieces: Array[Match3PieceUI] = []
-	#pieces.assign(get_tree().get_nodes_in_group(Match3PieceUI.ObstacleGroupName))
-#
-	#return pieces
-#
-#
-#func lock_all_pieces() -> void:
-	#for piece: Match3PieceUI in pieces():
-		#piece.lock()
-	#
-	#
-#func unlock_all_pieces() -> void:
-	#for piece: Match3PieceUI in pieces():
-		#piece.unlock()
-#
-#
-	#
+func pieces() -> Array[Match3PieceUI]:
+	var pieces: Array[Match3PieceUI] = []
+	pieces.assign(get_tree().get_nodes_in_group(Match3PieceUI.GroupName))
+
+	return pieces
+	
+
+func special_pieces() -> Array[Match3PieceUI]:
+	var pieces: Array[Match3PieceUI] = []
+	pieces.assign(get_tree().get_nodes_in_group(Match3PieceUI.SpecialGroupName))
+
+	return pieces
+
+
+func obstacle_pieces() -> Array[Match3PieceUI]:
+	var pieces: Array[Match3PieceUI] = []
+	pieces.assign(get_tree().get_nodes_in_group(Match3PieceUI.ObstacleGroupName))
+
+	return pieces
+
+
+func lock_all_pieces() -> void:
+	for piece: Match3PieceUI in pieces():
+		piece.lock()
+	
+	
+func unlock_all_pieces() -> void:
+	for piece: Match3PieceUI in pieces():
+		piece.unlock()
+
+
+	
 #func consume_sequences() -> void:
 	### TODO - IT MISS THE LOGIC TO SPAWN AND TRIGGER SPECIAL PIECES
 	#var sequences_result: Array[Match3SequenceConsumer.Match3SequenceConsumeResult] = board.sequences_to_combo_rules()
@@ -344,180 +363,142 @@ func remove_matches_from_board() -> void:
 #
 ##endregion
 #
-##region Swap
-#func swap_pieces(from_piece: Match3PieceUI, to_piece: Match3PieceUI) -> void:
-	#var from_grid_cell: Match3GridCellUI = match3_mapper.grid_cell_ui_from_piece_ui(from_piece)
-	#var to_grid_cell: Match3GridCellUI = match3_mapper.grid_cell_ui_from_piece_ui(to_piece)
-	#
-	#if swap_movement_is_valid(from_grid_cell, to_grid_cell):
-		#if animator:
-			#await animator.swap_pieces(
-				#from_piece, 
-				#to_piece, 
-				#to_piece.position,
-				#from_piece.position
-				#)
-		#else:
-			#from_piece.position = to_piece.position
-			#to_piece.position = from_piece.position
-			#
-		#if from_grid_cell.swap_piece_with(to_grid_cell):
-			#swap_accepted.emit(from_grid_cell, to_grid_cell)
-			#
-			#await get_tree().process_frame
-			#
-			#var matches: Array[Match3Sequence] = board.sequence_detector.find_board_sequences()
-					#
-			#if matches.size() > 0:
-				#current_state = BoardState.Consume
-			#else:
-				### Do another swap to return the pieces again
-				#from_grid_cell.swap_piece_with(to_grid_cell)
-				#
-				#if animator:
-					### The pieces already come up swapped so we can use the updated original cell position to apply the visual change
-					#await animator.swap_rejected_pieces(
-						#from_piece, 
-						#to_piece, 
-						#from_piece.original_cell_position,
-						#to_piece.original_cell_position
-						#)
-				#else:
-					#from_piece.position = from_piece.original_cell_position
-					#to_piece.position = to_piece.original_cell_position
-				#
-				#swap_rejected.emit(from_grid_cell, to_grid_cell)
-	#else:
-		#swap_rejected.emit(from_grid_cell, to_grid_cell)
-			#
+#region Swap
+func swap_pieces(from_piece: Match3PieceUI, to_piece: Match3PieceUI) -> void:
+	var from_cell: Match3GridCellUI = from_piece.cell
+	var to_cell: Match3GridCellUI = to_piece.cell
+	
+	if swap_movement_is_valid(from_cell, to_cell):
+		if animator:
+			await animator.swap_pieces(
+				from_piece, 
+				to_piece, 
+				to_cell.position,
+				from_cell.position
+				)
+		else:
+			from_piece.position = to_cell.position
+			to_piece.position = from_cell.position
+			
+		if from_cell.swap_piece_with_cell(to_cell):
+			swap_accepted.emit(from_cell, to_cell)
+			
+			await get_tree().process_frame
+			
+			var matches: Array[Match3Sequence] = sequence_detector.find_board_sequences()
+					
+			if matches.size() > 0:
+				current_state = BoardState.Consume
+			else:
+				## Do another swap to return the pieces again
+				from_cell.swap_piece_with_cell(to_cell)
+				
+				if animator:
+					## The pieces already come up swapped so we can use the updated original cell position to apply the visual change
+					await animator.swap_rejected_pieces(
+						from_piece, 
+						to_piece, 
+						from_cell.position,
+						to_cell.position
+						)
+				else:
+					from_piece.position = from_cell.position
+					to_piece.position = to_cell.position
+				
+				swap_rejected.emit(from_cell, to_cell)
+	else:
+		swap_rejected.emit(from_cell, to_cell)
+			
+
+func swap_movement_is_valid(from_cell: Match3GridCellUI, to_cell: Match3GridCellUI) -> bool:
+	if from_cell.piece.match_with(to_cell.piece):
+		return false
+		
+	match configuration.swap_mode:
+		Match3Configuration.BoardMovements.Adjacent:
+			return from_cell.is_adjacent_to(to_cell)
+			
+		Match3Configuration.BoardMovements.AdjacentWithDiagonals:
+			return from_cell.is_diagonal_adjacent_to(to_cell)
+			
+		Match3Configuration.BoardMovements.AdjacentOnlyDiagonals:
+			return from_cell.in_diagonal_with(to_cell)
+			
+		Match3Configuration.BoardMovements.Free:
+			return true
+			
+		Match3Configuration.BoardMovements.Row:
+			return from_cell.in_same_row_as(to_cell)
+			
+		Match3Configuration.BoardMovements.Column:
+			return from_cell.in_same_column_as(to_cell)
+			
+		Match3Configuration.BoardMovements.Cross:
+			return finder.cross_cells_from(from_cell).has(to_cell)
+			
+		Match3Configuration.BoardMovements.CrossDiagonal:
+			return finder.cross_diagonal_cells_from(from_cell).has(to_cell)
+		_:
+			return false
+#endregion
 #
-#func swap_movement_is_valid(from_grid_cell: Match3GridCellUI, to_grid_cell: Match3GridCellUI) -> bool:
-	#if from_grid_cell.piece_ui.match_with(to_grid_cell.piece_ui):
-		#return false
+#
+#region Signal callbacks 
+func on_child_entered_tree(child: Node) -> void:
+	if child is Match3PieceUI:
+		if not child.selected.is_connected(on_selected_piece.bind(child)):
+			child.selected.connect(on_selected_piece.bind(child))
+		
+		if not child.drag_started.is_connected(on_piece_drag_started.bind(child)):
+			child.drag_started.connect(on_piece_drag_started.bind(child))
+			
+		if not child.drag_ended.is_connected(on_piece_drag_ended.bind(child)):
+			child.drag_ended.connect(on_piece_drag_ended.bind(child))
+			
+
+func on_board_locked() -> void:
+	if is_inside_tree():
+		lock_all_pieces()
+
+
+func on_board_unlocked() -> void:
+	if is_inside_tree():
+		unlock_all_pieces()
+
+
+func on_selected_piece(piece_ui: Match3PieceUI) -> void:
+	if configuration.click_mode_is_selection():
+		
+		if current_selected_piece == null:
+			current_selected_piece = piece_ui
+		
+		elif current_selected_piece == piece_ui:
+			current_selected_piece = null
+			
+		elif current_selected_piece != piece_ui:
+			swap_pieces(current_selected_piece, piece_ui)
+			current_selected_piece = null
 		#
-	#match configuration.swap_mode:
-		#Match3Configuration.BoardMovements.Adjacent:
-			#return from_grid_cell.cell.is_adjacent_to(to_grid_cell.cell)
-			#
-		#Match3Configuration.BoardMovements.AdjacentWithDiagonals:
-			#return from_grid_cell.cell.is_diagonal_adjacent_to(to_grid_cell.cell)
-			#
-		#Match3Configuration.BoardMovements.AdjacentOnlyDiagonals:
-			#return from_grid_cell.cell.in_diagonal_with(to_grid_cell.cell)
-			#
-		#Match3Configuration.BoardMovements.Free:
-			#return true
-			#
-		#Match3Configuration.BoardMovements.Row:
-			#return from_grid_cell.cell.in_same_row_as(to_grid_cell.cell)
-			#
-		#Match3Configuration.BoardMovements.Column:
-			#return from_grid_cell.cell.in_same_column_as(to_grid_cell.cell)
-			#
-		#Match3Configuration.BoardMovements.Cross:
-			#return board.finder.cross_cells_from(from_grid_cell.cell).has(to_grid_cell.cell)
-			#
-		#Match3Configuration.BoardMovements.CrossDiagonal:
-			#return board.finder.cross_diagonal_cells_from(from_grid_cell.cell).has(to_grid_cell.cell)
-		#_:
-			#return false
-##endregion
-#
-#
-##region Signal callbacks 
-#func on_board_locked() -> void:
-	#if is_inside_tree():
-		#lock_all_pieces()
-#
-#
-#func on_board_unlocked() -> void:
-	#if is_inside_tree():
-		#unlock_all_pieces()
-#
-#
-#func on_child_entered_tree(child: Node) -> void:
-	#if child is Match3PieceUI:
-		#if not child.selected.is_connected(on_selected_piece.bind(child)):
-			#child.selected.connect(on_selected_piece.bind(child))
-		#
-		#if not child.drag_started.is_connected(on_piece_drag_started.bind(child)):
-			#child.drag_started.connect(on_piece_drag_started.bind(child))
-			#
-		#if not child.drag_ended.is_connected(on_piece_drag_ended.bind(child)):
-			#child.drag_ended.connect(on_piece_drag_ended.bind(child))
-			#
-	#elif child is Match3GridCellUI:
-		#if not child.assigned_new_piece.is_connected(on_assigned_new_piece_to_cell.bind(child)):
-			#child.assigned_new_piece.connect(on_assigned_new_piece_to_cell.bind(child))
-			#
-		#if not child.replaced_piece.is_connected(on_replaced_piece_to_cell.bind(child)):
-			#child.replaced_piece.connect(on_replaced_piece_to_cell.bind(child))
-			#
-		#if not child.unlinked_piece.is_connected(on_unlinked_piece_to_cell.bind(child)):
-			#child.unlinked_piece.connect(on_unlinked_piece_to_cell.bind(child))
-#
-		#if not child.removed_piece.is_connected(on_remove_piece_to_cell.bind(child)):
-			#child.removed_piece.connect(on_remove_piece_to_cell.bind(child))
-#
-#
-#func on_assigned_new_piece_to_cell(piece: Match3Piece, cell: Match3GridCellUI) -> void:
-	#var piece_ui: Match3PieceUI = match3_mapper.ui_piece_from_core_piece(piece)
-	#
-	#if is_instance_valid(piece_ui) and not piece_ui.is_queued_for_deletion():
-		#cell.piece_ui = match3_mapper.ui_piece_from_core_piece(piece)
-#
-#
-#func on_replaced_piece_to_cell(_previous_piece: Match3Piece, piece: Match3Piece, cell: Match3GridCellUI) -> void:
-	#var piece_ui: Match3PieceUI = match3_mapper.ui_piece_from_core_piece(piece)
-	#
-	#if is_instance_valid(piece_ui) and not piece_ui.is_queued_for_deletion():
-		#cell.piece_ui = match3_mapper.ui_piece_from_core_piece(piece)
-#
-	#
-#func on_remove_piece_to_cell(piece: Match3Piece, cell: Match3GridCellUI) -> void:
-	#var piece_ui: Match3PieceUI = match3_mapper.ui_piece_from_core_piece(piece)
-	#
-	#if is_instance_valid(piece_ui) and not piece_ui.is_queued_for_deletion():
-		#piece_ui.queue_free()
-#
-#
-#func on_unlinked_piece_to_cell(piece: Match3Piece, cell: Match3GridCellUI) -> void:
-	#cell.piece_ui = null
-#
-#
-#func on_selected_piece(piece_ui: Match3PieceUI) -> void:
-	#if configuration.click_mode_is_selection():
-		#
-		#if current_selected_piece == null:
-			#current_selected_piece = piece_ui
-		#
-		#elif current_selected_piece == piece_ui:
-			#current_selected_piece = null
-			#
-		#elif current_selected_piece != piece_ui:
-			#swap_pieces(current_selected_piece, piece_ui)
-			#current_selected_piece = null
-		#
-#
-#func on_piece_drag_started(piece_ui: Match3PieceUI) -> void:
-	#if configuration.click_mode_is_drag():
-		#current_selected_piece = piece_ui
-		#current_selected_piece.enable_drag()
-#
-#
-#func on_piece_drag_ended(piece_ui: Match3PieceUI) -> void:
-	#if configuration.click_mode_is_drag() and current_selected_piece:
-		#current_selected_piece.disable_drag()
-#
-#
-#func on_swap_accepted(_from: Match3GridCellUI, _to: Match3GridCellUI) -> void:
-	#lock()
-#
-#
-#func on_swap_rejected(_from: Match3GridCellUI, _to: Match3GridCellUI) -> void:
-	#unlock()
-	#
-#
+
+func on_piece_drag_started(piece_ui: Match3PieceUI) -> void:
+	if configuration.click_mode_is_drag():
+		current_selected_piece = piece_ui
+		current_selected_piece.enable_drag()
+
+
+func on_piece_drag_ended(piece_ui: Match3PieceUI) -> void:
+	if configuration.click_mode_is_drag() and current_selected_piece:
+		current_selected_piece.disable_drag()
+
+
+func on_swap_accepted(_from: Match3GridCellUI, _to: Match3GridCellUI) -> void:
+	lock()
+
+
+func on_swap_rejected(_from: Match3GridCellUI, _to: Match3GridCellUI) -> void:
+	unlock()
+	
+
 #func on_board_state_changed(_from: BoardState, to: BoardState) -> void:
 	#match to:
 		#BoardState.WaitForInput:

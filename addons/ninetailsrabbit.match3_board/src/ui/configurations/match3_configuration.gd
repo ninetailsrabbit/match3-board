@@ -80,7 +80,7 @@ enum BoardFillModes {
 @export var max_match: int  = 5:
 	set(value):
 		max_match = maxi(min_match, value)
-## This is only informative and only emits signals based on the movements used but does not block the board.
+## Set to -1 for infinite moves in the board. This is only informative and only emits signals based on the movements used but does not block the board.
 @export var available_moves_on_start: int = 25
 ## When enabled, the matches that could appear in the first board preparation will stay there and be consumed as sequences
 @export var allow_matches_on_start: bool = false
