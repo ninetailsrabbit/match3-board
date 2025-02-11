@@ -400,6 +400,8 @@ func swap_pieces(from_piece: Match3PieceUI, to_piece: Match3PieceUI) -> void:
 				to_cell.position,
 				from_cell.position
 				)
+		
+			
 		else:
 			from_piece.position = to_cell.position
 			to_piece.position = from_cell.position
@@ -499,7 +501,7 @@ func on_selected_piece(piece_ui: Match3PieceUI) -> void:
 		elif current_selected_piece == piece_ui:
 			current_selected_piece = null
 			
-		elif current_selected_piece != piece_ui:
+		elif current_selected_piece and current_selected_piece != piece_ui:
 			swap_pieces(current_selected_piece, piece_ui)
 			current_selected_piece = null
 		

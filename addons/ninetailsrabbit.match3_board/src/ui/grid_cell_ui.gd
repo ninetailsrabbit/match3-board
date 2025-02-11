@@ -34,8 +34,8 @@ var piece: Match3PieceUI:
 		if piece != new_piece:
 			piece = new_piece
 			
-			if new_piece:
-				new_piece.cell = self
+			if piece:
+				piece.cell = self
 
 var original_texture: Texture2D
 
@@ -88,9 +88,7 @@ func can_swap_piece_with_cell(other_cell: Match3GridCellUI) -> bool:
 		and other_cell.has_piece() \
 		and piece != other_cell.piece \
 		and piece.can_be_swapped \
-		and other_cell.piece.can_be_swapped \
-		and not piece.is_locked \
-		and not other_cell.piece.is_locked
+		and other_cell.piece.can_be_swapped 
 
 
 func swap_piece_with_cell(other_cell: Match3GridCellUI) -> bool:
