@@ -46,6 +46,7 @@ enum BoardFillModes {
 ## Piece scenes that contains or inherits the PieceUI script
 @export var available_pieces: Array[Match3PieceConfiguration] = []
 @export var available_special_pieces: Array[Match3PieceConfiguration] = []
+@export var pieces_collision_layer: int = 8
 @export_group("Size 🔲")
 @export var grid_width: int = 7:
 		set(value):

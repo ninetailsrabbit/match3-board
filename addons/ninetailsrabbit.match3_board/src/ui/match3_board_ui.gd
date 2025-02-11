@@ -357,8 +357,6 @@ func consume_sequences() -> void:
 		for combo: Match3SequenceConsumer.Match3SequenceConsumeCombo in sequence_result.combos:
 			combo.sequence.consume()
 
-	current_state = BoardState.Fill
-			
 			
 #func fall_pieces() -> void:
 	#var fall_movements: Array[Match3FallMover.FallMovement] = board.fall_mover.fall_pieces()
@@ -400,8 +398,6 @@ func swap_pieces(from_piece: Match3PieceUI, to_piece: Match3PieceUI) -> void:
 				to_cell.position,
 				from_cell.position
 				)
-		
-			
 		else:
 			from_piece.position = to_cell.position
 			to_piece.position = from_cell.position
@@ -493,7 +489,7 @@ func on_board_unlocked() -> void:
 
 
 func on_selected_piece(piece_ui: Match3PieceUI) -> void:
-	if configuration.click_mode_is_selection():
+	if configuration.click_mode_is_selection() and not is_locked:
 		
 		if current_selected_piece == null:
 			current_selected_piece = piece_ui
@@ -507,16 +503,24 @@ func on_selected_piece(piece_ui: Match3PieceUI) -> void:
 		
 
 func on_piece_drag_started(piece_ui: Match3PieceUI) -> void:
-	if configuration.click_mode_is_drag():
+	if configuration.click_mode_is_drag() and not is_locked:
 		current_selected_piece = piece_ui
 		current_selected_piece.enable_drag()
 		piece_drag_started.emit(current_selected_piece)
 
 
 func on_piece_drag_ended(piece_ui: Match3PieceUI) -> void:
-	if configuration.click_mode_is_drag() and current_selected_piece:
+	if configuration.click_mode_is_drag() and current_selected_piece == piece_ui:
+		var other_piece = current_selected_piece.detect_near_piece()
+		
+		if other_piece:
+			swap_pieces(current_selected_piece, other_piece)
+		
 		current_selected_piece.disable_drag()
 		piece_drag_ended.emit(current_selected_piece)
+		current_selected_piece = null
+		
+
 
 
 func on_swap_accepted(_from: Match3GridCellUI, _to: Match3GridCellUI) -> void:
@@ -535,7 +539,8 @@ func on_board_state_changed(_from: BoardState, to: BoardState) -> void:
 			lock()
 			consume_sequences()
 			await get_tree().process_frame
-			current_state = BoardState.WaitForInput
+			current_state = BoardState.Fill
+			
 		BoardState.Fill:
 			lock()
 			#fall_pieces()

@@ -241,7 +241,6 @@ func disable_detection_area() -> void:
 
 
 func enable_interaction_areas() -> void:
-					
 	## To not interrupt the detection area that the line connector creates
 	if is_click_mode_drag() and not board.is_swap_mode_connect_line():
 		detection_area.set_deferred("monitoring", true)

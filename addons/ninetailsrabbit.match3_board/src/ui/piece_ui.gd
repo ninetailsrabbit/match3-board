@@ -22,6 +22,9 @@ enum PieceType {
 @export var priority: int = 0:
 	set(value):
 		priority = maxi(0, value)
+@export var pieces_collision_layer: int = 8:
+	set(value):
+		pieces_collision_layer = clampi(value, 0, 32)
 @export_category("Behaviours")
 @export var can_be_swapped: bool = true
 @export var can_be_moved: bool = true
@@ -45,6 +48,13 @@ var drag_enabled: bool = false:
 	set(value):
 		drag_enabled = value
 		
+		if drag_enabled:
+			disable_piece_area()
+			enable_detection_area()
+		else:
+			enable_piece_area()
+			disable_detection_area()
+
 		if is_inside_tree():
 			set_process(drag_enabled and not is_locked)
 	
@@ -53,6 +63,8 @@ var sprite: Node2D
 var original_z_index: int = 0
 
 var cell: Match3GridCellUI
+var piece_area: Area2D
+var detection_area: Area2D
 
 
 static func from_configuration(configuration: Match3PieceConfiguration) -> Match3PieceUI:
@@ -62,6 +74,7 @@ static func from_configuration(configuration: Match3PieceConfiguration) -> Match
 	piece.shape = configuration.shape
 	piece.color = configuration.color
 	piece.priority = configuration.priority
+	piece.pieces_collision_layer = configuration.pieces_collision_layer
 	piece.can_be_swapped = configuration.can_be_swapped
 	piece.can_be_moved = configuration.can_be_moved
 	piece.can_be_shuffled = configuration.can_be_shuffled
@@ -87,11 +100,12 @@ func _enter_tree() -> void:
 
 func _ready() -> void:
 	_prepare_sprite()
-	
 	await get_tree().process_frame
 	
 	_create_mouse_region_button()
+	await get_tree().process_frame
 	
+	_prepare_area_detectors()
 	set_process(drag_enabled and not is_locked)
 
 
@@ -185,6 +199,19 @@ func back_to_cell_position() -> void:
 #endregion
 
 
+func detect_near_piece() -> Match3PieceUI:
+	var nearest_piece_area: Dictionary = Match3BoardPluginUtilities.get_nearest_node_by_distance(
+		global_position, detection_area.get_overlapping_areas()
+		)
+	
+	var piece_area = nearest_piece_area.get("target", null)
+	
+	if piece_area != null and piece_area is Area2D:
+		return piece_area.get_parent() as Match3PieceUI
+		
+	return null
+	
+	
 func lock() -> void:
 	is_locked = true
 	
@@ -199,6 +226,23 @@ func enable_drag() -> void:
 	
 func disable_drag() -> void:
 	drag_enabled = false
+	
+	
+func enable_piece_area() -> void:
+	piece_area.set_deferred("monitorable", true)
+
+	
+func disable_piece_area() -> void:
+	piece_area.set_deferred("monitorable", false)
+
+
+func enable_detection_area() -> void:
+	detection_area.set_deferred("monitoring", true)
+
+	
+func disable_detection_area() -> void:
+	detection_area.set_deferred("monitoring", false)
+
 
 
 func calculate_texture_scale(texture: Texture2D, size: Vector2i = Vector2i(48, 48)) -> Vector2:
@@ -243,12 +287,48 @@ func _prepare_sprite() -> void:
 		sprite.scale = calculate_texture_scale(sprite.get_sprite_frames().get_frame(sprite.animation, sprite.get_frame()))
 
 
+func _prepare_area_detectors() -> void:
+	piece_area = Area2D.new()
+	piece_area.name = "PieceArea"
+	var piece_area_collision = CollisionShape2D.new()
+	piece_area_collision.name = "PieceAreaCollisionShape"
+	var piece_area_collision_shape = RectangleShape2D.new()
+	piece_area_collision.shape = piece_area_collision_shape
+	piece_area.add_child(piece_area_collision)
+	
+	detection_area = Area2D.new()
+	detection_area.name = "DetectionArea"
+	var detection_area_collision = CollisionShape2D.new()
+	detection_area_collision.name = "DetectionAreaCollisionShape"
+	
+	var detection_area_collision_shape = RectangleShape2D.new()
+	detection_area_collision.shape = detection_area_collision_shape
+	
+	detection_area.add_child(detection_area_collision)
+	
+	piece_area.collision_layer = pow(2, pieces_collision_layer - 1)
+	piece_area.collision_mask = 0
+	piece_area.monitoring = false
+	piece_area.monitorable = true
+	
+	detection_area.collision_layer = 0
+	detection_area.collision_mask = piece_area.collision_layer
+	detection_area.monitoring = false ## Deactivated on initialization, it will active when piece is selected
+	detection_area.monitorable = false
+	
+	piece_area_collision.shape.size = cell.size / 1.5 
+	detection_area_collision.shape.size = cell.size / 1.5
+	
+	add_child(piece_area)
+	add_child(detection_area)
+
 #region Signal callbacks
 func on_mouse_region_pressed() -> void:
 	if is_locked:
 		return
 	
 	selected.emit()
+
 
 func on_mouse_region_holded() -> void:
 	if is_locked:

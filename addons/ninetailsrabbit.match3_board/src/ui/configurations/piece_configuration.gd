@@ -13,6 +13,9 @@ class_name Match3PieceConfiguration extends Resource
 @export var priority: int = 0:
 	set(value):
 		priority = maxi(0, value)
+@export var pieces_collision_layer: int = 8:
+	set(value):
+		pieces_collision_layer = clampi(value, 0, 32)
 @export var can_be_swapped: bool = true
 @export var can_be_moved: bool = true
 @export var can_be_shuffled: bool = true
