@@ -31,6 +31,13 @@ func calculate_fall_movements_on_column(column: int) -> Array[FallMovement]:
 				from_cell = cell
 				to_cell = cell.neighbour_bottom
 				break
+				
+			if cell.neighbour_bottom and cell.neighbour_bottom.has_piece() and board.fill_mode == board.FillModes.Side:
+				if cell.diagonal_neighbour_bottom_left and cell.diagonal_neighbour_bottom_left.is_empty():
+					to_cell = cell.diagonal_neighbour_bottom_left
+					
+				elif cell.diagonal_neighbour_bottom_right and cell.diagonal_neighbour_bottom_right.is_empty():
+					to_cell = cell.diagonal_neighbour_bottom_right
 
 	if from_cell and to_cell:
 		var next_cell: Match3GridCell = to_cell.neighbour_bottom
@@ -44,7 +51,6 @@ func calculate_fall_movements_on_column(column: int) -> Array[FallMovement]:
 			
 			next_cell = next_cell.neighbour_bottom
 			
-	
 	if from_cell and to_cell and from_cell.has_piece() and to_cell.is_empty():
 		movements.append(FallMovement.new(from_cell, to_cell, from_cell.piece))
 		

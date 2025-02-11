@@ -2,30 +2,30 @@ class_name Match3PieceGenerator extends RefCounted
 
 
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()
-var available_pieces: Array[Match3PieceWeight] = []
+var available_pieces: Array[Match3PieceConfiguration] = []
 
 
 func _init() -> void:
 	rng.randomize()
 
 
-func add_pieces(pieces: Array[Match3PieceWeight]) -> void:
-	for piece: Match3PieceWeight in pieces:
+func add_pieces(pieces: Array[Match3PieceConfiguration]) -> void:
+	for piece: Match3PieceConfiguration in pieces:
 		add_piece(piece)
 
 
-func add_piece(piece: Match3PieceWeight) -> void:
+func add_piece(piece: Match3PieceConfiguration) -> void:
 	if available_pieces.has(piece):
 		return
 		
 	available_pieces.append(piece)
 
 
-func roll(except: Array[Match3PieceWeight] = []) -> Match3Piece:
+func roll(except: Array[Match3PieceConfiguration] = []) -> Match3PieceConfiguration:
 	var available_pieces_to_roll = available_pieces.filter(
-		func(piece: Match3PieceWeight): return not except.has(piece))
+		func(piece: Match3PieceConfiguration): return not except.has(piece))
 		
-	var selected_piece: Match3Piece
+	var selected_piece: Match3PieceConfiguration
 	
 	assert(available_pieces_to_roll.size() > 0, "Match3PieceGenerator: No pieces available to roll")
 	
@@ -38,25 +38,25 @@ func roll(except: Array[Match3PieceWeight] = []) -> Match3Piece:
 	return selected_piece
 	
 
-func _prepare_weight(pieces: Array[Match3PieceWeight]) -> float:
+func _prepare_weight(pieces: Array[Match3PieceConfiguration]) -> float:
 	var total_weight: float = 0.0
 	
-	for piece_weight: Match3PieceWeight in pieces:
-		piece_weight.reset_accum_weight()
+	for piece: Match3PieceConfiguration in pieces:
+		piece.weight.reset_accum_weight()
 		
-		total_weight += piece_weight.current_weight
-		piece_weight.total_accum_weight = total_weight
+		total_weight += piece.weight.current_weight
+		piece.weight.total_accum_weight = total_weight
 	
 	return total_weight
 
 
-func _roll_piece(pieces: Array[Match3PieceWeight], total_weight: float) -> Match3Piece:
+func _roll_piece(pieces: Array[Match3PieceConfiguration], total_weight: float) -> Match3PieceConfiguration:
 	var threshold: float = rng.randf_range(0.0, total_weight)
-	var selected_piece: Match3Piece
+	var selected_piece: Match3PieceConfiguration
 	
-	for piece_weight: Match3PieceWeight in pieces:
-		if threshold <= piece_weight.total_accum_weight:
-			selected_piece = Match3Piece.from_piece(piece_weight.piece)
+	for piece: Match3PieceConfiguration in pieces:
+		if threshold <= piece.weight.total_accum_weight:
+			selected_piece = piece
 			break;
 	
 	return selected_piece

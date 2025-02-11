@@ -12,7 +12,9 @@ enum PieceType {
 ## The type of this piece, refers to behaviour
 @export var type: PieceType = PieceType.Normal
 ## A piece can share a behaviour (type) but with different shape so they are not strictly equals
-@export var shape: String = ""
+@export var shape: StringName = ""
+@export var color: Color = Color.BLACK
+@export var priority: int = 0
 @export var can_be_swapped: bool = true
 @export var can_be_moved: bool = true
 @export var can_be_shuffled: bool = true

@@ -19,14 +19,14 @@ func meet_conditions(sequence: Match3Sequence) -> bool:
 	if not shapes.has(sequence.shape):
 		return false
 	
-	var sequence_pieces: Array[Match3Piece] = sequence.normal_pieces()
+	var sequence_pieces: Array[Match3PieceUI] = sequence.normal_pieces()
 
 	if sequence_pieces.size() != target_pieces.size():
 		return false
 	
 	var contain_all_pieces: bool = true
 	
-	for piece: Match3Piece in sequence_pieces:
+	for piece: Match3PieceUI in sequence_pieces:
 		if not target_pieces.has(piece):
 			contain_all_pieces = false
 			break

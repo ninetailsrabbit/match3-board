@@ -8,23 +8,33 @@ const GroupName: StringName = &"match3-pieces"
 const SpecialGroupName: StringName = &"match3-special-pieces"
 const ObstacleGroupName: StringName = &"match3-obstacle-pieces"
 
-## Priority tt the time of its special effect or when it is consumed
+enum PieceType {
+	Normal,
+	Special,
+	Obstacle
+}
+
+
+@export var id: StringName
+@export var type: PieceType = PieceType.Normal
+@export var shape: StringName = &""
+@export var color: Color = Color.WHITE
 @export var priority: int = 0:
 	set(value):
 		priority = maxi(0, value)
+@export_category("Behaviours")
+@export var can_be_swapped: bool = true
+@export var can_be_moved: bool = true
+@export var can_be_shuffled: bool = true
+@export var can_be_triggered: bool = false
+@export var can_be_replaced: bool = true
+@export var can_be_consumed: bool = true
+
 @export_category("Visual")
 @export var texture_scale: float = 0.85
 @export_category("Drag&Drop")
 @export var reset_position_on_drag_release: bool = true
 @export var drag_smooth_factor: float = 20.0
-
-var piece: Match3Piece:
-	set(value):
-		if value != piece:
-			piece = value
-			
-			if piece:
-				piece.priority = priority
 
 var mouse_region: Button
 var current_position: Vector2 = Vector2.ZERO
@@ -41,22 +51,36 @@ var drag_enabled: bool = false:
 ## Could be Sprite2D or AnimatedSprite2D
 var sprite: Node2D
 var original_z_index: int = 0
-var original_cell_position: Vector2
+
+var cell: Match3GridCellUI
+
+
+static func from_configuration(configuration: Match3PieceConfiguration) -> Match3PieceUI:
+	var piece: Match3PieceUI = configuration.scene.instantiate()
+	piece.id = configuration.id
+	piece.type = configuration.type
+	piece.shape = configuration.shape
+	piece.color = configuration.color
+	piece.priority = configuration.priority
+	piece.can_be_swapped = configuration.can_be_swapped
+	piece.can_be_moved = configuration.can_be_moved
+	piece.can_be_shuffled = configuration.can_be_shuffled
+	piece.can_be_triggered = configuration.can_be_triggered
+	piece.can_be_replaced = configuration.can_be_replaced
+	piece.can_be_consumed = configuration.can_be_consumed
+	
+	return piece
 
 
 func _enter_tree() -> void:
-	assert(piece != null, "Match3PieceUI: The Piece UI needs the core piece to get the information to be usable")
-	
 	add_to_group(GroupName)
 	
-	piece.priority = priority
-	
-	if piece.is_special():
+	if is_special():
 		add_to_group(SpecialGroupName)
-	elif piece.is_obstacle():
+	elif is_obstacle():
 		add_to_group(ObstacleGroupName)
 	
-	name = "%s_%s" % [piece.id, piece.shape]
+	name = "%s_%s" % [id, shape]
 	z_index = 10
 	original_z_index = z_index
 
@@ -76,6 +100,90 @@ func _process(delta: float) -> void:
 		global_position = global_position.lerp(get_global_mouse_position(), drag_smooth_factor * delta) if drag_smooth_factor > 0 else get_global_mouse_position()
 		current_position = global_position + m_offset
 	
+
+func equals_to(other_piece: Match3PieceUI) -> bool:
+	return same_type_as(other_piece) and same_shape_as(other_piece) and same_color_as(other_piece)
+
+
+func same_type_as(other_piece: Match3PieceUI) -> bool:
+	return type == other_piece.type 
+
+
+func same_shape_as(other_piece: Match3PieceUI) -> bool:
+	return shape == other_piece.shape 
+
+
+func same_color_as(other_piece: Match3PieceUI) -> bool:
+	return color.is_equal_approx(other_piece.color)
+
+
+#region Behaviour configuration
+func with_swapped(enabled: bool) -> Match3PieceUI:
+	can_be_swapped = enabled
+	
+	return self
+
+
+func with_moved(enabled: bool) -> Match3PieceUI:
+	can_be_moved = enabled
+	
+	return self
+
+
+func with_shuffled(enabled: bool) -> Match3PieceUI:
+	can_be_shuffled = enabled
+	
+	return self
+
+
+func with_triggered(enabled: bool) -> Match3PieceUI:
+	can_be_triggered = enabled
+	
+	return self
+
+
+func with_replaced(enabled: bool) -> Match3PieceUI:
+	can_be_replaced = enabled
+	
+	return self
+	
+func with_consumed(enabled: bool) -> Match3PieceUI:
+	can_be_consumed = enabled
+	
+	return self
+#endregion
+
+func change_priority(new_value: int) -> Match3PieceUI:
+	priority = new_value
+	
+	return self
+
+#region Types
+func is_normal() -> bool:
+	return type == PieceType.Normal
+
+
+func is_special() -> bool:
+	return type == PieceType.Special
+
+
+func is_obstacle() -> bool:
+	return type == PieceType.Obstacle
+#endregion
+
+
+#region Overridables
+func match_with(other_piece: Match3PieceUI) -> bool:
+	if is_obstacle() or other_piece.is_obstacle():
+		return false
+		
+	return equals_to(other_piece)
+
+## Useful if you want to create animations when coming back to position when drag ended
+func back_to_cell_position() -> void:
+	position = cell.position
+#endregion
+
 
 func lock() -> void:
 	is_locked = true
@@ -133,19 +241,6 @@ func _prepare_sprite() -> void:
 		sprite.scale = calculate_texture_scale(sprite.texture)
 	elif sprite is AnimatedSprite2D:
 		sprite.scale = calculate_texture_scale(sprite.get_sprite_frames().get_frame(sprite.animation, sprite.get_frame()))
-	
-
-#region Overridables
-func match_with(other_piece: Match3PieceUI) -> bool:
-	if piece.is_obstacle() or other_piece.piece.is_obstacle():
-		return false
-		
-	return piece.match_with(other_piece.piece)
-
-## Useful if you want to create animations when coming back to position when drag ended
-func back_to_cell_position() -> void:
-	position = original_cell_position
-#endregion
 
 
 #region Signal callbacks

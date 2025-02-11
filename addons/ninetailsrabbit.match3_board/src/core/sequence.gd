@@ -1,6 +1,6 @@
 class_name Match3Sequence extends RefCounted
 
-signal consumed(pieces: Array[Match3Piece])
+signal consumed(pieces: Array[Match3PieceUI])
 
 enum Shapes {
 	Horizontal,
@@ -16,35 +16,35 @@ enum Shapes {
 }
 
 
-var cells: Array[Match3GridCell] = []
-var pieces: Array[Match3Piece] = []
+var cells: Array[Match3GridCellUI] = []
+var pieces: Array[Match3PieceUI] = []
 var shape: Shapes = Shapes.Irregular
 
 
-func _init(sequence_cells: Array[Match3GridCell], _shape: Shapes = Shapes.Irregular) -> void:
+func _init(sequence_cells: Array[Match3GridCellUI], _shape: Shapes = Shapes.Irregular) -> void:
 	cells.assign(Match3BoardPluginUtilities.remove_duplicates(sequence_cells.filter(
-		func(cell: Match3GridCell): return is_instance_valid(cell) and cell.can_contain_piece and cell.has_piece()))
+		func(cell: Match3GridCellUI): return is_instance_valid(cell) and cell.can_contain_piece and cell.has_piece()))
 		)
 	
 	pieces.assign(Match3BoardPluginUtilities.remove_falsy_values(
-		cells.map(func(cell: Match3GridCell): return cell.piece))
+		cells.map(func(cell: Match3GridCellUI): return cell.piece))
 		)
 	
 	shape = _detect_shape() if _shape == Shapes.Irregular else _shape
 
 
 func all_pieces_are_the_same() -> bool:
-	return pieces.all(func(piece: Match3Piece): return piece.match_with(pieces.front()))
+	return pieces.all(func(piece: Match3PieceUI): return piece.match_with(pieces.front()))
 
 #region Pieces
 func consume() -> void:
 	consume_cells(cells)
 	
 	
-func consume_cells(consumable_cells: Array[Match3GridCell], remove_from_sequence: bool = false) -> void:
-	var consumed_pieces: Array[Match3Piece] = []
+func consume_cells(consumable_cells: Array[Match3GridCellUI], remove_from_sequence: bool = false) -> void:
+	var consumed_pieces: Array[Match3PieceUI] = []
 	
-	for cell: Match3GridCell in cells.filter(func(grid_cell: Match3GridCell): return grid_cell.has_piece()):
+	for cell: Match3GridCellUI in cells.filter(func(grid_cell: Match3GridCellUI): return grid_cell.has_piece()):
 		consumed_pieces.append(cell.piece)
 		consume_cell(cell, remove_from_sequence)
 	
@@ -52,7 +52,7 @@ func consume_cells(consumable_cells: Array[Match3GridCell], remove_from_sequence
 		consumed.emit(consumed_pieces)
 	
 
-func consume_cell(consumable_cell: Match3GridCell, remove_from_sequence: bool = false) -> void:
+func consume_cell(consumable_cell: Match3GridCellUI, remove_from_sequence: bool = false) -> void:
 	if cells.has(consumable_cell) and consumable_cell.has_piece():
 		consumable_cell.remove_piece()
 		
@@ -65,21 +65,21 @@ func consume_normal_cells() -> void:
 
 			
 
-func normal_pieces() -> Array[Match3Piece]:
-	return pieces.filter(func(piece: Match3Piece): return piece.is_normal())
+func normal_pieces() -> Array[Match3PieceUI]:
+	return pieces.filter(func(piece: Match3PieceUI): return piece.is_normal())
 
 
 func normal_pieces_ids() -> Array[StringName]:
-	return normal_pieces().map(func(piece: Match3Piece): return piece.id)
+	return normal_pieces().map(func(piece: Match3PieceUI): return piece.id)
 
 
 func contains_special_piece() -> bool:
-	return pieces.any(func(piece: Match3Piece): return piece.is_special())
+	return pieces.any(func(piece: Match3PieceUI): return piece.is_special())
 
 
 func get_special_piece():
 	if contains_special_piece():
-		var special_pieces: Array[Match3Piece] = get_special_pieces()
+		var special_pieces: Array[Match3PieceUI] = get_special_pieces()
 		
 		if not special_pieces.is_empty():
 			return special_pieces.front()
@@ -87,9 +87,9 @@ func get_special_piece():
 	return null
 
 
-func get_special_pieces() -> Array[Match3Piece]:
-	var special_pieces: Array[Match3Piece] = pieces.filter(
-		func(piece: Match3Piece): return piece.is_special() and not piece.triggered
+func get_special_pieces() -> Array[Match3PieceUI]:
+	var special_pieces: Array[Match3PieceUI] = pieces.filter(
+		func(piece: Match3PieceUI): return piece.is_special() and not piece.triggered
 		)
 	
 	if special_pieces.size() > 1:
@@ -100,15 +100,15 @@ func get_special_pieces() -> Array[Match3Piece]:
 #endregion
 
 #region Cell positions
-func normal_cells() -> Array[Match3GridCell]:
-	return cells.filter(func(cell: Match3GridCell): return cell.has_piece() and cell.piece.is_normal())
+func normal_cells() -> Array[Match3GridCellUI]:
+	return cells.filter(func(cell: Match3GridCellUI): return cell.has_piece() and cell.piece.is_normal())
 	
 	
-func special_cells() -> Array[Match3GridCell]:
-	return cells.filter(func(cell: Match3GridCell): return cell.has_piece() and cell.piece.is_special())
+func special_cells() -> Array[Match3GridCellUI]:
+	return cells.filter(func(cell: Match3GridCellUI): return cell.has_piece() and cell.piece.is_special())
 	
 	
-func middle_cell() -> Match3GridCell:
+func middle_cell() -> Match3GridCellUI:
 	return Match3BoardPluginUtilities.middle_element(cells)
 
 
@@ -213,5 +213,5 @@ func _detect_shape() -> Shapes:
 		return Shapes.Irregular
 
 
-func _sort_by_priority(a: Match3Piece, b: Match3Piece): 
+func _sort_by_priority(a: Match3PieceUI, b: Match3PieceUI): 
 	return a.priority > b.priority

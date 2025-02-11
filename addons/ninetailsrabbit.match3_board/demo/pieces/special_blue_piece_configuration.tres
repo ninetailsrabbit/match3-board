@@ -1,7 +1,12 @@
-[gd_resource type="Resource" script_class="Match3PieceConfiguration" load_steps=3 format=3 uid="uid://dx168ycw2k4i3"]
+[gd_resource type="Resource" script_class="Match3PieceConfiguration" load_steps=5 format=3 uid="uid://dx168ycw2k4i3"]
 
 [ext_resource type="PackedScene" uid="uid://n1gjjyowue3q" path="res://addons/ninetailsrabbit.match3_board/demo/pieces/special_blue_piece.tscn" id="1_utxkk"]
 [ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/ui/configurations/piece_configuration.gd" id="2_55er4"]
+[ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/core/piece_weight.gd" id="3_g1a1x"]
+
+[sub_resource type="Resource" id="Resource_qdyyv"]
+script = ExtResource("3_g1a1x")
+weight = 1.0
 
 [resource]
 script = ExtResource("2_55er4")
@@ -9,7 +14,7 @@ scene = ExtResource("1_utxkk")
 id = &"special-blue-triangle"
 name = "Special Blue Gem"
 description = ""
-weight = 1.05
+weight = SubResource("Resource_qdyyv")
 type = 1
 shape = &"special-triangle"
 color = Color(0.00509031, 0.188667, 0.832808, 1)

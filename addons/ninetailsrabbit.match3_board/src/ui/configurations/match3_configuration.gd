@@ -32,6 +32,15 @@ enum BoardSelectionMode {
 	Drag
 }
 
+enum BoardFillModes {
+	## Pieces fall down to fill the empty cells
+	FallDown,
+	## Pieces still fall down but the empty cell sides are taking into account
+	Side,
+	## Pieces appears in the same place they were removed
+	InPlace
+}
+
 #endregion
 
 ## Piece scenes that contains or inherits the PieceUI script
@@ -58,18 +67,19 @@ enum BoardSelectionMode {
 ## The click mode defines if the swap is made by select & click or dragging the piece to the desired place
 @export var selection_mode: BoardSelectionMode = BoardSelectionMode.Click
 ## The fill mode defines how the pieces are redrawed into the board.
-@export var fill_mode: Board.FillModes = Board.FillModes.FallDown
+@export var fill_mode: BoardFillModes = BoardFillModes.FallDown
 
 @export_group("Start")
+## Draws automatically the cells & pieces when the board is ready on the scene tree
 @export var auto_start: bool = true
 ## The minimum amount of pieces to make a match valid
 @export var min_match: int = 3:
 	set(value):
-		min_match = max(3, value)
+		min_match = maxi(3, value)
 ## The maximum amount of pieces a match can have.
 @export var max_match: int  = 5:
 	set(value):
-		max_match = max(min_match, value)
+		max_match = maxi(min_match, value)
 ## This is only informative and only emits signals based on the movements used but does not block the board.
 @export var available_moves_on_start: int = 25
 ## When enabled, the matches that could appear in the first board preparation will stay there and be consumed as sequences
@@ -99,15 +109,15 @@ func click_mode_is_drag() -> bool:
 	
 
 func fill_mode_is_fall_down() -> bool:
-	return fill_mode == Board.FillModes.FallDown
+	return fill_mode == BoardFillModes.FallDown
 	
 
 func fill_mode_is_side() -> bool:
-	return fill_mode == Board.FillModes.Side
+	return fill_mode == BoardFillModes.Side
 	
 	
 func fill_mode_is_in_place() -> bool:
-	return fill_mode == Board.FillModes.InPlace
+	return fill_mode == BoardFillModes.InPlace
 	
 
 func swap_mode_is_adjacent() -> bool:
