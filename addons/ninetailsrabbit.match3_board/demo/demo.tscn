@@ -55,11 +55,10 @@ offset_right = 581.0
 offset_bottom = 65.0
 text = "STATE"
 
-[node name="Match3BoardUI" type="Node2D" parent="." node_paths=PackedStringArray("animator", "highlighter")]
+[node name="Match3BoardUI" type="Node2D" parent="." node_paths=PackedStringArray("highlighter")]
 position = Vector2(270, 171)
 script = ExtResource("2_wxjdv")
 configuration = SubResource("Resource_f1ea4")
-animator = NodePath("Match3Animator")
 highlighter = NodePath("Match3Highlighter")
 
 [node name="Match3Animator" type="Node" parent="Match3BoardUI" node_paths=PackedStringArray("board")]

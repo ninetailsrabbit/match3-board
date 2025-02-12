@@ -375,7 +375,7 @@ func fall_pieces() -> void:
 		await animator.fall_pieces(fall_movements)
 	else:
 		for movement in fall_movements:
-			movement.to_cell.piece_ui.position = movement.to_cell.position
+			movement.to_cell.piece.position = movement.to_cell.position
 	
 			
 func fill_pieces() -> void:
