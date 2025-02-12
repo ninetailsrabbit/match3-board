@@ -133,7 +133,7 @@ func _prepare_detection_area() -> void:
 	detection_area.area_entered.connect(on_piece_detected)
 	
 	
-##region Signal callbacks
+#region Signal callbacks
 func on_selected_origin_piece(piece: Match3PieceUI) -> void:
 	add_piece(piece)
 	
@@ -150,9 +150,18 @@ func on_connected_origin_piece(piece: Match3PieceUI) -> void:
 	detection_area.global_position = get_global_mouse_position()
 
 
-func on_piece_detected(area: Area2D) -> void:
-	var piece: Match3PieceUI = area.get_parent() as Match3PieceUI
+func on_connected_piece(piece: Match3PieceUI) -> void:
+	pass
 
+
+func on_piece_detected(area: Area2D) -> void:
+	if pieces_connected.size() == board.configuration.max_match:
+		return
+		
+	var detected_piece: Match3PieceUI = area.get_parent() as Match3PieceUI
+	
+	if detected_piece and detected_piece.cell.is_adjacent_to(pieces_connected.back().cell, true) and detected_piece.match_with(origin_piece):
+		add_piece(detected_piece)
 	
 #func on_piece_detected(other_area: Area2D) -> void:
 	#var piece: PieceUI = other_area.get_parent() as PieceUI
@@ -179,4 +188,4 @@ func on_piece_detected(area: Area2D) -> void:
 		#if board.is_click_mode_drag():
 			#consume_matches()
 #
-##endregion
+#endregion

@@ -174,10 +174,10 @@ func is_diagonal_adjacent_to(other_cell: Match3GridCellUI) -> bool:
 
 
 func in_diagonal_with(other_cell: Match3GridCellUI) -> bool:
-	var diagonal_top_right: Vector2 = Vector2(row - 1, column + 1)
-	var diagonal_top_left: Vector2 = Vector2(row - 1, column - 1)
-	var diagonal_bottom_right: Vector2 = Vector2(row + 1, column + 1)
-	var diagonal_bottom_left: Vector2 = Vector2(row + 1, column - 1)
+	var diagonal_top_right: Vector2 = Vector2(column + 1, row - 1)
+	var diagonal_top_left: Vector2 = Vector2( column - 1, row - 1)
+	var diagonal_bottom_right: Vector2 = Vector2( column + 1, row + 1)
+	var diagonal_bottom_left: Vector2 = Vector2(column - 1, row + 1)
 
 	return other_cell.in_same_grid_position_as(diagonal_top_right) \
 		or other_cell.in_same_grid_position_as(diagonal_top_left) \
