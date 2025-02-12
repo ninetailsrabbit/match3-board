@@ -125,11 +125,8 @@ func fall_pieces(movements: Array[Match3FallMover.FallMovement]) -> void:
 		var tween: Tween = create_tween().set_parallel(true)
 		
 		for movement in movements:
-			var piece_ui: Match3PieceUI = board.match3_mapper.ui_piece_from_core_piece(movement.piece)
-			var empty_cell_ui: Match3GridCellUI = board.match3_mapper.core_cell_to_ui_cell(movement.to_cell)
-			
-			if is_instance_valid(piece_ui) and is_instance_valid(empty_cell_ui):
-				tween.tween_property(piece_ui, "position", empty_cell_ui.position, 0.15)\
+			if is_instance_valid(movement.piece) and is_instance_valid(movement.to_cell):
+				tween.tween_property(movement.piece, "position", movement.to_cell.position, 0.15)\
 					.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_LINEAR)
 				
 		await tween.finished
@@ -143,14 +140,13 @@ func spawn_pieces(cells: Array[Match3GridCellUI]) -> void:
 	if cells.size() > 0:
 		var tween: Tween = create_tween().set_parallel(true)
 		
-		for cell_ui: Match3GridCellUI in cells.filter(func(cell: Match3GridCellUI): return cell.has_piece()):
-			var piece = cell_ui.piece_ui
-			
+		for cell: Match3GridCellUI in cells.filter(func(cell: Match3GridCellUI): return cell.has_piece()):
 			var fall_distance = board.configuration.cell_size.y * board.configuration.grid_height
-			piece.hide()
-			tween.tween_property(piece, "visible", true, 0.1)
-			tween.tween_property(piece, "position", cell_ui.position, 0.25)\
-				.set_trans(Tween.TRANS_QUAD).from(Vector2(cell_ui.position.x, cell_ui.position.y - fall_distance))
+			
+			cell.piece.hide()
+			tween.tween_property(cell.piece, "visible", true, 0.1)
+			tween.tween_property(cell.piece, "position", cell.position, 0.25)\
+				.set_trans(Tween.TRANS_QUAD).from(Vector2(cell.position.x, cell.position.y - fall_distance))
 			
 		await tween.finished
 	

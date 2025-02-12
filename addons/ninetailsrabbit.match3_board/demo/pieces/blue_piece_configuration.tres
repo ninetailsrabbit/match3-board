@@ -19,6 +19,7 @@ type = 0
 shape = &"triangle"
 color = Color(0.100438, 0.337708, 1, 1)
 priority = 0
+pieces_collision_layer = 8
 can_be_swapped = true
 can_be_moved = true
 can_be_shuffled = true
