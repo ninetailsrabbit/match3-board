@@ -66,6 +66,8 @@ var cell: Match3GridCellUI
 var piece_area: Area2D
 var detection_area: Area2D
 
+var triggered: bool = false
+
 
 static func from_configuration(configuration: Match3PieceConfiguration) -> Match3PieceUI:
 	var piece: Match3PieceUI = configuration.scene.instantiate()
@@ -192,6 +194,11 @@ func match_with(other_piece: Match3PieceUI) -> bool:
 		return false
 		
 	return equals_to(other_piece)
+
+## Special pieces run this function when triggered
+func trigger() -> void:
+	if can_be_triggered:
+		triggered = true
 
 ## Useful if you want to create animations when coming back to position when drag ended
 func back_to_cell_position() -> void:

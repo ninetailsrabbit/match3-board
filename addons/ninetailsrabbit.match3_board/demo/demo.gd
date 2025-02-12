@@ -9,7 +9,6 @@ extends Node2D
 func _ready() -> void:
 	state_label.text = "WaitForInput"
 	
-	#match_3_board.change_sequence_consumer(DemoSequenceConsumer.new())
 	match_3_board_ui.state_changed.connect(on_state_changed)
 	
 

@@ -2,6 +2,10 @@ class_name SequenceConsumeRule extends Resource
 
 
 @export var id: StringName
+## The rules are ordered by priority, rules with higher priority values are checked first
+@export var priority: int = 0:
+	set(value):
+		priority = maxi(0, value)
 @export var shapes: Array[Match3Sequence.Shapes] = []
 @export var piece_to_spawn: Match3PieceConfiguration
 ## Piece IDs order are readed from left to right for horizontal shapes
@@ -24,5 +28,6 @@ func meet_conditions(sequence: Match3Sequence) -> bool:
 		if not target_pieces.any(func(piece_conf: Match3PieceConfiguration): return piece_conf.id == piece.id):
 			contain_all_pieces = false
 			break
-		
+	
+	print(sequence_pieces, contain_all_pieces)
 	return contain_all_pieces

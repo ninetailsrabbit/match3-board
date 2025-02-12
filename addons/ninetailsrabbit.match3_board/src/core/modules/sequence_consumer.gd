@@ -62,7 +62,6 @@ func consume_sequence(sequence: Match3Sequence) -> Match3SequenceConsumeResult:
 			break
 	
 	if found_rule:
-		var result: Match3SequenceConsumeResult = null
 		## TODO - SEE HOW TO SPLIT COMBOS WHEN THE SEQUENCE IS MORE COMPLEX THAN SIMILAR PIECES
 		if sequence.all_pieces_are_the_same():
 			return Match3SequenceConsumeResult.new([

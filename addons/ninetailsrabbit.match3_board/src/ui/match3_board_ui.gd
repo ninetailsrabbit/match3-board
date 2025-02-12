@@ -354,7 +354,7 @@ func unlock_all_pieces() -> void:
 
 
 func consume_sequences() -> void:
-	## TODO - IT MISS THE LOGIC TO SPAWN AND TRIGGER SPECIAL PIECES
+	## TODO - IT MISS THE LOGIC TRIGGER SPECIAL PIECES
 	var sequences_result: Array[Match3SequenceConsumer.Match3SequenceConsumeResult] = sequence_consumer.sequences_to_combo_rules()
 	
 	if animator:
@@ -368,7 +368,13 @@ func consume_sequences() -> void:
 		
 	for sequence_result in sequences_result:
 		for combo: Match3SequenceConsumer.Match3SequenceConsumeCombo in sequence_result.combos:
+			if combo.sequence.contains_special_piece():
+				pass
+				
 			combo.sequence.consume()
+			
+			if combo.special_piece_to_spawn:
+				draw_piece_on_cell(combo.sequence.middle_cell(), Match3PieceUI.from_configuration(combo.special_piece_to_spawn))
 
 			
 func fall_pieces() -> void:

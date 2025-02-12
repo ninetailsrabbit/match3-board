@@ -37,8 +37,8 @@ func all_pieces_are_the_same() -> bool:
 	return pieces.all(func(piece: Match3PieceUI): return piece.match_with(pieces.front()))
 
 #region Pieces
-func consume() -> void:
-	consume_cells(cells)
+func consume(remove_from_sequence: bool = false) -> void:
+	consume_cells(cells, remove_from_sequence)
 	
 	
 func consume_cells(consumable_cells: Array[Match3GridCellUI], remove_from_sequence: bool = false) -> void:
@@ -77,17 +77,7 @@ func contains_special_piece() -> bool:
 	return pieces.any(func(piece: Match3PieceUI): return piece.is_special())
 
 
-func get_special_piece():
-	if contains_special_piece():
-		var special_pieces: Array[Match3PieceUI] = get_special_pieces()
-		
-		if not special_pieces.is_empty():
-			return special_pieces.front()
-		
-	return null
-
-
-func get_special_pieces() -> Array[Match3PieceUI]:
+func special_pieces() -> Array[Match3PieceUI]:
 	var special_pieces: Array[Match3PieceUI] = pieces.filter(
 		func(piece: Match3PieceUI): return piece.is_special() and not piece.triggered
 		)
