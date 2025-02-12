@@ -28,6 +28,5 @@ func meet_conditions(sequence: Match3Sequence) -> bool:
 		if not target_pieces.any(func(piece_conf: Match3PieceConfiguration): return piece_conf.id == piece.id):
 			contain_all_pieces = false
 			break
-	
-	print(sequence_pieces, contain_all_pieces)
+			
 	return contain_all_pieces

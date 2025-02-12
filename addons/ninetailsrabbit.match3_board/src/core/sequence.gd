@@ -74,7 +74,7 @@ func normal_pieces_ids() -> Array[StringName]:
 
 
 func contains_special_piece() -> bool:
-	return pieces.any(func(piece: Match3PieceUI): return piece.is_special())
+	return pieces.any(func(piece): return is_instance_valid(piece) and piece.is_special())
 
 
 func special_pieces() -> Array[Match3PieceUI]:

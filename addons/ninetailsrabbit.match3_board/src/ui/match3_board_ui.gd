@@ -17,6 +17,7 @@ signal finished_available_movements
 @export var configuration: Match3BoardConfiguration
 @export var animator: Match3Animator
 @export var highlighter: Match3Highlighter
+@export var line_connector: Match3LineConnector
 
 enum BoardState {
 	WaitForInput,
@@ -408,6 +409,9 @@ func fill_pieces() -> void:
 
 #region Swap
 func swap_pieces(from_piece: Match3PieceUI, to_piece: Match3PieceUI) -> void:
+	if configuration.swap_mode_is_connect_line():
+		return
+		
 	var from_cell: Match3GridCellUI = from_piece.cell
 	var to_cell: Match3GridCellUI = to_piece.cell
 	
@@ -524,7 +528,7 @@ func on_selected_piece(piece_ui: Match3PieceUI) -> void:
 		
 
 func on_piece_drag_started(piece_ui: Match3PieceUI) -> void:
-	if configuration.click_mode_is_drag() and not is_locked:
+	if configuration.click_mode_is_drag() and not is_locked and not configuration.swap_mode_is_connect_line():
 		current_selected_piece = piece_ui
 		current_selected_piece.enable_drag()
 		piece_drag_started.emit(current_selected_piece)
