@@ -358,7 +358,13 @@ func consume_sequences() -> void:
 	var sequences_result: Array[Match3SequenceConsumer.Match3SequenceConsumeResult] = sequence_consumer.sequences_to_combo_rules()
 	
 	if animator:
-		await animator.consume_sequences(sequences_result)
+		if configuration.sequence_animation_is_serial():
+			for sequence_result in sequences_result:
+				for combo: Match3SequenceConsumer.Match3SequenceConsumeCombo in sequence_result.combos:
+					await animator.consume_sequence(combo.sequence)
+					
+		elif configuration.sequence_animation_is_parallel():
+			await animator.consume_sequences(sequences_result)
 		
 	for sequence_result in sequences_result:
 		for combo: Match3SequenceConsumer.Match3SequenceConsumeCombo in sequence_result.combos:
@@ -372,7 +378,11 @@ func fall_pieces() -> void:
 		movement.to_cell.piece = movement.piece
 	
 	if animator:
-		await animator.fall_pieces(fall_movements)
+		if configuration.fall_animation_is_serial():
+			for movement in fall_movements:
+				await animator.fall_piece(movement)
+		elif configuration.fall_animation_is_parallel():
+			await animator.fall_pieces(fall_movements)
 	else:
 		for movement in fall_movements:
 			movement.to_cell.piece.position = movement.to_cell.position
@@ -382,7 +392,11 @@ func fill_pieces() -> void:
 	var filled_cells : Array[Match3GridCellUI] = filler.fill_empty_cells()
 		
 	if animator:
-		await animator.spawn_pieces(filled_cells)
+		if configuration.fill_animation_is_serial():
+			for filled_cell in filled_cells:
+				await animator.spawn_piece(filled_cell)
+		elif configuration.fill_animation_is_parallel():
+			await animator.spawn_pieces(filled_cells)
 	
 #endregion
 

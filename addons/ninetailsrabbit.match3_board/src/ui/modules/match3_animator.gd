@@ -9,6 +9,7 @@ const ConsumeSequenceAnimation: StringName = &"consume-sequence"
 const ConsumeSequencesAnimation: StringName = &"consume-sequences"
 const FallPieceAnimation: StringName = &"fall-piece"
 const FallPiecesAnimation: StringName = &"fall-pieces"
+const SpawnPieceAnimation: StringName = &"spawn-piece"
 const SpawnPiecesAnimation: StringName = &"spawn-pieces"
 #endregion
 
@@ -104,13 +105,11 @@ func consume_sequences(sequences: Array[Match3SequenceConsumer.Match3SequenceCon
 
 func fall_piece(movement: Match3FallMover.FallMovement) -> void:
 	animation_started.emit(FallPieceAnimation)
-	var piece_ui: Match3PieceUI = board.match3_mapper.ui_piece_from_core_piece(movement.piece)
-	var empty_cell_ui: Match3GridCellUI = board.match3_mapper.core_cell_to_ui_cell(movement.to_cell)
 	
-	if is_instance_valid(piece_ui) and is_instance_valid(empty_cell_ui):
+	if is_instance_valid(movement.piece) and is_instance_valid(movement.to_cell):
 		var tween: Tween = create_tween()
 		
-		tween.tween_property(piece_ui, "position", empty_cell_ui.position, 0.2)\
+		tween.tween_property(movement.piece, "position", movement.to_cell.position, 0.2)\
 			.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_LINEAR)
 			
 		await tween.finished
@@ -126,12 +125,29 @@ func fall_pieces(movements: Array[Match3FallMover.FallMovement]) -> void:
 		
 		for movement in movements:
 			if is_instance_valid(movement.piece) and is_instance_valid(movement.to_cell):
-				tween.tween_property(movement.piece, "position", movement.to_cell.position, 0.15)\
+				tween.tween_property(movement.piece, "position", movement.to_cell.position, 0.2)\
 					.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_LINEAR)
 				
 		await tween.finished
 	
 	animation_finished.emit(FallPiecesAnimation)
+	
+	
+func spawn_piece(cell: Match3GridCellUI) -> void:
+	animation_started.emit(SpawnPieceAnimation)
+	
+	if cell.has_piece():
+		var tween: Tween = create_tween()
+		var fall_distance = board.configuration.cell_size.y * board.configuration.grid_height
+		
+		cell.piece.hide()
+		tween.tween_property(cell.piece, "visible", true, 0.1)
+		tween.tween_property(cell.piece, "position", cell.position, 0.25)\
+			.set_trans(Tween.TRANS_QUAD).from(Vector2(cell.position.x, cell.position.y - fall_distance))
+		
+		await tween.finished
+	
+	animation_finished.emit(SpawnPieceAnimation)
 	
 
 func spawn_pieces(cells: Array[Match3GridCellUI]) -> void:

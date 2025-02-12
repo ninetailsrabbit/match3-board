@@ -44,6 +44,9 @@ horizontal_shape = true
 vertical_shape = true
 tshape = true
 lshape = true
+sequence_animation = 1
+fall_animation = 1
+fill_animation = 1
 
 [node name="Demo" type="Node2D"]
 script = ExtResource("1_dqalp")
@@ -55,10 +58,11 @@ offset_right = 581.0
 offset_bottom = 65.0
 text = "STATE"
 
-[node name="Match3BoardUI" type="Node2D" parent="." node_paths=PackedStringArray("highlighter")]
+[node name="Match3BoardUI" type="Node2D" parent="." node_paths=PackedStringArray("animator", "highlighter")]
 position = Vector2(270, 171)
 script = ExtResource("2_wxjdv")
 configuration = SubResource("Resource_f1ea4")
+animator = NodePath("Match3Animator")
 highlighter = NodePath("Match3Highlighter")
 
 [node name="Match3Animator" type="Node" parent="Match3BoardUI" node_paths=PackedStringArray("board")]

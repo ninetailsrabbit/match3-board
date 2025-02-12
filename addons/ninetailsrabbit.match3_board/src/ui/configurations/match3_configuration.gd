@@ -41,6 +41,13 @@ enum BoardFillModes {
 	InPlace
 }
 
+enum AnimationFlow {
+	## Consume the sequences one by one
+	Serial,
+	## Consume the sequences in parallel
+	Parallel
+}
+
 #endregion
 
 ## Piece scenes that contains or inherits the PieceUI script
@@ -87,7 +94,9 @@ enum BoardFillModes {
 @export var allow_matches_on_start: bool = false
 
 @export_group("Sequences")
+## Set the rules to spawn new special pieces in the board 
 @export var sequence_rules: Array[SequenceConsumeRule] = []
+
 ## When enabled, horizontal matchs between pieces are allowed
 @export var horizontal_shape: bool = true
 ## When enabled, vertical matchs between pieces are allowed
@@ -98,7 +107,13 @@ enum BoardFillModes {
 @export var lshape: bool = true
 ## The minimum amount of pieces to make a match valid
 
-
+@export_group("Animations")
+## Set the animation type when consuming sequences
+@export var sequence_animation: AnimationFlow = AnimationFlow.Parallel
+## Set the animation type when falling pieces
+@export var fall_animation: AnimationFlow = AnimationFlow.Parallel
+## Set the animation type when filling the board with new pieces
+@export var fill_animation: AnimationFlow = AnimationFlow.Parallel
 
 #region Information
 func click_mode_is_selection() -> bool:
@@ -156,4 +171,27 @@ func swap_mode_is_cross_diagonal() -> bool:
 func swap_mode_is_connect_line() -> bool:
 	return swap_mode == BoardMovements.ConnectLine
 
+
+func sequence_animation_is_serial() -> bool:
+	return sequence_animation == AnimationFlow.Serial
+	
+
+func sequence_animation_is_parallel() -> bool:
+	return sequence_animation == AnimationFlow.Parallel
+
+
+func fall_animation_is_serial() -> bool:
+	return fall_animation == AnimationFlow.Serial
+	
+
+func fall_animation_is_parallel() -> bool:
+	return fall_animation == AnimationFlow.Parallel
+	
+
+func fill_animation_is_serial() -> bool:
+	return fill_animation == AnimationFlow.Serial
+	
+
+func fill_animation_is_parallel() -> bool:
+	return fill_animation == AnimationFlow.Parallel
 #endregion
