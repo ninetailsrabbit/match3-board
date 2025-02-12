@@ -62,7 +62,7 @@ func add_piece(new_piece: Match3PieceUI) -> void:
 	
 	if pieces_connected.size() == 1:
 		connected_origin_piece.emit(new_piece)
-		
+	
 	connected_piece.emit(new_piece)
 
 #func detect_new_matches_from_last_piece(last_piece: PieceUI) -> void:
@@ -163,12 +163,6 @@ func on_piece_detected(area: Area2D) -> void:
 	if detected_piece and detected_piece.cell.is_adjacent_to(pieces_connected.back().cell, true) and detected_piece.match_with(origin_piece):
 		add_piece(detected_piece)
 	
-#func on_piece_detected(other_area: Area2D) -> void:
-	#var piece: PieceUI = other_area.get_parent() as PieceUI
-	#
-	#if possible_next_matches.has(piece):
-		#add_piece(piece)
-#
 #
 #func on_added_piece(piece: PieceUI) -> void:
 	#piece.disable_piece_area()
