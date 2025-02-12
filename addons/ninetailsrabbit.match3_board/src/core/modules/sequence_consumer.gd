@@ -56,7 +56,14 @@ func sequences_to_combo_rules() -> Array[Match3SequenceConsumer.Match3SequenceCo
 func consume_sequence(sequence: Match3Sequence) -> Match3SequenceConsumeResult:
 	var found_rule: SequenceConsumeRule = null
 	
-	for rule: SequenceConsumeRule in rules.values():
+	var active_rules: Array[SequenceConsumeRule] = []
+	active_rules.assign(rules.values().duplicate())
+	
+	if active_rules.size() > 1:
+		active_rules.sort_custom(
+			func(a: SequenceConsumeRule, b: SequenceConsumeRule): return a.priority > b.priority)
+	
+	for rule: SequenceConsumeRule in active_rules:
 		if rule.meet_conditions(sequence):
 			found_rule = rule
 			break
