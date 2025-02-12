@@ -89,6 +89,9 @@ func _enter_tree() -> void:
 func _ready() -> void:
 	assert(configuration != null, "Match3BoardUI: This board needs a configuration")
 	
+	if configuration.swap_mode_is_connect_line():
+		assert(line_connector != null, "Match3BoardUI: The swap mode ConnectLine needs a line connector in this board")
+	
 	sequence_consumer = Match3SequenceConsumer.new(self, configuration.sequence_rules)
 	current_available_moves = configuration.available_moves_on_start
 	
@@ -514,28 +517,30 @@ func on_board_unlocked() -> void:
 
 
 func on_selected_piece(piece_ui: Match3PieceUI) -> void:
-	if configuration.click_mode_is_selection() and not is_locked:
-		
+	if (configuration.click_mode_is_selection() or configuration.swap_mode_is_connect_line()) and not is_locked:
 		if current_selected_piece == null:
 			current_selected_piece = piece_ui
 		
 		elif current_selected_piece == piece_ui:
 			current_selected_piece = null
 			
-		elif current_selected_piece and current_selected_piece != piece_ui:
+		elif current_selected_piece and current_selected_piece != piece_ui and not configuration.swap_mode_is_connect_line():
 			swap_pieces(current_selected_piece, piece_ui)
 			current_selected_piece = null
 		
 
 func on_piece_drag_started(piece_ui: Match3PieceUI) -> void:
-	if configuration.click_mode_is_drag() and not is_locked and not configuration.swap_mode_is_connect_line():
+	if configuration.click_mode_is_drag() and not is_locked:
 		current_selected_piece = piece_ui
-		current_selected_piece.enable_drag()
+		
+		if not configuration.swap_mode_is_connect_line():
+			current_selected_piece.enable_drag()
+			
 		piece_drag_started.emit(current_selected_piece)
 
 
 func on_piece_drag_ended(piece_ui: Match3PieceUI) -> void:
-	if configuration.click_mode_is_drag() and current_selected_piece == piece_ui:
+	if configuration.click_mode_is_drag() and current_selected_piece == piece_ui and not configuration.swap_mode_is_connect_line():
 		var other_piece = current_selected_piece.detect_near_piece()
 		
 		if other_piece:

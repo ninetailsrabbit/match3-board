@@ -69,5 +69,8 @@ func on_selected_piece(piece: Match3PieceUI) -> void:
 		Match3Configuration.BoardMovements.CrossDiagonal:
 			target_cells.append_array(board.finder.cross_diagonal_cells_from(cell, true))
 			
+		Match3Configuration.BoardMovements.ConnectLine:
+			pass ## TODO
+			
 	highlight_cells(target_cells)
 	

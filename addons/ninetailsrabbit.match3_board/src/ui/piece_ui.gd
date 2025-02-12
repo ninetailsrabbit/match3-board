@@ -25,6 +25,13 @@ enum PieceType {
 @export var pieces_collision_layer: int = 8:
 	set(value):
 		pieces_collision_layer = clampi(value, 0, 32)
+		
+		if detection_area:
+			detection_area.collision_mask = pieces_collision_layer
+			
+		if piece_area:
+			piece_area.collision_mask = pieces_collision_layer
+
 @export_category("Behaviours")
 @export var can_be_swapped: bool = true
 @export var can_be_moved: bool = true
