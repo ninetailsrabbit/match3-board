@@ -19,7 +19,8 @@
 script = ExtResource("11_tuwog")
 id = &"special-blue-triangle"
 priority = 0
-shapes = Array[int]([0, 1])
+strict_size_comparison = true
+shapes = Array[int]([0, 1, 5])
 piece_to_spawn = ExtResource("8_ja6f8")
 target_pieces = Array[ExtResource("3_lxq78")]([ExtResource("4_xuqmf"), ExtResource("4_xuqmf"), ExtResource("4_xuqmf"), ExtResource("4_xuqmf")])
 
@@ -33,7 +34,7 @@ grid_height = 8
 cell_size = Vector2i(48, 48)
 cell_offset = Vector2i(25, 25)
 grid_cell_scene = ExtResource("8_igev1")
-swap_mode = 1
+swap_mode = 8
 selection_mode = 1
 fill_mode = 0
 auto_start = true

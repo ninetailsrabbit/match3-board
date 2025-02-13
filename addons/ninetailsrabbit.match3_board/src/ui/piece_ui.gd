@@ -202,8 +202,8 @@ func match_with(other_piece: Match3PieceUI) -> bool:
 		
 	return equals_to(other_piece)
 
-## Special pieces run this function when triggered
-func trigger() -> void:
+## Special pieces run this function when triggered from board
+func trigger(_board: Match3BoardUI) -> void:
 	if can_be_triggered:
 		triggered = true
 

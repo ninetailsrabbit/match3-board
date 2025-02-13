@@ -6,6 +6,8 @@ class_name SequenceConsumeRule extends Resource
 @export var priority: int = 0:
 	set(value):
 		priority = maxi(0, value)
+## When this property is enabled, the sequence and the target pieces needs to have the same size
+@export var strict_size_comparison: bool = false
 @export var shapes: Array[Match3Sequence.Shapes] = []
 @export var piece_to_spawn: Match3PieceConfiguration
 ## Piece IDs order are readed from left to right for horizontal shapes
@@ -18,15 +20,28 @@ func meet_conditions(sequence: Match3Sequence) -> bool:
 		return false
 	
 	var sequence_pieces: Array[Match3PieceUI] = sequence.normal_pieces()
-
-	if sequence_pieces.size() != target_pieces.size():
+	var pieces_configuration: Array[Match3PieceConfiguration] = target_pieces.duplicate()
+	
+	if strict_size_comparison and sequence_pieces.size() != target_pieces.size():
 		return false
 	
 	var contain_all_pieces: bool = true
+	var valid_pieces: Array[bool] = []
 	
 	for piece: Match3PieceUI in sequence_pieces:
-		if not target_pieces.any(func(piece_conf: Match3PieceConfiguration): return piece_conf.id == piece.id):
-			contain_all_pieces = false
+		if pieces_configuration.is_empty():
 			break
 			
+		var found_pieces = pieces_configuration.filter(
+			func(conf: Match3PieceConfiguration): return piece.id == conf.id)
+		
+		if found_pieces.size() > 0:
+			pieces_configuration.erase(pieces_configuration.front())
+			valid_pieces.append(true)
+	
+	if strict_size_comparison:
+		contain_all_pieces = valid_pieces.size() == target_pieces.size()
+	else:
+		contain_all_pieces = valid_pieces.size() >= target_pieces.size()
+		
 	return contain_all_pieces
