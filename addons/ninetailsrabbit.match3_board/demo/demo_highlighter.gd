@@ -68,19 +68,15 @@ func on_selected_piece(piece: Match3PieceUI) -> void:
 		Match3Configuration.BoardMovements.CrossDiagonal:
 			target_cells.append_array(board.finder.cross_diagonal_cells_from(cell, true))
 			
+		Match3Configuration.BoardMovements.ConnectLine:
+			pass ## This swap mode is handled on the on_connected_piece signal callback
+			
 	highlight_cells(target_cells)
 
 
 func on_connected_piece(piece: Match3PieceUI) -> void:
 	if board.configuration.swap_mode_is_connect_line():
-		var last_connected_piece: Match3PieceUI = board.line_connector.pieces_connected.back()
-		var current_neighbours: Dictionary = last_connected_piece.cell.usable_neighbours()
-		
-		var adjacent_cells: Array[Match3GridCellUI] = []
-		adjacent_cells.assign(
-			Match3BoardPluginUtilities.remove_falsy_values(current_neighbours.values())
-			)
-			
-		for adjacent_cell in adjacent_cells:
-			if is_instance_valid(adjacent_cell.piece) and adjacent_cell.piece.match_with(last_connected_piece):
-				highlight_cell(adjacent_cell)
+		remove_highlight()
+		var valid_cells: Array[Match3GridCellUI] = board.line_connector.matches_from_piece(piece)
+		highlight_cells(valid_cells)
+		current_highlighted_cells.append_array(valid_cells)

@@ -2,6 +2,7 @@ class_name Match3LineConnector extends Line2D
 
 signal connected_origin_piece(piece: Match3PieceUI)
 signal connected_piece(piece: Match3PieceUI)
+signal max_connected_pieces_reached(pieces: Match3PieceUI)
 #signal match_selected(selected_pieces: Array[PieceUI])
 #signal canceled_match(selected_pieces: Array[PieceUI])
 #
@@ -9,11 +10,7 @@ signal connected_piece(piece: Match3PieceUI)
 
 var pieces_connected: Array[Match3PieceUI] = []
 var origin_piece: Match3PieceUI
-
 var detection_area: Area2D
-#var previous_matches: Array[PieceUI] = []
-#var possible_next_matches: Array[PieceUI] = []
-
 
 
 func _enter_tree() -> void:
@@ -65,22 +62,21 @@ func add_piece(new_piece: Match3PieceUI) -> void:
 	
 	connected_piece.emit(new_piece)
 
-#func detect_new_matches_from_last_piece(last_piece: PieceUI) -> void:
-	#var origin_cell: GridCellUI = last_piece.cell()
-	#
-	#if origin_cell is GridCellUI:
-		#var adjacent_cells: Array[GridCellUI] = origin_cell.available_neighbours(true)
-	#
-		#previous_matches = possible_next_matches.duplicate()
-		#possible_next_matches.clear()
-		#
-		#for cell: GridCellUI in adjacent_cells:
-			#var piece: PieceUI = cell.current_piece as PieceUI
-			#
-			#if not pieces_connected.has(piece) and (piece.match_with(last_piece) or piece.is_special()):
-				#possible_next_matches.append(piece)
-#
-#
+
+func matches_from_piece(piece: Match3PieceUI) -> Array[Match3GridCellUI]:
+	var current_neighbours: Dictionary = piece.cell.usable_neighbours()
+	
+	var adjacent_cells: Array[Match3GridCellUI] = []
+	adjacent_cells.assign(
+		Match3BoardPluginUtilities.remove_falsy_values(current_neighbours.values())
+		)
+		 
+	return adjacent_cells.filter(
+		func(cell: Match3GridCellUI): 
+		return is_instance_valid(cell.piece) and not pieces_connected.has(cell.piece) and cell.piece.match_with(origin_piece)
+		)
+
+
 #func consume_matches() -> void:
 	#if pieces_connected.size() >= origin_piece.board.configuration.min_match or _connected_pieces_has_special():
 		#var cells: Array[GridCellUI] = []
@@ -156,6 +152,7 @@ func on_connected_piece(piece: Match3PieceUI) -> void:
 
 func on_piece_detected(area: Area2D) -> void:
 	if pieces_connected.size() == board.configuration.max_match:
+		max_connected_pieces_reached.emit(pieces_connected)
 		return
 		
 	var detected_piece: Match3PieceUI = area.get_parent() as Match3PieceUI
