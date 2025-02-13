@@ -5,6 +5,8 @@ const GroupName: StringName = &"match3-board"
 signal state_changed(from: BoardState, to: BoardState)
 signal swap_accepted(from: Match3GridCellUI, to: Match3GridCellUI)
 signal swap_rejected(from: Match3GridCellUI, to: Match3GridCellUI)
+signal consumed_sequence(sequence: Match3Sequence)
+signal consumed_sequences(sequences: Array[Match3Sequence])
 signal selected_piece(piece: Match3PieceUI)
 signal unselected_piece(piece: Match3PieceUI)
 signal piece_drag_started(piece: Match3PieceUI)
@@ -299,12 +301,19 @@ func consume_sequences(sequences: Array[Match3Sequence]) -> void:
 			if combo.sequence.contains_special_piece():
 				pass ## TODO - SEE HOW TO TRIGGER CUSTOM SPECIAL PIECES
 				
+			consumed_sequence.emit(combo.sequence)
 			combo.sequence.consume()
+			await get_tree().process_frame
 			
 			if combo.special_piece_to_spawn: ## TODO - TEMPORARY DRAW ON THE MIDDLE CELL
 				draw_piece_on_cell(combo.sequence.middle_cell(), Match3PieceUI.from_configuration(combo.special_piece_to_spawn))
+	
+	consumed_sequences.emit(sequences)
+	
+	await get_tree().process_frame
+	current_state = BoardState.Fall
 
-			
+
 func fall_pieces() -> void:
 	var fall_movements: Array[Match3FallMover.FallMovement] = fall_mover.fall_pieces()
 	
@@ -343,6 +352,8 @@ func swap_pieces(from_piece: Match3PieceUI, to_piece: Match3PieceUI) -> void:
 	var to_cell: Match3GridCellUI = to_piece.cell
 	
 	if swap_movement_is_valid(from_cell, to_cell):
+		lock_all_pieces()
+
 		if animator:
 			await animator.swap_pieces(
 				from_piece, 
@@ -477,7 +488,10 @@ func on_selected_piece(piece_ui: Match3PieceUI) -> void:
 func on_piece_drag_started(piece_ui: Match3PieceUI) -> void:
 	if configuration.swap_mode_is_connect_line():
 		current_selected_piece = piece_ui
-		piece_drag_started.emit(current_selected_piece)
+		
+		if configuration.click_mode_is_drag():
+			piece_drag_started.emit(current_selected_piece)
+			
 		lock()
 		
 	elif configuration.click_mode_is_drag() and not is_locked:
@@ -489,8 +503,9 @@ func on_piece_drag_started(piece_ui: Match3PieceUI) -> void:
 
 func on_piece_drag_ended(piece_ui: Match3PieceUI) -> void:
 	if configuration.swap_mode_is_connect_line():
-		piece_drag_ended.emit(current_selected_piece)
-		current_selected_piece = null
+		if configuration.click_mode_is_drag():
+			piece_drag_ended.emit(current_selected_piece)
+			current_selected_piece = null
 
 	elif configuration.click_mode_is_drag() and current_selected_piece == piece_ui:
 		var other_piece = current_selected_piece.detect_near_piece()
@@ -515,12 +530,11 @@ func on_board_state_changed(_from: BoardState, to: BoardState) -> void:
 	match to:
 		BoardState.WaitForInput:
 			unlock()
+			
 		BoardState.Consume:
 			lock()
 			await consume_sequences(sequence_detector.find_board_sequences())
-			await get_tree().process_frame
-			current_state = BoardState.Fall
-		
+			
 		BoardState.Fall:
 			lock()
 			await fall_pieces()

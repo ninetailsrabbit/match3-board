@@ -23,13 +23,10 @@ var shape: Shapes = Shapes.Irregular
 
 func _init(sequence_cells: Array[Match3GridCellUI], _shape: Shapes = Shapes.Irregular) -> void:
 	cells.assign(Match3BoardPluginUtilities.remove_duplicates(sequence_cells.filter(
-		func(cell: Match3GridCellUI): return is_instance_valid(cell) and cell.can_contain_piece and cell.has_piece()))
+		func(cell: Match3GridCellUI): return cell.can_contain_piece and cell.has_piece() and is_instance_valid(cell.piece)))
 		)
 	
-	pieces.assign(Match3BoardPluginUtilities.remove_falsy_values(
-		cells.map(func(cell: Match3GridCellUI): return cell.piece))
-		)
-	
+	pieces.assign(cells.map(func(cell: Match3GridCellUI): return cell.piece))
 	shape = _detect_shape() if _shape == Shapes.Irregular else _shape
 
 
@@ -70,7 +67,6 @@ func consume_cell(consumable_cell: Match3GridCellUI, remove_from_sequence: bool 
 func consume_normal_cells() -> void:
 	consume_cells(normal_cells())
 
-			
 
 func normal_pieces() -> Array[Match3PieceUI]:
 	return pieces.filter(func(piece: Match3PieceUI): return piece.is_normal())

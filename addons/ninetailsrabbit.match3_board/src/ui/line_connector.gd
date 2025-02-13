@@ -104,8 +104,6 @@ func confirm_match() -> void:
 		confirmed_match.emit(pieces)
 		
 		await board.consume_sequences([Match3Sequence.create_from_pieces(pieces, Match3Sequence.Shapes.LineConnected)])
-		await get_tree().process_frame
-		board.current_state = board.BoardState.Fall
 
 
 func cancel_match() -> void:
