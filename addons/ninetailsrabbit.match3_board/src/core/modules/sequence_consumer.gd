@@ -39,8 +39,7 @@ func remove_rule(rule: SequenceConsumeRule) -> Match3SequenceConsumer:
 	return self
 
 
-func sequences_to_combo_rules() -> Array[Match3SequenceConsumer.Match3SequenceConsumeResult]:
-	var matches: Array[Match3Sequence] = board.sequence_detector.find_board_sequences()
+func sequences_to_combo_rules(matches: Array[Match3Sequence]) -> Array[Match3SequenceConsumer.Match3SequenceConsumeResult]:
 	
 	if matches.is_empty():
 		return []

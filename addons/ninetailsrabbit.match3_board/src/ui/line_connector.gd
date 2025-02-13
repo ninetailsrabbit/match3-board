@@ -6,7 +6,9 @@ signal max_connected_pieces_reached(pieces: Array[Match3PieceUI])
 signal canceled_match(pieces: Array[Match3PieceUI])
 
 @export var board: Match3BoardUI
+@export var confirm_match_input_action: StringName = &"ui_accept"
 @export var cancel_match_input_action: StringName = &"ui_cancel"
+@export var auto_consume_when_release_drag: bool = false
 
 var pieces_connected: Array[Match3PieceUI] = []
 var origin_piece: Match3PieceUI
@@ -16,6 +18,9 @@ var detection_area: Area2D
 func _unhandled_input(event: InputEvent) -> void:
 	if Input.is_action_just_pressed(cancel_match_input_action):
 		cancel()
+	
+	if board.configuration.click_mode_is_selection() and Input.is_action_just_pressed(confirm_match_input_action):
+		pass ## TODO - CREATE SEQUENCE AND CONSUME
 
 
 func _enter_tree() -> void:
@@ -32,6 +37,7 @@ func _ready() -> void:
 	
 	board.selected_piece.connect(on_selected_origin_piece)
 	board.piece_drag_started.connect(on_selected_origin_piece)
+	board.piece_drag_ended.connect(on_piece_drag_ended)
 	connected_origin_piece.connect(on_connected_origin_piece)
 	
 	
@@ -86,6 +92,11 @@ func matches_from_piece(piece: Match3PieceUI) -> Array[Match3GridCellUI]:
 		)
 
 
+func confirm_match() -> void:
+	if pieces_connected.size() >= board.configuration.min_match:
+		board.consume_sequences([Match3Sequence.create_from_pieces(pieces_connected, Match3Sequence.Shapes.LineConnected)])
+		
+
 func cancel() -> void:
 	set_process(false)
 	set_process_unhandled_input(false)
@@ -129,8 +140,8 @@ func _prepare_detection_area() -> void:
 	
 #region Signal callbacks
 func on_selected_origin_piece(piece: Match3PieceUI) -> void:
-	print("selected origin piece ", piece)
-	add_piece(piece)
+	if board.configuration.swap_mode_is_connect_line():
+		add_piece(piece)
 	
 
 func on_connected_origin_piece(piece: Match3PieceUI) -> void:
@@ -159,4 +170,8 @@ func on_piece_detected(area: Area2D) -> void:
 			
 	else:
 		max_connected_pieces_reached.emit(pieces_connected)
+		
+		
+func on_piece_drag_ended() -> void:
+	pass
 #endregion

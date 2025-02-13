@@ -359,10 +359,11 @@ func unlock_all_pieces() -> void:
 	for piece: Match3PieceUI in pieces():
 		piece.unlock()
 
+	
 
-func consume_sequences() -> void:
+func consume_sequences(sequences: Array[Match3Sequence]) -> void:
 	## TODO - IT MISS THE LOGIC TRIGGER SPECIAL PIECES
-	var sequences_result: Array[Match3SequenceConsumer.Match3SequenceConsumeResult] = sequence_consumer.sequences_to_combo_rules()
+	var sequences_result: Array[Match3SequenceConsumer.Match3SequenceConsumeResult] = sequence_consumer.sequences_to_combo_rules(sequences)
 	
 	if animator:
 		if configuration.sequence_animation_is_serial():
@@ -376,7 +377,7 @@ func consume_sequences() -> void:
 	for sequence_result in sequences_result:
 		for combo: Match3SequenceConsumer.Match3SequenceConsumeCombo in sequence_result.combos:
 			if combo.sequence.contains_special_piece():
-				pass
+				pass ## TODO - SEE HOW TO TRIGGER CUSTOM SPECIAL PIECES
 				
 			combo.sequence.consume()
 			
@@ -542,7 +543,11 @@ func on_selected_piece(piece_ui: Match3PieceUI) -> void:
 		
 
 func on_piece_drag_started(piece_ui: Match3PieceUI) -> void:
-	if configuration.click_mode_is_drag() and not is_locked:
+	if configuration.swap_mode_is_connect_line():
+		current_selected_piece = piece_ui
+		lock()
+		
+	elif configuration.click_mode_is_drag() and not is_locked:
 		current_selected_piece = piece_ui
 		current_selected_piece.enable_drag()
 			
@@ -551,9 +556,9 @@ func on_piece_drag_started(piece_ui: Match3PieceUI) -> void:
 
 func on_piece_drag_ended(piece_ui: Match3PieceUI) -> void:
 	if configuration.swap_mode_is_connect_line():
-		return
-		
-	if configuration.click_mode_is_drag() and current_selected_piece == piece_ui:
+		piece_drag_ended.emit(current_selected_piece)
+
+	elif configuration.click_mode_is_drag() and current_selected_piece == piece_ui:
 		var other_piece = current_selected_piece.detect_near_piece()
 		
 		if other_piece:
@@ -578,7 +583,7 @@ func on_board_state_changed(_from: BoardState, to: BoardState) -> void:
 			unlock()
 		BoardState.Consume:
 			lock()
-			await consume_sequences()
+			await consume_sequences(sequence_detector.find_board_sequences())
 			await get_tree().process_frame
 			
 			current_state = BoardState.Fall

@@ -33,6 +33,13 @@ func _init(sequence_cells: Array[Match3GridCellUI], _shape: Shapes = Shapes.Irre
 	shape = _detect_shape() if _shape == Shapes.Irregular else _shape
 
 
+static func create_from_pieces(pieces: Array[Match3PieceUI], selected_shape: Shapes = Shapes.Irregular) -> Match3Sequence:
+	var cells: Array[Match3GridCellUI] = []
+	cells.assign(pieces.map(func(piece: Match3GridCellUI): return piece.cell))
+	
+	return Match3Sequence.new(cells, selected_shape)
+	
+
 func all_pieces_are_the_same() -> bool:
 	return pieces.all(func(piece: Match3PieceUI): return piece.match_with(pieces.front()))
 
@@ -192,7 +199,7 @@ func _detect_shape() -> Shapes:
 		is_vertical = index == 0 or cells[index].in_same_row_as(cells[index - 1])
 		is_diagonal = index == 0 or cells[index].in_diagonal_with(cells[index - 1])
 	
-	## We don't need to detect TShape or LShape as this ones are set always manually when the sequence it's created
+	## We don't need to detect TShape or LShape as this ones are set always manually when the sequence it's d
 	if is_horizontal:
 		return Shapes.Horizontal
 	elif is_vertical:
