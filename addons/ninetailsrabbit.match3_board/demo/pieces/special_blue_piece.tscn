@@ -6,8 +6,12 @@
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_sm7co"]
 blend_mode = 1
 
-[node name="SpecialBlueGemPieceUI" type="Node2D"]
+[node name="SpecialBlueGemPieceUI5" type="Node2D"]
 script = ExtResource("1_bxdsx")
+id = &"special-blue"
+type = 1
+color = Color(1.63645e-06, 0.469306, 0.471775, 1)
+priority = 2
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 material = SubResource("CanvasItemMaterial_sm7co")

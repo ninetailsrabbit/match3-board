@@ -61,6 +61,7 @@ func consume_sequence(sequence: Match3Sequence) -> Match3SequenceConsumeResult:
 		active_rules.sort_custom(
 			func(a: SequenceConsumeRule, b: SequenceConsumeRule): return a.priority > b.priority)
 	
+	
 	for rule: SequenceConsumeRule in active_rules:
 		if rule.meet_conditions(sequence):
 			found_rule = rule

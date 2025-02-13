@@ -1,6 +1,5 @@
 class_name SequenceConsumeRule extends Resource
 
-
 @export var id: StringName
 ## The rules are ordered by priority, rules with higher priority values are checked first
 @export var priority: int = 0:
