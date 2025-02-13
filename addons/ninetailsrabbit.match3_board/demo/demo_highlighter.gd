@@ -77,6 +77,8 @@ func on_selected_piece(piece: Match3PieceUI) -> void:
 func on_connected_piece(piece: Match3PieceUI) -> void:
 	if board.configuration.swap_mode_is_connect_line():
 		remove_highlight()
-		var valid_cells: Array[Match3GridCellUI] = board.line_connector.matches_from_piece(piece)
-		highlight_cells(valid_cells)
-		current_highlighted_cells.append_array(valid_cells)
+		
+		if board.line_connector.can_connect_more_pieces():
+			var valid_cells: Array[Match3GridCellUI] = board.line_connector.matches_from_piece(piece)
+			highlight_cells(valid_cells)
+			current_highlighted_cells.append_array(valid_cells)

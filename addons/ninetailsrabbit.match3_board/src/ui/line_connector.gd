@@ -2,15 +2,20 @@ class_name Match3LineConnector extends Line2D
 
 signal connected_origin_piece(piece: Match3PieceUI)
 signal connected_piece(piece: Match3PieceUI)
-signal max_connected_pieces_reached(pieces: Match3PieceUI)
-#signal match_selected(selected_pieces: Array[PieceUI])
-#signal canceled_match(selected_pieces: Array[PieceUI])
-#
+signal max_connected_pieces_reached(pieces: Array[Match3PieceUI])
+signal canceled_match(pieces: Array[Match3PieceUI])
+
 @export var board: Match3BoardUI
+@export var cancel_match_input_action: StringName = &"ui_cancel"
 
 var pieces_connected: Array[Match3PieceUI] = []
 var origin_piece: Match3PieceUI
 var detection_area: Area2D
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if Input.is_action_just_pressed(cancel_match_input_action):
+		cancel()
 
 
 func _enter_tree() -> void:
@@ -21,13 +26,13 @@ func _ready() -> void:
 	if board == null:
 		get_tree().get_first_node_in_group(Match3BoardUI.GroupName)
 	
+	set_process(false)
+	set_process_unhandled_input(false)
 	_prepare_detection_area()
 	
 	board.selected_piece.connect(on_selected_origin_piece)
 	board.piece_drag_started.connect(on_selected_origin_piece)
 	connected_origin_piece.connect(on_connected_origin_piece)
-	
-	set_process(false)
 	
 	
 func _process(_delta: float) -> void:
@@ -40,6 +45,10 @@ func _process(_delta: float) -> void:
 	add_point(mouse_position)
 	
 	detection_area.global_position = mouse_position
+
+
+func can_connect_more_pieces() -> bool:
+	return pieces_connected.size() < board.configuration.max_match
 
 
 func add_piece(new_piece: Match3PieceUI) -> void:
@@ -77,33 +86,22 @@ func matches_from_piece(piece: Match3PieceUI) -> Array[Match3GridCellUI]:
 		)
 
 
-#func consume_matches() -> void:
-	#if pieces_connected.size() >= origin_piece.board.configuration.min_match or _connected_pieces_has_special():
-		#var cells: Array[GridCellUI] = []
-		#cells.assign(pieces_connected.map(func(piece: PieceUI): return piece.cell()))
-		#
-		#origin_piece.board.consume_requested.emit(Sequence.new(cells, Sequence.Shapes.LineConnected))
-		#match_selected.emit(pieces_connected)
-		#
-		#queue_free()
-	#else:
-		#cancel()
-		#
-#
-#func cancel() -> void:
-	#set_process(false)
-	#remove_point(points.size() - 1)
-	#detection_area.process_mode = Node.PROCESS_MODE_DISABLED
-	#canceled_match.emit(pieces_connected)
-	#board.canceled_line_connector_match.emit(pieces_connected)
-	#
-	#queue_free()
-#
-#
-#func _connected_pieces_has_special() -> bool:
-	#return pieces_connected.any(func(piece: PieceUI): return piece.is_special())
-	#
-	#
+func cancel() -> void:
+	set_process(false)
+	set_process_unhandled_input(false)
+	clear_points()
+	
+	origin_piece = null
+	detection_area.position = Vector2.ZERO
+	detection_area.monitoring = false
+	
+	for piece in pieces_connected:
+		piece.enable_piece_area()
+		
+	canceled_match.emit(pieces_connected)
+	pieces_connected.clear()
+
+
 func _prepare_detection_area() -> void:
 	detection_area = Area2D.new()
 	detection_area.name = "Match3LineConnectorDetectionArea"
@@ -131,14 +129,16 @@ func _prepare_detection_area() -> void:
 	
 #region Signal callbacks
 func on_selected_origin_piece(piece: Match3PieceUI) -> void:
+	print("selected origin piece ", piece)
 	add_piece(piece)
 	
 
 func on_connected_origin_piece(piece: Match3PieceUI) -> void:
 	piece.disable_piece_area()
-	piece.disable_detection_area()
 	
 	set_process(true)
+	set_process_unhandled_input(true)
+	
 	top_level = true
 	z_index = detection_area.z_index
 	
@@ -151,32 +151,12 @@ func on_connected_piece(piece: Match3PieceUI) -> void:
 
 
 func on_piece_detected(area: Area2D) -> void:
-	if pieces_connected.size() == board.configuration.max_match:
-		max_connected_pieces_reached.emit(pieces_connected)
-		return
+	if can_connect_more_pieces():
+		var detected_piece: Match3PieceUI = area.get_parent() as Match3PieceUI
 		
-	var detected_piece: Match3PieceUI = area.get_parent() as Match3PieceUI
-	
-	if detected_piece and detected_piece.cell.is_adjacent_to(pieces_connected.back().cell, true) and detected_piece.match_with(origin_piece):
-		add_piece(detected_piece)
-	
-#
-#func on_added_piece(piece: PieceUI) -> void:
-	#piece.disable_piece_area()
-	#
-	#board.added_piece_to_line_connector.emit(piece)
-	#
-	#if pieces_connected.size() == 1:
-		#origin_piece = piece
-#
-		#_prepare_detection_area(origin_piece)
-	#
-	#if pieces_connected.size() < origin_piece.board.configuration.max_match:
-		#detect_new_matches_from_last_piece(piece)
-		#board.cell_highlighter.remove_current_highlighters()
-		#board.cell_highlighter.highlight_cells(board.grid_cells_from_pieces(possible_next_matches))
-	#else:
-		#if board.is_click_mode_drag():
-			#consume_matches()
-#
+		if detected_piece and detected_piece.cell.is_adjacent_to(pieces_connected.back().cell, true) and detected_piece.match_with(origin_piece):
+			add_piece(detected_piece)
+			
+	else:
+		max_connected_pieces_reached.emit(pieces_connected)
 #endregion

@@ -108,6 +108,9 @@ func _ready() -> void:
 	locked.connect(on_board_locked)
 	unlocked.connect(on_board_unlocked)
 	state_changed.connect(on_board_state_changed)
+	
+	if line_connector:
+		line_connector.canceled_match.connect(on_line_connector_canceled_match)
 
 
 func distance() -> int:
@@ -516,15 +519,24 @@ func on_board_unlocked() -> void:
 		unlock_all_pieces()
 
 
+func on_line_connector_canceled_match(_pieces: Array[Match3PieceUI]) -> void:
+	current_selected_piece = null
+	unlock()
+
+
 func on_selected_piece(piece_ui: Match3PieceUI) -> void:
-	if (configuration.click_mode_is_selection() or configuration.swap_mode_is_connect_line()) and not is_locked:
+	if configuration.swap_mode_is_connect_line():
+		current_selected_piece = piece_ui
+		lock()
+	
+	elif configuration.click_mode_is_selection() and not is_locked:
 		if current_selected_piece == null:
 			current_selected_piece = piece_ui
 		
 		elif current_selected_piece == piece_ui:
 			current_selected_piece = null
 			
-		elif current_selected_piece and current_selected_piece != piece_ui and not configuration.swap_mode_is_connect_line():
+		elif current_selected_piece and current_selected_piece != piece_ui:
 			swap_pieces(current_selected_piece, piece_ui)
 			current_selected_piece = null
 		
@@ -532,15 +544,16 @@ func on_selected_piece(piece_ui: Match3PieceUI) -> void:
 func on_piece_drag_started(piece_ui: Match3PieceUI) -> void:
 	if configuration.click_mode_is_drag() and not is_locked:
 		current_selected_piece = piece_ui
-		
-		if not configuration.swap_mode_is_connect_line():
-			current_selected_piece.enable_drag()
+		current_selected_piece.enable_drag()
 			
 		piece_drag_started.emit(current_selected_piece)
 
 
 func on_piece_drag_ended(piece_ui: Match3PieceUI) -> void:
-	if configuration.click_mode_is_drag() and current_selected_piece == piece_ui and not configuration.swap_mode_is_connect_line():
+	if configuration.swap_mode_is_connect_line():
+		return
+		
+	if configuration.click_mode_is_drag() and current_selected_piece == piece_ui:
 		var other_piece = current_selected_piece.detect_near_piece()
 		
 		if other_piece:

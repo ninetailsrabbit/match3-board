@@ -17,6 +17,7 @@ func _ready() -> void:
 	
 	if board.line_connector:
 		board.line_connector.connected_piece.connect(on_connected_piece)
+		board.line_connector.canceled_match.connect(on_canceled_line_connector_match)
 
 
 func highlight_cells(cells: Array[Match3GridCellUI]) -> Match3Highlighter:
@@ -38,7 +39,10 @@ func on_selected_piece(piece: Match3PieceUI) -> void:
 func on_unselected_piece(_piece: Match3PieceUI) -> void:
 	remove_highlight()
 
-## We separate the method when line connector is set as the line connector needs to be updated
-## in order to highlight the adjacent cells
+
 func on_connected_piece(piece: Match3PieceUI) -> void:
 	pass
+
+
+func on_canceled_line_connector_match(pieces: Array[Match3PieceUI]) -> void:
+	remove_highlight()
