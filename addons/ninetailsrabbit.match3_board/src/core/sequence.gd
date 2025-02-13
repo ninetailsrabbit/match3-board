@@ -35,7 +35,7 @@ func _init(sequence_cells: Array[Match3GridCellUI], _shape: Shapes = Shapes.Irre
 
 static func create_from_pieces(pieces: Array[Match3PieceUI], selected_shape: Shapes = Shapes.Irregular) -> Match3Sequence:
 	var cells: Array[Match3GridCellUI] = []
-	cells.assign(pieces.map(func(piece: Match3GridCellUI): return piece.cell))
+	cells.assign(pieces.map(func(piece: Match3PieceUI): return piece.cell))
 	
 	return Match3Sequence.new(cells, selected_shape)
 	
@@ -51,7 +51,7 @@ func consume(remove_from_sequence: bool = false) -> void:
 func consume_cells(consumable_cells: Array[Match3GridCellUI], remove_from_sequence: bool = false) -> void:
 	var consumed_pieces: Array[Match3PieceUI] = []
 	
-	for cell: Match3GridCellUI in cells.filter(func(grid_cell: Match3GridCellUI): return grid_cell.has_piece()):
+	for cell: Match3GridCellUI in consumable_cells.filter(func(grid_cell: Match3GridCellUI): return grid_cell.has_piece() and is_instance_valid(grid_cell.piece)):
 		consumed_pieces.append(cell.piece)
 		consume_cell(cell, remove_from_sequence)
 	

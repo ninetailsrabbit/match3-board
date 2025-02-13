@@ -17,7 +17,7 @@ func fill_empty_cells() -> Array[Match3GridCellUI]:
 		last_pieces.append(cell.piece)
 		
 		if last_pieces.size() >= board.configuration.min_match:
-			while last_pieces.all(func(piece: Match3PieceUI): return piece.match_with(cell.piece)):
+			while last_pieces.all(func(piece): return piece.match_with(cell.piece)):
 				board.draw_random_piece_on_cell(cell, true)
 			
 			last_pieces.clear()

@@ -17,6 +17,7 @@ func _ready() -> void:
 	
 	if board.line_connector:
 		board.line_connector.connected_piece.connect(on_connected_piece)
+		board.line_connector.confirmed_match.connect(on_confirmed_line_connector_match)
 		board.line_connector.canceled_match.connect(on_canceled_line_connector_match)
 
 
@@ -42,6 +43,10 @@ func on_unselected_piece(_piece: Match3PieceUI) -> void:
 
 func on_connected_piece(piece: Match3PieceUI) -> void:
 	pass
+
+
+func on_confirmed_line_connector_match(pieces: Array[Match3PieceUI]) -> void:
+	remove_highlight()
 
 
 func on_canceled_line_connector_match(pieces: Array[Match3PieceUI]) -> void:

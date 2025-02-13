@@ -358,9 +358,6 @@ func on_mouse_region_holded() -> void:
 	
 
 func on_mouse_region_released() -> void:
-	if is_locked:
-		return
-	
 	if reset_position_on_drag_release:
 		back_to_cell_position()
 	

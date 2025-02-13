@@ -99,10 +99,7 @@ func _ready() -> void:
 	
 	if configuration.auto_start:
 		draw_cells().draw_pieces()
-	
-	if not configuration.allow_matches_on_start:
-		remove_matches_from_board()
-		
+
 	swap_accepted.connect(on_swap_accepted)
 	swap_rejected.connect(on_swap_rejected)
 	locked.connect(on_board_locked)
@@ -111,7 +108,12 @@ func _ready() -> void:
 	
 	if line_connector:
 		line_connector.canceled_match.connect(on_line_connector_canceled_match)
-
+	
+	if configuration.allow_matches_on_start:
+		current_state = BoardState.Consume
+	else:
+		remove_matches_from_board()
+		
 
 func distance() -> int:
 	return configuration.grid_width + configuration.grid_height
@@ -128,92 +130,6 @@ func lock() -> void:
 func unlock() -> void:
 	is_locked = false
 
-
-##region Modules
-#func change_animator(new_animator: Match3Animator) -> Match3BoardUI:
-	#if animator:
-		#animator.queue_free()
-		#animator = null
-		#
-	#animator = new_animator
-	#animator.board = self
-	#
-	#if not animator.is_inside_tree():
-		#add_child(animator)
-	#
-	#if not animator.animation_started.is_connected(on_animator_animation_started):
-		#animator.animation_started.connect(on_animator_animation_started)
-		#
-	#return self
-#
-##endregion
-#
-##region Draw
-#func prepare_animator() -> Match3BoardUI:
-	#if animator == null:
-		#animator = Match3BoardPluginUtilities.first_node_of_custom_class(self, Match3Animator)
-		#
-		#if animator:
-			#change_animator(animator)
-		#else:
-			#return self
-			#
-	#else:
-		#if not animator.is_inside_tree():
-			#animator.board = self
-			#add_child(animator)
-	#
-	#if not animator.animation_started.is_connected(on_animator_animation_started):
-		#animator.animation_started.connect(on_animator_animation_started)
-	#
-	#return self
-	#
-#
-#func prepare_board() -> Match3BoardUI:
-	#assert(configuration != null, "Match3BoardUI: No configuration found, the board cannot be prepared")
-	#assert(configuration.available_pieces.size() > 2, "Match3BoardUI: There is less than 3 pieces in the configuration, the board cannot be prepared")
-	#
-	#if board == null:
-		#board = Board.new(
-					#configuration.min_match,
-					#configuration.max_match,
-					#configuration.grid_width,
-					#configuration.grid_height,
-					#configuration.available_moves_on_start,
-					#configuration.allow_matches_on_start
-					#)
-		#
-	#board.change_fill_mode(configuration.fill_mode)\
-		#.prepare_grid_cells()
-	#
-	### We instantiate the piece scenes to create the core board piece with the information
-	#for piece_configuration: Match3PieceConfiguration in configuration.available_pieces:
-		#var board_piece: Match3Piece = Match3Piece.new(
-				#piece_configuration.id, 
-				#piece_configuration.shape, 
-				#piece_configuration.color, 
-				#piece_configuration.type)
-				#
-		#board.add_piece(board_piece, piece_configuration.weight)
-		#
-	#for piece_configuration: Match3PieceConfiguration in configuration.available_special_pieces:
-		#var board_piece: Match3Piece = Match3Piece.new(
-				#piece_configuration.id, 
-				#piece_configuration.shape, 
-				#piece_configuration.color, 
-				#piece_configuration.type)
-				#
-		#board.add_special_piece(board_piece)
-	#
-	#board.prepare_pieces()\
-		#.prepare_sequence_consumer(match3_mapper.sequence_rules_to_core_sequence_rules())
-		#
-	#if board.allow_matches_on_start:
-		#current_state = BoardState.Consume
-	#
-	#
-	#return self
-	#
 
 #region Draw 
 func draw_cells() -> Match3BoardUI:
@@ -381,7 +297,7 @@ func consume_sequences(sequences: Array[Match3Sequence]) -> void:
 				
 			combo.sequence.consume()
 			
-			if combo.special_piece_to_spawn:
+			if combo.special_piece_to_spawn: ## TODO - TEMPORARY DRAW ON THE MIDDLE CELL
 				draw_piece_on_cell(combo.sequence.middle_cell(), Match3PieceUI.from_configuration(combo.special_piece_to_spawn))
 
 			
@@ -528,6 +444,10 @@ func on_line_connector_canceled_match(_pieces: Array[Match3PieceUI]) -> void:
 func on_selected_piece(piece_ui: Match3PieceUI) -> void:
 	if configuration.swap_mode_is_connect_line():
 		current_selected_piece = piece_ui
+		
+		if configuration.click_mode_is_drag():
+			current_selected_piece.drag_started.emit()
+			
 		lock()
 	
 	elif configuration.click_mode_is_selection() and not is_locked:
@@ -545,6 +465,7 @@ func on_selected_piece(piece_ui: Match3PieceUI) -> void:
 func on_piece_drag_started(piece_ui: Match3PieceUI) -> void:
 	if configuration.swap_mode_is_connect_line():
 		current_selected_piece = piece_ui
+		piece_drag_started.emit(current_selected_piece)
 		lock()
 		
 	elif configuration.click_mode_is_drag() and not is_locked:
@@ -557,6 +478,7 @@ func on_piece_drag_started(piece_ui: Match3PieceUI) -> void:
 func on_piece_drag_ended(piece_ui: Match3PieceUI) -> void:
 	if configuration.swap_mode_is_connect_line():
 		piece_drag_ended.emit(current_selected_piece)
+		current_selected_piece = null
 
 	elif configuration.click_mode_is_drag() and current_selected_piece == piece_ui:
 		var other_piece = current_selected_piece.detect_near_piece()
@@ -585,7 +507,6 @@ func on_board_state_changed(_from: BoardState, to: BoardState) -> void:
 			lock()
 			await consume_sequences(sequence_detector.find_board_sequences())
 			await get_tree().process_frame
-			
 			current_state = BoardState.Fall
 		
 		BoardState.Fall:

@@ -3,12 +3,12 @@ class_name Match3LineConnector extends Line2D
 signal connected_origin_piece(piece: Match3PieceUI)
 signal connected_piece(piece: Match3PieceUI)
 signal max_connected_pieces_reached(pieces: Array[Match3PieceUI])
+signal confirmed_match(pieces: Array[Match3PieceUI])
 signal canceled_match(pieces: Array[Match3PieceUI])
 
 @export var board: Match3BoardUI
 @export var confirm_match_input_action: StringName = &"ui_accept"
 @export var cancel_match_input_action: StringName = &"ui_cancel"
-@export var auto_consume_when_release_drag: bool = false
 
 var pieces_connected: Array[Match3PieceUI] = []
 var origin_piece: Match3PieceUI
@@ -17,10 +17,10 @@ var detection_area: Area2D
 
 func _unhandled_input(event: InputEvent) -> void:
 	if Input.is_action_just_pressed(cancel_match_input_action):
-		cancel()
+		cancel_match()
 	
 	if board.configuration.click_mode_is_selection() and Input.is_action_just_pressed(confirm_match_input_action):
-		pass ## TODO - CREATE SEQUENCE AND CONSUME
+		confirm_match()
 
 
 func _enter_tree() -> void:
@@ -58,6 +58,9 @@ func can_connect_more_pieces() -> bool:
 
 
 func add_piece(new_piece: Match3PieceUI) -> void:
+	if pieces_connected.has(new_piece):
+		return
+		
 	new_piece.disable_detection_area()
 	new_piece.disable_piece_area()
 	
@@ -75,6 +78,7 @@ func add_piece(new_piece: Match3PieceUI) -> void:
 	if pieces_connected.size() == 1:
 		connected_origin_piece.emit(new_piece)
 	
+	await get_tree().process_frame
 	connected_piece.emit(new_piece)
 
 
@@ -94,8 +98,20 @@ func matches_from_piece(piece: Match3PieceUI) -> Array[Match3GridCellUI]:
 
 func confirm_match() -> void:
 	if pieces_connected.size() >= board.configuration.min_match:
-		board.consume_sequences([Match3Sequence.create_from_pieces(pieces_connected, Match3Sequence.Shapes.LineConnected)])
+		var pieces: Array[Match3PieceUI] = pieces_connected.duplicate()
+		cancel()
 		
+		confirmed_match.emit(pieces)
+		
+		await board.consume_sequences([Match3Sequence.create_from_pieces(pieces, Match3Sequence.Shapes.LineConnected)])
+		await get_tree().process_frame
+		board.current_state = board.BoardState.Fall
+
+
+func cancel_match() -> void:
+	canceled_match.emit(pieces_connected)
+	cancel()
+
 
 func cancel() -> void:
 	set_process(false)
@@ -109,7 +125,6 @@ func cancel() -> void:
 	for piece in pieces_connected:
 		piece.enable_piece_area()
 		
-	canceled_match.emit(pieces_connected)
 	pieces_connected.clear()
 
 
@@ -172,6 +187,9 @@ func on_piece_detected(area: Area2D) -> void:
 		max_connected_pieces_reached.emit(pieces_connected)
 		
 		
-func on_piece_drag_ended() -> void:
-	pass
+func on_piece_drag_ended(_piece: Match3PieceUI) -> void:
+	if pieces_connected.size() >= board.configuration.min_match:
+		confirm_match()
+	else:
+		cancel_match()
 #endregion

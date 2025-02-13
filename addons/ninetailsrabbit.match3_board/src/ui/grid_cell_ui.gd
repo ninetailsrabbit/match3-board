@@ -79,7 +79,7 @@ func remove_piece(queued: bool = false) -> void:
 		else:
 			piece.free()
 			
-		piece = null
+	piece = null
 		
 
 func can_swap_piece_with_cell(other_cell: Match3GridCellUI) -> bool:
