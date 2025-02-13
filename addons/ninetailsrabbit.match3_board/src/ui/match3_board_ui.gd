@@ -9,6 +9,8 @@ signal selected_piece(piece: Match3PieceUI)
 signal unselected_piece(piece: Match3PieceUI)
 signal piece_drag_started(piece: Match3PieceUI)
 signal piece_drag_ended(piece: Match3PieceUI)
+signal drawed_cells
+signal drawed_pieces
 signal locked
 signal unlocked
 signal movement_consumed
@@ -50,6 +52,7 @@ var current_available_moves: int = 0:
 			
 			elif value == 0:
 				finished_available_movements.emit()
+			
 
 var current_selected_piece: Match3PieceUI:
 	set(new_piece):
@@ -96,24 +99,20 @@ func _ready() -> void:
 	current_available_moves = configuration.available_moves_on_start
 	
 	add_pieces_to_generator(configuration.available_pieces)
-	
-	if configuration.auto_start:
-		draw_cells().draw_pieces()
 
 	swap_accepted.connect(on_swap_accepted)
 	swap_rejected.connect(on_swap_rejected)
 	locked.connect(on_board_locked)
 	unlocked.connect(on_board_unlocked)
 	state_changed.connect(on_board_state_changed)
+	drawed_pieces.connect(on_drawed_pieces)
 	
 	if line_connector:
 		line_connector.canceled_match.connect(on_line_connector_canceled_match)
 	
-	if configuration.allow_matches_on_start:
-		current_state = BoardState.Consume
-	else:
-		remove_matches_from_board()
-		
+	if configuration.auto_start:
+		draw_cells().draw_pieces()
+
 
 func distance() -> int:
 	return configuration.grid_width + configuration.grid_height
@@ -143,6 +142,8 @@ func draw_cells() -> Match3BoardUI:
 		grid_cells_flattened.append_array(Match3BoardPluginUtilities.flatten(grid_cells))
 		_update_grid_cells_neighbours(grid_cells_flattened)
 		
+		drawed_cells.emit()
+		
 	return self
 
 
@@ -163,6 +164,8 @@ func draw_pieces() -> Match3BoardUI:
 	
 	for cell: Match3GridCellUI in grid_cells_flattened:
 		draw_random_piece_on_cell(cell)
+	
+	drawed_pieces.emit()
 	
 	return self
 
@@ -244,6 +247,7 @@ func remove_matches_from_board() -> void:
 				draw_piece_on_cell(current_cell, Match3PieceUI.from_configuration(piece_generator.roll(piece_exceptions)))
 			
 		sequences = sequence_detector.find_board_sequences()
+
 
 func pieces() -> Array[Match3PieceUI]:
 	var pieces: Array[Match3PieceUI] = []
@@ -352,6 +356,7 @@ func swap_pieces(from_piece: Match3PieceUI, to_piece: Match3PieceUI) -> void:
 			
 		if from_cell.swap_piece_with_cell(to_cell):
 			swap_accepted.emit(from_cell, to_cell)
+			current_available_moves -= 1
 			
 			await get_tree().process_frame
 			
@@ -426,6 +431,13 @@ func on_child_entered_tree(child: Node) -> void:
 			child.drag_ended.connect(on_piece_drag_ended.bind(child))
 			
 
+func on_drawed_pieces() -> void:
+	if configuration.allow_matches_on_start:
+		current_state = BoardState.Consume
+	else:
+		remove_matches_from_board()
+		
+		
 func on_board_locked() -> void:
 	if is_inside_tree():
 		lock_all_pieces()
@@ -525,7 +537,7 @@ func on_board_state_changed(_from: BoardState, to: BoardState) -> void:
 				current_state = BoardState.WaitForInput
 			else:
 				current_state = BoardState.Consume
-				
+		
 					
 func on_animator_animation_started(_animation_name: StringName) -> void:
 	lock()
