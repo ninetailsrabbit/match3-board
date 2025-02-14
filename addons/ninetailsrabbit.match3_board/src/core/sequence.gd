@@ -17,7 +17,6 @@ enum Shapes {
 
 
 var cells: Array[Match3GridCellUI] = []
-var pieces: Array[Match3PieceUI] = []
 var shape: Shapes = Shapes.Irregular
 var origin_special_piece: Match3PieceConfiguration
 
@@ -27,7 +26,6 @@ func _init(sequence_cells: Array[Match3GridCellUI], _shape: Shapes = Shapes.Irre
 		func(cell: Match3GridCellUI): return cell.can_contain_piece and cell.has_piece() and is_instance_valid(cell.piece)))
 		)
 	
-	pieces.assign(cells.map(func(cell: Match3GridCellUI): return cell.piece))
 	shape = _detect_shape() if _shape == Shapes.Irregular else _shape
 	
 
@@ -39,7 +37,9 @@ static func create_from_pieces(pieces: Array[Match3PieceUI], selected_shape: Sha
 	
 
 func all_pieces_are_the_same() -> bool:
-	return pieces.all(func(piece: Match3PieceUI): return piece.match_with(pieces.front()))
+	var origin_piece: Match3PieceUI = pieces().front()
+	
+	return pieces().all(func(piece: Match3PieceUI): return piece.match_with(origin_piece))
 
 #region Pieces
 func consume(remove_from_sequence: bool = false) -> void:
@@ -52,10 +52,7 @@ func consume_cells(consumable_cells: Array[Match3GridCellUI], remove_from_sequen
 
 	var consumed_pieces: Array[Match3PieceUI] = []
 	
-	for cell: Match3GridCellUI in consumable_cells.filter(func(grid_cell: Match3GridCellUI): return grid_cell.has_piece() and is_instance_valid(grid_cell.piece)):
-		if cell.piece.is_special() and not cell.piece.triggered:
-			continue
-			
+	for cell: Match3GridCellUI in consumable_cells.filter(func(grid_cell: Match3GridCellUI): return grid_cell.has_piece() and grid_cell.piece and is_instance_valid(grid_cell.piece)):
 		consumed_pieces.append(cell.piece)
 		consume_cell(cell, remove_from_sequence)
 	
@@ -75,8 +72,15 @@ func consume_normal_cells() -> void:
 	consume_cells(normal_cells())
 
 
+func pieces() -> Array[Match3PieceUI]:
+	var pieces: Array[Match3PieceUI] = []
+	pieces.assign(cells.map(func(cell: Match3GridCellUI): return cell.piece))
+	
+	return pieces
+
+
 func normal_pieces() -> Array[Match3PieceUI]:
-	return pieces.filter(func(piece: Match3PieceUI): return piece.is_normal())
+	return pieces().filter(func(piece: Match3PieceUI): return piece.is_normal())
 
 
 func normal_pieces_ids() -> Array[StringName]:
@@ -84,14 +88,15 @@ func normal_pieces_ids() -> Array[StringName]:
 
 
 func contains_special_piece() -> bool:
-	return pieces.any(func(piece): return is_instance_valid(piece) and piece.is_special())
+	return pieces().any(func(piece: Match3PieceUI): return is_instance_valid(piece) and piece.is_special())
 
 
 func special_pieces() -> Array[Match3PieceUI]:
 	var result: Array[Match3PieceUI] = []
 	
-	result.assign(pieces.filter(
-		func(piece: Match3PieceUI): return is_instance_valid(piece) and piece.is_special() and not piece.on_queue and not piece.triggered)
+	result.assign(pieces().filter(
+		func(piece: Match3PieceUI): 
+			return is_instance_valid(piece) and piece.is_special() and not piece.on_queue and not piece.triggered)
 		)
 	
 	if result.size() > 1:

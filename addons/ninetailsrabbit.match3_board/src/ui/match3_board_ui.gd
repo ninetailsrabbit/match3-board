@@ -120,9 +120,9 @@ func _ready() -> void:
 		
 	const special = preload("res://addons/ninetailsrabbit.match3_board/demo/pieces/special_blue_piece_configuration.tres")
 	
-	#for i in range(2):
-	draw_piece_on_cell(finder.get_cell(2, 2), Match3PieceUI.from_configuration(special), true)
-		#draw_piece_on_cell(finder.get_cell(2, 5), Match3PieceUI.from_configuration(special), true)
+	for i in range(2):
+		draw_piece_on_cell(finder.get_cell(2, 2), Match3PieceUI.from_configuration(special), true)
+		draw_piece_on_cell(finder.get_cell(2, 5), Match3PieceUI.from_configuration(special), true)
 
 
 func distance() -> int:
@@ -361,7 +361,28 @@ func consume_sequences(sequences: Array[Match3Sequence]) -> void:
 	if pending_special_pieces.is_empty():
 		travel_to(BoardState.Fall if (BoardState.Consume or BoardState.SpecialConsume) else BoardState.Consume)
 	else:
-		travel_to(BoardState.SpecialConsume)
+		if current_state == BoardState.SpecialConsume:
+			consume_special_pieces(pending_special_pieces)
+		else:
+			travel_to(BoardState.SpecialConsume)
+
+
+func consume_special_pieces(special_pieces: Array[Match3PieceUI] = pending_special_pieces) -> void:
+	if animator:
+		var special_animation_callback = func(anim_name: StringName, piece: Match3PieceUI):
+			if anim_name == Match3Animator.TriggerSpecialPieceAnimation:
+				pending_special_pieces.erase(piece)
+				consume_sequences(piece.trigger(self))
+				piece.cell.remove_piece(true)
+		
+		for piece in special_pieces:
+			animator.animation_finished.connect(special_animation_callback.bind(piece), CONNECT_ONE_SHOT)
+			animator.trigger_special_piece(piece)
+	else:
+		for piece in special_pieces:
+			pending_special_pieces.erase(piece)
+			consume_sequences(piece.trigger(self))
+			piece.cell.remove_piece(true)
 
 
 func fall_pieces() -> void:
@@ -597,21 +618,7 @@ func on_board_state_changed(_from: BoardState, to: BoardState) -> void:
 			if pending_special_pieces.is_empty():
 				travel_to(BoardState.Fall)
 			else:
-				if animator:
-					var special_animation_callback = func(anim_name: StringName, piece: Match3PieceUI):
-						if anim_name == Match3Animator.TriggerSpecialPieceAnimation:
-							pending_special_pieces.erase(piece)
-							consume_sequences(piece.trigger(self))
-							piece.cell.remove_piece(true)
-					
-					for piece in pending_special_pieces:
-						animator.animation_finished.connect(special_animation_callback.bind(piece), CONNECT_ONE_SHOT)
-						animator.trigger_special_piece(piece)
-				else:
-					for piece in pending_special_pieces:
-						pending_special_pieces.erase(piece)
-						consume_sequences(piece.trigger(self))
-						piece.cell.remove_piece(true)
+				consume_special_pieces(pending_special_pieces)
 			
 		BoardState.Fall:
 			lock()
