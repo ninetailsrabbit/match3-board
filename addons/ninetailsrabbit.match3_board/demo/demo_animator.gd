@@ -42,7 +42,7 @@ func swap_rejected_pieces(from_piece: Match3PieceUI, to_piece: Match3PieceUI, fr
 func consume_sequence(sequence: Match3Sequence) -> void:
 	animation_started.emit(ConsumeSequenceAnimation)
 	
-	var pieces: Array[Match3PieceUI] = sequence.pieces
+	var pieces: Array[Match3PieceUI] = sequence.normal_pieces()
 	
 	if pieces.size() > 0:
 		var tween: Tween = create_tween().set_parallel(true)
@@ -63,7 +63,7 @@ func consume_sequences(sequences: Array[Match3SequenceConsumer.Match3SequenceCon
 		
 		for sequence: Match3SequenceConsumer.Match3SequenceConsumeResult in sequences:
 			for combo: Match3SequenceConsumer.Match3SequenceConsumeCombo in sequence.combos:
-				var pieces: Array[Match3PieceUI] = combo.sequence.pieces
+				var pieces: Array[Match3PieceUI] = combo.sequence.normal_pieces()
 				
 				for piece_ui: Match3PieceUI in pieces:
 					tween.tween_property(piece_ui, "scale", Vector2.ZERO, 0.2).set_ease(Tween.EASE_OUT)
@@ -139,6 +139,20 @@ func spawn_pieces(cells: Array[Match3GridCellUI]) -> void:
 	animation_finished.emit(SpawnPiecesAnimation)
 	
 	
+func trigger_special_piece(piece: Match3PieceUI) -> void:
+	animation_started.emit(TriggerSpecialPieceAnimation)
+	
+	match piece.id:
+		&"special-blue-triangle":
+			var tween: Tween = create_tween()
+			tween.tween_property(piece, "scale", Vector2(piece.scale.x * 1.2, piece.scale.y * 1.5), 1.0)\
+				.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO)
+			
+			await tween.finished
+			
+	animation_finished.emit(TriggerSpecialPieceAnimation)
+
+
 func on_animation_started(animation_name: StringName) -> void:
 	current_animation = animation_name
 

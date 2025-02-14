@@ -74,6 +74,7 @@ var piece_area: Area2D
 var detection_area: Area2D
 
 var triggered: bool = false
+var on_queue: bool = false
 
 
 static func from_configuration(configuration: Match3PieceConfiguration) -> Match3PieceUI:
@@ -116,6 +117,7 @@ func _ready() -> void:
 	
 	_prepare_area_detectors()
 	set_process(drag_enabled and not is_locked)
+	
 
 
 func _process(delta: float) -> void:
@@ -203,13 +205,16 @@ func match_with(other_piece: Match3PieceUI) -> bool:
 	return equals_to(other_piece)
 
 ## Special pieces run this function when triggered from board
-func trigger(_board: Match3BoardUI) -> void:
+func trigger(board: Match3BoardUI) -> Array[Match3Sequence]:
 	if can_be_triggered:
 		triggered = true
+		
+	return []
 
 ## Useful if you want to create animations when coming back to position when drag ended
 func back_to_cell_position() -> void:
 	position = cell.position
+	
 #endregion
 
 

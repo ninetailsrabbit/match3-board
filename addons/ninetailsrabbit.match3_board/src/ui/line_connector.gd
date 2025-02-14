@@ -154,6 +154,9 @@ func _prepare_detection_area() -> void:
 #region Signal callbacks
 func on_selected_origin_piece(piece: Match3PieceUI) -> void:
 	if board.configuration.swap_mode_is_connect_line():
+		if piece.is_special() and piece.can_be_triggered:
+			return
+			
 		add_piece(piece)
 	
 

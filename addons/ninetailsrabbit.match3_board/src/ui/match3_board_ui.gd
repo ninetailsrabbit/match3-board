@@ -26,6 +26,7 @@ signal finished_available_movements
 enum BoardState {
 	WaitForInput,
 	Consume,
+	SpecialConsume,
 	Fall,
 	Fill
 }
@@ -56,6 +57,7 @@ var current_available_moves: int = 0:
 				finished_available_movements.emit()
 			
 
+var pending_special_pieces: Array[Match3PieceUI] = []
 var current_selected_piece: Match3PieceUI:
 	set(new_piece):
 		if new_piece != current_selected_piece:
@@ -114,6 +116,13 @@ func _ready() -> void:
 	
 	if configuration.auto_start:
 		draw_cells().draw_pieces()
+		
+		
+	const special = preload("res://addons/ninetailsrabbit.match3_board/demo/pieces/special_blue_piece_configuration.tres")
+	
+	#for i in range(2):
+	draw_piece_on_cell(finder.get_cell(2, 2), Match3PieceUI.from_configuration(special), true)
+		#draw_piece_on_cell(finder.get_cell(2, 5), Match3PieceUI.from_configuration(special), true)
 
 
 func distance() -> int:
@@ -122,6 +131,10 @@ func distance() -> int:
 
 func size() -> int:
 	return configuration.grid_width * configuration.grid_height
+
+
+func travel_to(new_state: BoardState) -> void:
+	current_state = new_state
 
 
 func lock() -> void:
@@ -281,12 +294,45 @@ func unlock_all_pieces() -> void:
 	for piece: Match3PieceUI in pieces():
 		piece.unlock()
 
+
+func add_special_pieces_to_queue(pieces: Array[Match3PieceUI]) -> void:
+	for piece in pieces:
+		add_special_piece_to_queue(piece)
+
+
+func add_special_piece_to_queue(piece: Match3PieceUI) -> void:
+	if not pending_special_pieces.has(piece) \
+		and is_instance_valid(piece) \
+		and piece.is_special() \
+		and not piece.on_queue \
+		and not piece.is_queued_for_deletion():
+			piece.on_queue = true
+			pending_special_pieces.append(piece)
+			
+
+func consume_sequence(sequence: Match3Sequence) -> void:
+	var pending_special_pieces: Array[Match3PieceUI] = []
 	
+	if sequence.contains_special_piece():
+		for special_piece: Match3PieceUI in sequence.special_pieces():
+			add_special_piece_to_queue(special_piece)
+		
+	if animator:
+		await animator.consume_sequence(sequence)
+	
+	consumed_sequence.emit(sequence)
+	sequence.consume()
+	await get_tree().process_frame
+	
+	if pending_special_pieces.is_empty():
+		travel_to(BoardState.Fall if (BoardState.Consume or BoardState.SpecialConsume) else BoardState.Consume)
+	else:
+		travel_to(BoardState.SpecialConsume)
+		
 
 func consume_sequences(sequences: Array[Match3Sequence]) -> void:
-	## TODO - IT MISS THE LOGIC TRIGGER SPECIAL PIECES
 	var sequences_result: Array[Match3SequenceConsumer.Match3SequenceConsumeResult] = sequence_consumer.sequences_to_combo_rules(sequences)
-	
+					
 	if animator:
 		if configuration.sequence_animation_is_serial():
 			for sequence_result in sequences_result:
@@ -299,19 +345,23 @@ func consume_sequences(sequences: Array[Match3Sequence]) -> void:
 	for sequence_result in sequences_result:
 		for combo: Match3SequenceConsumer.Match3SequenceConsumeCombo in sequence_result.combos:
 			if combo.sequence.contains_special_piece():
-				pass ## TODO - SEE HOW TO TRIGGER CUSTOM SPECIAL PIECES
+				add_special_pieces_to_queue(combo.sequence.special_pieces())
 				
 			consumed_sequence.emit(combo.sequence)
-			combo.sequence.consume()
+			combo.sequence.consume_normal_cells()
 			await get_tree().process_frame
 			
 			if combo.special_piece_to_spawn: ## TODO - TEMPORARY DRAW ON THE MIDDLE CELL
 				draw_piece_on_cell(combo.sequence.middle_cell(), Match3PieceUI.from_configuration(combo.special_piece_to_spawn))
-	
+			
 	consumed_sequences.emit(sequences)
 	
 	await get_tree().process_frame
-	current_state = BoardState.Fall
+	
+	if pending_special_pieces.is_empty():
+		travel_to(BoardState.Fall if (BoardState.Consume or BoardState.SpecialConsume) else BoardState.Consume)
+	else:
+		travel_to(BoardState.SpecialConsume)
 
 
 func fall_pieces() -> void:
@@ -374,7 +424,7 @@ func swap_pieces(from_piece: Match3PieceUI, to_piece: Match3PieceUI) -> void:
 			var matches: Array[Match3Sequence] = sequence_detector.find_board_sequences()
 					
 			if matches.size() > 0:
-				current_state = BoardState.Consume
+				travel_to(BoardState.Consume)
 			else:
 				## Do another swap to return the pieces again
 				from_cell.swap_piece_with_cell(to_cell)
@@ -444,7 +494,7 @@ func on_child_entered_tree(child: Node) -> void:
 
 func on_drawed_pieces() -> void:
 	if configuration.allow_matches_on_start:
-		current_state = BoardState.Consume
+		travel_to(BoardState.Consume)
 	else:
 		remove_matches_from_board()
 		
@@ -464,9 +514,13 @@ func on_line_connector_canceled_match(_pieces: Array[Match3PieceUI]) -> void:
 	unlock()
 
 
-func on_selected_piece(piece_ui: Match3PieceUI) -> void:
-	if configuration.swap_mode_is_connect_line():
-		current_selected_piece = piece_ui
+func on_selected_piece(piece: Match3PieceUI) -> void:
+	if piece.is_special() and piece.can_be_triggered:
+		add_special_piece_to_queue(piece)
+		travel_to(BoardState.SpecialConsume)
+		
+	elif configuration.swap_mode_is_connect_line():
+		current_selected_piece = piece
 		
 		if configuration.click_mode_is_drag():
 			current_selected_piece.drag_started.emit()
@@ -475,19 +529,23 @@ func on_selected_piece(piece_ui: Match3PieceUI) -> void:
 	
 	elif configuration.click_mode_is_selection() and not is_locked:
 		if current_selected_piece == null:
-			current_selected_piece = piece_ui
+			current_selected_piece = piece
 		
-		elif current_selected_piece == piece_ui:
+		elif current_selected_piece == piece:
 			current_selected_piece = null
 			
-		elif current_selected_piece and current_selected_piece != piece_ui:
-			swap_pieces(current_selected_piece, piece_ui)
+		elif current_selected_piece and current_selected_piece != piece:
+			swap_pieces(current_selected_piece, piece)
 			current_selected_piece = null
 		
 
-func on_piece_drag_started(piece_ui: Match3PieceUI) -> void:
-	if configuration.swap_mode_is_connect_line():
-		current_selected_piece = piece_ui
+func on_piece_drag_started(piece: Match3PieceUI) -> void:
+	if piece.is_special() and piece.can_be_triggered:
+		add_special_piece_to_queue(piece)
+		travel_to(BoardState.SpecialConsume)
+		
+	elif configuration.swap_mode_is_connect_line():
+		current_selected_piece = piece
 		
 		if configuration.click_mode_is_drag():
 			piece_drag_started.emit(current_selected_piece)
@@ -495,19 +553,19 @@ func on_piece_drag_started(piece_ui: Match3PieceUI) -> void:
 		lock()
 		
 	elif configuration.click_mode_is_drag() and not is_locked:
-		current_selected_piece = piece_ui
+		current_selected_piece = piece
 		current_selected_piece.enable_drag()
 			
 		piece_drag_started.emit(current_selected_piece)
 
 
-func on_piece_drag_ended(piece_ui: Match3PieceUI) -> void:
+func on_piece_drag_ended(piece: Match3PieceUI) -> void:
 	if configuration.swap_mode_is_connect_line():
 		if configuration.click_mode_is_drag():
 			piece_drag_ended.emit(current_selected_piece)
 			current_selected_piece = null
 
-	elif configuration.click_mode_is_drag() and current_selected_piece == piece_ui:
+	elif configuration.click_mode_is_drag() and current_selected_piece == piece:
 		var other_piece = current_selected_piece.detect_near_piece()
 		
 		if other_piece:
@@ -534,13 +592,33 @@ func on_board_state_changed(_from: BoardState, to: BoardState) -> void:
 		BoardState.Consume:
 			lock()
 			await consume_sequences(sequence_detector.find_board_sequences())
+		BoardState.SpecialConsume:
+			lock()
+			if pending_special_pieces.is_empty():
+				travel_to(BoardState.Fall)
+			else:
+				if animator:
+					var special_animation_callback = func(anim_name: StringName, piece: Match3PieceUI):
+						if anim_name == Match3Animator.TriggerSpecialPieceAnimation:
+							pending_special_pieces.erase(piece)
+							consume_sequences(piece.trigger(self))
+							piece.cell.remove_piece(true)
+					
+					for piece in pending_special_pieces:
+						animator.animation_finished.connect(special_animation_callback.bind(piece), CONNECT_ONE_SHOT)
+						animator.trigger_special_piece(piece)
+				else:
+					for piece in pending_special_pieces:
+						pending_special_pieces.erase(piece)
+						consume_sequences(piece.trigger(self))
+						piece.cell.remove_piece(true)
 			
 		BoardState.Fall:
 			lock()
 			await fall_pieces()
 			await get_tree().process_frame
 			
-			current_state = BoardState.Fill
+			travel_to(BoardState.Fill)
 			
 		BoardState.Fill:
 			lock()
@@ -548,12 +626,12 @@ func on_board_state_changed(_from: BoardState, to: BoardState) -> void:
 			await get_tree().process_frame
 			
 			if sequence_detector.find_board_sequences().is_empty():
-				current_state = BoardState.WaitForInput
+				travel_to(BoardState.WaitForInput)
 			else:
-				current_state = BoardState.Consume
+				travel_to(BoardState.Consume)
 		
 					
 func on_animator_animation_started(_animation_name: StringName) -> void:
 	lock()
-	
-##endregion
+
+#endregion

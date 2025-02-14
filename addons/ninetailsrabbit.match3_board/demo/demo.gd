@@ -20,6 +20,8 @@ func on_state_changed(from: Match3BoardUI.BoardState, to: Match3BoardUI.BoardSta
 		from_state = "WaitForInput"
 	elif from == Match3BoardUI.BoardState.Consume:
 		from_state = "Consume"
+	elif from == Match3BoardUI.BoardState.SpecialConsume:
+		from_state = "SpecialConsume"
 	elif from == Match3BoardUI.BoardState.Fall:
 		from_state = "Fall"
 	elif from == Match3BoardUI.BoardState.Fill:
@@ -29,6 +31,8 @@ func on_state_changed(from: Match3BoardUI.BoardState, to: Match3BoardUI.BoardSta
 		to_state = "WaitForInput"
 	elif to == Match3BoardUI.BoardState.Consume:
 		to_state = "Consume"
+	elif from == Match3BoardUI.BoardState.SpecialConsume:
+		to_state = "SpecialConsume"
 	elif from == Match3BoardUI.BoardState.Fall:
 		to_state = "Fall"
 	elif to == Match3BoardUI.BoardState.Fill:

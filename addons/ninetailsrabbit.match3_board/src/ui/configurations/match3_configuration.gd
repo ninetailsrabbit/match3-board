@@ -115,6 +115,28 @@ enum AnimationFlow {
 ## Set the animation type when filling the board with new pieces
 @export var fill_animation: AnimationFlow = AnimationFlow.Parallel
 
+
+func piece_configuration_by_id(id: StringName) -> Match3PieceConfiguration:
+	var configurations: Array[Match3PieceConfiguration] = available_pieces.filter(
+		func(piece: Match3PieceConfiguration):
+			return piece.id == id)
+	
+	if configurations.is_empty():
+		return null
+		
+	return configurations.front()
+	
+	
+func special_piece_configuration_by_id(id: StringName) -> Match3PieceConfiguration:
+	var configurations: Array[Match3PieceConfiguration] = available_special_pieces.filter(
+		func(piece: Match3PieceConfiguration):
+			return piece.id == id)
+	
+	if configurations.is_empty():
+		return null
+		
+	return configurations.front()
+
 #region Information
 func click_mode_is_selection() -> bool:
 	return selection_mode == BoardSelectionMode.Click

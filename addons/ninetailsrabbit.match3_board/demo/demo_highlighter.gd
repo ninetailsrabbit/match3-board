@@ -34,9 +34,13 @@ func remove_highlight() -> Match3Highlighter:
 
 
 func on_selected_piece(piece: Match3PieceUI) -> void:
+	if piece.is_special() and piece.can_be_triggered:
+		return
+	
 	var cell: Match3GridCellUI = piece.cell
 	var neighbours: Dictionary = cell.usable_neighbours()
 	var target_cells: Array[Match3GridCellUI] = []
+	
 	
 	match board.configuration.swap_mode:
 		Match3Configuration.BoardMovements.Adjacent:

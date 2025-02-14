@@ -19,6 +19,7 @@ enum Shapes {
 var cells: Array[Match3GridCellUI] = []
 var pieces: Array[Match3PieceUI] = []
 var shape: Shapes = Shapes.Irregular
+var origin_special_piece: Match3PieceConfiguration
 
 
 func _init(sequence_cells: Array[Match3GridCellUI], _shape: Shapes = Shapes.Irregular) -> void:
@@ -28,7 +29,7 @@ func _init(sequence_cells: Array[Match3GridCellUI], _shape: Shapes = Shapes.Irre
 	
 	pieces.assign(cells.map(func(cell: Match3GridCellUI): return cell.piece))
 	shape = _detect_shape() if _shape == Shapes.Irregular else _shape
-
+	
 
 static func create_from_pieces(pieces: Array[Match3PieceUI], selected_shape: Shapes = Shapes.Irregular) -> Match3Sequence:
 	var cells: Array[Match3GridCellUI] = []
@@ -46,9 +47,15 @@ func consume(remove_from_sequence: bool = false) -> void:
 	
 	
 func consume_cells(consumable_cells: Array[Match3GridCellUI], remove_from_sequence: bool = false) -> void:
+	if is_special_shape():
+		assert(origin_special_piece != null, "Match3Sequence: This sequence with Special Shape needs a origin piece configuration to be set")
+
 	var consumed_pieces: Array[Match3PieceUI] = []
 	
 	for cell: Match3GridCellUI in consumable_cells.filter(func(grid_cell: Match3GridCellUI): return grid_cell.has_piece() and is_instance_valid(grid_cell.piece)):
+		if cell.piece.is_special() and not cell.piece.triggered:
+			continue
+			
 		consumed_pieces.append(cell.piece)
 		consume_cell(cell, remove_from_sequence)
 	
@@ -81,24 +88,26 @@ func contains_special_piece() -> bool:
 
 
 func special_pieces() -> Array[Match3PieceUI]:
-	var special_pieces: Array[Match3PieceUI] = pieces.filter(
-		func(piece: Match3PieceUI): return piece.is_special() and not piece.triggered
+	var result: Array[Match3PieceUI] = []
+	
+	result.assign(pieces.filter(
+		func(piece: Match3PieceUI): return is_instance_valid(piece) and piece.is_special() and not piece.on_queue and not piece.triggered)
 		)
 	
-	if special_pieces.size() > 1:
-		special_pieces.sort_custom(_sort_by_priority)
+	if result.size() > 1:
+		result.sort_custom(_sort_by_priority)
 	
-	return special_pieces
+	return result
 	
 #endregion
 
 #region Cell positions
 func normal_cells() -> Array[Match3GridCellUI]:
-	return cells.filter(func(cell: Match3GridCellUI): return cell.has_piece() and cell.piece.is_normal())
+	return cells.filter(func(cell: Match3GridCellUI): return cell.has_piece() and is_instance_valid(cell.piece) and cell.piece.is_normal())
 	
 	
 func special_cells() -> Array[Match3GridCellUI]:
-	return cells.filter(func(cell: Match3GridCellUI): return cell.has_piece() and cell.piece.is_special())
+	return cells.filter(func(cell: Match3GridCellUI): return cell.has_piece() and is_instance_valid(cell.piece) and cell.piece.is_special())
 	
 	
 func middle_cell() -> Match3GridCellUI:
