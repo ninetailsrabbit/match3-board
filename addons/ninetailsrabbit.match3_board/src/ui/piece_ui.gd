@@ -201,8 +201,14 @@ func is_obstacle() -> bool:
 func match_with(other_piece: Match3PieceUI) -> bool:
 	if is_obstacle() or other_piece.is_obstacle():
 		return false
+	
+	if is_normal() and other_piece.is_normal():
+		return equals_to(other_piece)
 		
-	return equals_to(other_piece)
+	if (is_special() and other_piece.is_normal()) or (is_normal() and other_piece.is_special()):
+		return same_shape_as(other_piece)
+		
+	return false
 
 ## Special pieces run this function when triggered from board
 func trigger(board: Match3BoardUI) -> Array[Match3Sequence]:
