@@ -31,9 +31,9 @@ func on_state_changed(from: Match3BoardUI.BoardState, to: Match3BoardUI.BoardSta
 		to_state = "WaitForInput"
 	elif to == Match3BoardUI.BoardState.Consume:
 		to_state = "Consume"
-	elif from == Match3BoardUI.BoardState.SpecialConsume:
+	elif to == Match3BoardUI.BoardState.SpecialConsume:
 		to_state = "SpecialConsume"
-	elif from == Match3BoardUI.BoardState.Fall:
+	elif to == Match3BoardUI.BoardState.Fall:
 		to_state = "Fall"
 	elif to == Match3BoardUI.BoardState.Fill:
 		to_state = "Fill"

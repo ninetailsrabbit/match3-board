@@ -52,7 +52,7 @@ func consume_cells(consumable_cells: Array[Match3GridCellUI], remove_from_sequen
 
 	var consumed_pieces: Array[Match3PieceUI] = []
 	
-	for cell: Match3GridCellUI in consumable_cells.filter(func(grid_cell: Match3GridCellUI): return grid_cell.has_piece() and grid_cell.piece and is_instance_valid(grid_cell.piece)):
+	for cell: Match3GridCellUI in consumable_cells.filter(func(grid_cell: Match3GridCellUI): return grid_cell.has_piece() and is_instance_valid(grid_cell.piece)):
 		consumed_pieces.append(cell.piece)
 		consume_cell(cell, remove_from_sequence)
 	
@@ -74,7 +74,8 @@ func consume_normal_cells() -> void:
 
 func pieces() -> Array[Match3PieceUI]:
 	var pieces: Array[Match3PieceUI] = []
-	pieces.assign(cells.map(func(cell: Match3GridCellUI): return cell.piece))
+	pieces.assign(cells.filter(func(cell: Match3GridCellUI): return cell.has_piece() and is_instance_valid(cell.piece))\
+			.map(func(cell: Match3GridCellUI): return cell.piece))
 	
 	return pieces
 
