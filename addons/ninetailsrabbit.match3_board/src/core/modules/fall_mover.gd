@@ -55,27 +55,27 @@ func calculate_fall_movements_on_column(column: int) -> Array:
 						to_cell.piece = from_cell.piece
 						from_cell.piece = null
 	
-	## We revert to the original state to give the column_movements without altering the board
-	## This is because the pieces_can_fall() uses the updated board with the fall column_movements applied
+	## We revert to the original state to return the column_movements without altering the board
+	## This is because the pieces_can_fall_in_column() uses the updated board with the fall column_movements applied
 	for movement: FallMovement in column_movements:
 		movement.from_cell.piece = movement.piece
 		movement.to_cell.piece = null
 		
 	return column_movements
 	
-	
-func pieces_can_fall() -> bool:
-	return board.grid_cells_flattened.filter(func(cell: Match3GridCellUI): return cell.has_piece() and cell.piece.can_be_moved)\
-		.any(func(cell: Match3GridCellUI): return cell.neighbour_bottom and cell.neighbour_bottom.can_contain_piece and cell.neighbour_bottom.is_empty()
-		)
-		
 		
 func pieces_can_fall_in_column(column: int) -> bool:
 	var column_cells: Array[Match3GridCellUI] = board.finder.grid_cells_from_column(column)
 	
-	return column_cells.filter(func(cell: Match3GridCellUI): return cell.has_piece() and cell.piece.can_be_moved)\
-		.any(func(cell: Match3GridCellUI): return cell.neighbour_bottom and cell.neighbour_bottom.can_contain_piece and cell.neighbour_bottom.is_empty()
-		)
+	return column_cells.filter(_piece_can_fall).size() > 0
+	
+	
+func _piece_can_fall(cell: Match3GridCellUI) -> bool:
+	return cell.has_piece() \
+		and cell.piece.can_be_moved \
+		and cell.neighbour_bottom \
+		and cell.neighbour_bottom.can_contain_piece \
+		and cell.neighbour_bottom.is_empty()
 	
 
 class FallMovement:

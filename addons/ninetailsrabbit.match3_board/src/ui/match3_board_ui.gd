@@ -389,7 +389,6 @@ func fall_pieces() -> void:
 	var fall_movements: Array[Match3FallMover.FallMovement] = fall_mover.fall_pieces()
 	
 	for movement in fall_movements:
-		print(movement.from_cell.board_position(), movement.to_cell.board_position(), movement.piece.name)
 		movement.from_cell.piece = null
 		movement.to_cell.piece = movement.piece
 	
