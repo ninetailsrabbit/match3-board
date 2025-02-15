@@ -1,7 +1,7 @@
 class_name Match3DemoAnimator extends Match3Animator
 
 
-func swap_pieces(from_piece: Match3PieceUI, to_piece: Match3PieceUI, from_piece_position: Vector2, to_piece_position: Vector2):
+func swap_pieces(from_piece: Match3Piece, to_piece: Match3Piece, from_piece_position: Vector2, to_piece_position: Vector2):
 	animation_started.emit(SwapPiecesAnimation)
 	
 	var tween: Tween = create_tween().set_parallel(true)
@@ -20,7 +20,7 @@ func swap_pieces(from_piece: Match3PieceUI, to_piece: Match3PieceUI, from_piece_
 	animation_finished.emit(SwapPiecesAnimation)
 	
 	
-func swap_rejected_pieces(from_piece: Match3PieceUI, to_piece: Match3PieceUI, from_piece_position: Vector2, to_piece_position: Vector2):
+func swap_rejected_pieces(from_piece: Match3Piece, to_piece: Match3Piece, from_piece_position: Vector2, to_piece_position: Vector2):
 	animation_started.emit(SwapRejectedPiecesAnimation)
 	
 	var tween: Tween = create_tween().set_parallel(true)
@@ -42,12 +42,12 @@ func swap_rejected_pieces(from_piece: Match3PieceUI, to_piece: Match3PieceUI, fr
 func consume_sequence(sequence: Match3Sequence) -> void:
 	animation_started.emit(ConsumeSequenceAnimation)
 	
-	var pieces: Array[Match3PieceUI] = sequence.normal_pieces()
+	var pieces: Array[Match3Piece] = sequence.normal_pieces()
 	
 	if pieces.size() > 0:
 		var tween: Tween = create_tween().set_parallel(true)
 		
-		for piece_ui: Match3PieceUI in pieces:
+		for piece_ui: Match3Piece in pieces:
 			tween.tween_property(piece_ui, "scale", Vector2.ZERO, 0.2).set_ease(Tween.EASE_OUT)
 		
 		await tween.finished
@@ -63,9 +63,9 @@ func consume_sequences(sequences: Array[Match3SequenceConsumer.Match3SequenceCon
 		
 		for sequence: Match3SequenceConsumer.Match3SequenceConsumeResult in sequences:
 			for combo: Match3SequenceConsumer.Match3SequenceConsumeCombo in sequence.combos:
-				var pieces: Array[Match3PieceUI] = combo.sequence.normal_pieces()
+				var pieces: Array[Match3Piece] = combo.sequence.normal_pieces()
 				
-				for piece_ui: Match3PieceUI in pieces:
+				for piece_ui: Match3Piece in pieces:
 					tween.tween_property(piece_ui, "scale", Vector2.ZERO, 0.2).set_ease(Tween.EASE_OUT)
 		
 		await tween.finished
@@ -103,7 +103,7 @@ func fall_pieces(movements: Array[Match3FallMover.FallMovement]) -> void:
 	animation_finished.emit(FallPiecesAnimation)
 	
 	
-func spawn_piece(cell: Match3GridCellUI) -> void:
+func spawn_piece(cell: Match3GridCell) -> void:
 	animation_started.emit(SpawnPieceAnimation)
 	
 	if cell.has_piece():
@@ -120,13 +120,13 @@ func spawn_piece(cell: Match3GridCellUI) -> void:
 	animation_finished.emit(SpawnPieceAnimation)
 	
 
-func spawn_pieces(cells: Array[Match3GridCellUI]) -> void:
+func spawn_pieces(cells: Array[Match3GridCell]) -> void:
 	animation_started.emit(SpawnPiecesAnimation)
 	
 	if cells.size() > 0:
 		var tween: Tween = create_tween().set_parallel(true)
 		
-		for cell: Match3GridCellUI in cells.filter(func(cell: Match3GridCellUI): return cell.has_piece()):
+		for cell: Match3GridCell in cells.filter(func(cell: Match3GridCell): return cell.has_piece()):
 			var fall_distance = board.configuration.cell_size.y * board.configuration.grid_height
 			
 			cell.piece.hide()
@@ -139,7 +139,7 @@ func spawn_pieces(cells: Array[Match3GridCellUI]) -> void:
 	animation_finished.emit(SpawnPiecesAnimation)
 	
 	
-func trigger_special_piece(piece: Match3PieceUI) -> void:
+func trigger_special_piece(piece: Match3Piece) -> void:
 	animation_started.emit(TriggerSpecialPieceAnimation)
 	
 	match piece.id:

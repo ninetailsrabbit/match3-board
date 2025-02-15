@@ -1,25 +1,25 @@
 [gd_scene load_steps=19 format=3 uid="uid://ccqn6wrassd5a"]
 
 [ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/demo/demo.gd" id="1_dqalp"]
-[ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/ui/match3_board_ui.gd" id="2_wxjdv"]
-[ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/ui/configurations/match3_configuration.gd" id="3_diwbo"]
-[ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/ui/configurations/piece_configuration.gd" id="3_lxq78"]
-[ext_resource type="Resource" uid="uid://cay10ewk1e3fi" path="res://addons/ninetailsrabbit.match3_board/demo/pieces/blue_piece_configuration.tres" id="4_xuqmf"]
-[ext_resource type="Resource" uid="uid://da5nusy7aijo0" path="res://addons/ninetailsrabbit.match3_board/demo/pieces/green_piece_configuration.tres" id="5_yyrbf"]
-[ext_resource type="Resource" uid="uid://cpx8ur2qg3x3n" path="res://addons/ninetailsrabbit.match3_board/demo/pieces/yellow_piece_configuration.tres" id="6_nl6e2"]
-[ext_resource type="Resource" uid="uid://tncprvn1fkmb" path="res://addons/ninetailsrabbit.match3_board/demo/pieces/purple_piece_configuration.tres" id="7_w35it"]
-[ext_resource type="PackedScene" uid="uid://dyxg5roal1gmk" path="res://addons/ninetailsrabbit.match3_board/src/ui/match_3_grid_cell_ui.tscn" id="8_igev1"]
-[ext_resource type="Resource" uid="uid://dx168ycw2k4i3" path="res://addons/ninetailsrabbit.match3_board/demo/pieces/special_blue_piece_configuration.tres" id="8_ja6f8"]
-[ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/ui/configurations/sequence_consume_rule.gd" id="11_tuwog"]
-[ext_resource type="Resource" uid="uid://dsyolaf2k8kxh" path="res://addons/ninetailsrabbit.match3_board/demo/pieces/special_blue_piece_5_configuration.tres" id="12_5axuw"]
+[ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/match3_board.gd" id="2_wxjdv"]
+[ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/configurations/match3_board_configuration.gd" id="3_diwbo"]
+[ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/configurations/piece_configuration.gd" id="3_lxq78"]
+[ext_resource type="Resource" uid="uid://cay10ewk1e3fi" path="res://addons/ninetailsrabbit.match3_board/demo/pieces/normal/blue_piece_configuration.tres" id="4_xuqmf"]
+[ext_resource type="Resource" uid="uid://da5nusy7aijo0" path="res://addons/ninetailsrabbit.match3_board/demo/pieces/normal/green_piece_configuration.tres" id="5_yyrbf"]
+[ext_resource type="Resource" uid="uid://cpx8ur2qg3x3n" path="res://addons/ninetailsrabbit.match3_board/demo/pieces/normal/yellow_piece_configuration.tres" id="6_nl6e2"]
+[ext_resource type="Resource" uid="uid://tncprvn1fkmb" path="res://addons/ninetailsrabbit.match3_board/demo/pieces/normal/purple_piece_configuration.tres" id="7_w35it"]
+[ext_resource type="Resource" uid="uid://dx168ycw2k4i3" path="res://addons/ninetailsrabbit.match3_board/demo/pieces/normal/special_blue_piece_configuration.tres" id="8_ja6f8"]
+[ext_resource type="PackedScene" uid="uid://dyxg5roal1gmk" path="res://addons/ninetailsrabbit.match3_board/src/cells/grid_cell.tscn" id="10_8jgsm"]
+[ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/configurations/sequence_consume_rule.gd" id="11_tuwog"]
+[ext_resource type="Resource" uid="uid://dsyolaf2k8kxh" path="res://addons/ninetailsrabbit.match3_board/demo/pieces/special/special_blue_piece_5_configuration.tres" id="12_5axuw"]
 [ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/demo/demo_animator.gd" id="12_fov6k"]
 [ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/demo/demo_highlighter.gd" id="13_dlgcr"]
-[ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/ui/line_connector.gd" id="14_ktadd"]
+[ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/pieces/line_connector.gd" id="14_ktadd"]
 
 [sub_resource type="Resource" id="Resource_gjd77"]
 script = ExtResource("11_tuwog")
 id = &"special-blue-triangle"
-priority = 0
+priority = null
 strict_size_comparison = true
 shapes = Array[int]([0, 1, 5])
 piece_to_spawn = ExtResource("8_ja6f8")
@@ -29,7 +29,7 @@ target_pieces = Array[ExtResource("3_lxq78")]([ExtResource("4_xuqmf"), ExtResour
 script = ExtResource("11_tuwog")
 id = &"special-blue-triangle-5"
 priority = 1
-strict_size_comparison = false
+strict_size_comparison = null
 shapes = Array[int]([0, 1, 5])
 piece_to_spawn = ExtResource("12_5axuw")
 target_pieces = Array[ExtResource("3_lxq78")]([ExtResource("4_xuqmf"), ExtResource("4_xuqmf"), ExtResource("4_xuqmf"), ExtResource("4_xuqmf"), ExtResource("4_xuqmf")])
@@ -43,7 +43,7 @@ grid_width = 7
 grid_height = 8
 cell_size = Vector2i(48, 48)
 cell_offset = Vector2i(25, 25)
-grid_cell_scene = ExtResource("8_igev1")
+grid_cell_scene = ExtResource("10_8jgsm")
 swap_mode = 1
 selection_mode = 0
 fill_mode = 0

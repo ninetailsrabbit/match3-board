@@ -12,12 +12,9 @@ func _enter_tree() -> void:
 	if not DirAccess.dir_exists_absolute(MyPluginSettings.PluginTemporaryReleaseUpdateDirectoryPath):
 		DirAccess.make_dir_recursive_absolute(MyPluginSettings.PluginTemporaryReleaseUpdateDirectoryPath)
 	
-	add_custom_type("Match3Board", "Node2D", preload("src/match3_board.gd"), preload("assets/board.svg"))
-	add_custom_type("PieceConfiguration", "Resource", preload("src/components/pieces/piece_configuration.gd"), preload("assets/piece.svg"))
-	add_custom_type("PieceWeight", "Resource", preload("src/components/pieces/piece_weight.gd"), preload("assets/piece.svg"))
-	add_custom_type("PieceUI", "Node2D", preload("src/components/pieces/piece_ui.gd"), preload("assets/piece_ui.svg"))
-	add_custom_type("LineConnector", "Line2D", preload("src/components/pieces/swap_mode/line_connector.gd"), null)
- 
+	add_custom_type("Match3Board", "Node2D", preload("res://addons/ninetailsrabbit.match3_board/src/match3_board.gd"), preload("assets/board.svg"))
+	add_custom_type("Match3BoardPreview", "Node2D", preload("res://addons/ninetailsrabbit.match3_board/src/tools/match3_preview.gd"), preload("assets/board_preview.svg"))
+	
 
 func _exit_tree() -> void:
 	MyPluginSettings.remove_settings()
@@ -26,11 +23,9 @@ func _exit_tree() -> void:
 		update_notify_tool_instance.free()
 		update_notify_tool_instance = null
 
-	remove_custom_type("LineConnector")
-	remove_custom_type("PieceUI")
-	remove_custom_type("PieceWeight")
-	remove_custom_type("PieceConfiguration")
+	remove_custom_type("Match3BoardPreview")
 	remove_custom_type("Match3Board")
+
 	
 ## Update tool referenced from https://github.com/MikeSchulze/gdUnit4/blob/master/addons/gdUnit4
 func _setup_updater() -> void:
