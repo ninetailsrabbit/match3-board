@@ -1,10 +1,10 @@
 class_name Match3BoardFinder extends RefCounted
 
 
-var board: Match3BoardUI
+var board: Match3Board
 
 
-func _init(_board: Match3BoardUI) -> void:
+func _init(_board: Match3Board) -> void:
 	board = _board
 
 

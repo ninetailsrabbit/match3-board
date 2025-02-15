@@ -5,7 +5,7 @@ class_name Match3Preview extends Node2D
 	set(value):
 		test = false
 		draw_preview_cells()
-@export var board: Match3BoardUI:
+@export var board: Match3Board:
 	set(value):
 		if value != board:
 			board = value

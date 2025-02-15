@@ -16,16 +16,16 @@ const TriggerSpecialPieceAnimation: StringName = &"trigger-special-piece"
 signal animation_started(animation_name: StringName)
 signal animation_finished(animation_name: StringName)
 
-@export var board: Match3BoardUI
+@export var board: Match3Board
 
 var current_animation: StringName = &""
 
 
 func _ready() -> void:
 	if board == null:
-		board = get_tree().get_first_node_in_group(Match3BoardUI.GroupName)
+		board = get_tree().get_first_node_in_group(Match3Board.GroupName)
 	
-	assert(board != null, "Match3Animator: This animator needs a Match3BoardUI assigned")
+	assert(board != null, "Match3Animator: This animator needs a Match3Board assigned")
 	
 	animation_started.connect(on_animation_started)
 	animation_finished.connect(on_animation_finished)

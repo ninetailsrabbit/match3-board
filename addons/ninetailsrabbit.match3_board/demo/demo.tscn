@@ -1,65 +1,11 @@
-[gd_scene load_steps=19 format=3 uid="uid://ccqn6wrassd5a"]
+[gd_scene load_steps=7 format=3 uid="uid://ccqn6wrassd5a"]
 
 [ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/demo/demo.gd" id="1_dqalp"]
 [ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/match3_board.gd" id="2_wxjdv"]
-[ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/configurations/match3_board_configuration.gd" id="3_diwbo"]
-[ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/configurations/piece_configuration.gd" id="3_lxq78"]
-[ext_resource type="Resource" uid="uid://cay10ewk1e3fi" path="res://addons/ninetailsrabbit.match3_board/demo/pieces/normal/blue_piece_configuration.tres" id="4_xuqmf"]
-[ext_resource type="Resource" uid="uid://da5nusy7aijo0" path="res://addons/ninetailsrabbit.match3_board/demo/pieces/normal/green_piece_configuration.tres" id="5_yyrbf"]
-[ext_resource type="Resource" uid="uid://cpx8ur2qg3x3n" path="res://addons/ninetailsrabbit.match3_board/demo/pieces/normal/yellow_piece_configuration.tres" id="6_nl6e2"]
-[ext_resource type="Resource" uid="uid://tncprvn1fkmb" path="res://addons/ninetailsrabbit.match3_board/demo/pieces/normal/purple_piece_configuration.tres" id="7_w35it"]
-[ext_resource type="Resource" uid="uid://dx168ycw2k4i3" path="res://addons/ninetailsrabbit.match3_board/demo/pieces/normal/special_blue_piece_configuration.tres" id="8_ja6f8"]
-[ext_resource type="PackedScene" uid="uid://dyxg5roal1gmk" path="res://addons/ninetailsrabbit.match3_board/src/cells/grid_cell.tscn" id="10_8jgsm"]
-[ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/configurations/sequence_consume_rule.gd" id="11_tuwog"]
-[ext_resource type="Resource" uid="uid://dsyolaf2k8kxh" path="res://addons/ninetailsrabbit.match3_board/demo/pieces/special/special_blue_piece_5_configuration.tres" id="12_5axuw"]
+[ext_resource type="Resource" uid="uid://conr06fdjbas6" path="res://addons/ninetailsrabbit.match3_board/demo/demo_board_configuration.tres" id="3_gr7lp"]
 [ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/demo/demo_animator.gd" id="12_fov6k"]
 [ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/demo/demo_highlighter.gd" id="13_dlgcr"]
 [ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/pieces/line_connector.gd" id="14_ktadd"]
-
-[sub_resource type="Resource" id="Resource_gjd77"]
-script = ExtResource("11_tuwog")
-id = &"special-blue-triangle"
-priority = null
-strict_size_comparison = true
-shapes = Array[int]([0, 1, 5])
-piece_to_spawn = ExtResource("8_ja6f8")
-target_pieces = Array[ExtResource("3_lxq78")]([ExtResource("4_xuqmf"), ExtResource("4_xuqmf"), ExtResource("4_xuqmf"), ExtResource("4_xuqmf")])
-
-[sub_resource type="Resource" id="Resource_owv42"]
-script = ExtResource("11_tuwog")
-id = &"special-blue-triangle-5"
-priority = 1
-strict_size_comparison = null
-shapes = Array[int]([0, 1, 5])
-piece_to_spawn = ExtResource("12_5axuw")
-target_pieces = Array[ExtResource("3_lxq78")]([ExtResource("4_xuqmf"), ExtResource("4_xuqmf"), ExtResource("4_xuqmf"), ExtResource("4_xuqmf"), ExtResource("4_xuqmf")])
-
-[sub_resource type="Resource" id="Resource_f1ea4"]
-script = ExtResource("3_diwbo")
-available_pieces = Array[ExtResource("3_lxq78")]([ExtResource("4_xuqmf"), ExtResource("5_yyrbf"), ExtResource("6_nl6e2"), ExtResource("7_w35it")])
-available_special_pieces = Array[ExtResource("3_lxq78")]([ExtResource("8_ja6f8"), ExtResource("12_5axuw")])
-pieces_collision_layer = 8
-grid_width = 7
-grid_height = 8
-cell_size = Vector2i(48, 48)
-cell_offset = Vector2i(25, 25)
-grid_cell_scene = ExtResource("10_8jgsm")
-swap_mode = 1
-selection_mode = 0
-fill_mode = 0
-auto_start = true
-min_match = 3
-max_match = 5
-available_moves_on_start = 25
-allow_matches_on_start = false
-sequence_rules = Array[ExtResource("11_tuwog")]([SubResource("Resource_gjd77"), SubResource("Resource_owv42")])
-horizontal_shape = true
-vertical_shape = true
-tshape = true
-lshape = true
-sequence_animation = 1
-fall_animation = 1
-fill_animation = 1
 
 [node name="Demo" type="Node2D"]
 script = ExtResource("1_dqalp")
@@ -71,23 +17,23 @@ offset_right = 581.0
 offset_bottom = 65.0
 text = "STATE"
 
-[node name="Match3BoardUI" type="Node2D" parent="." node_paths=PackedStringArray("animator", "highlighter", "line_connector")]
+[node name="Match3Board" type="Node2D" parent="." node_paths=PackedStringArray("animator", "highlighter", "line_connector")]
 position = Vector2(270, 171)
 script = ExtResource("2_wxjdv")
-configuration = SubResource("Resource_f1ea4")
+configuration = ExtResource("3_gr7lp")
 animator = NodePath("Match3Animator")
 highlighter = NodePath("Match3Highlighter")
 line_connector = NodePath("Match3LineConnector")
 
-[node name="Match3Animator" type="Node" parent="Match3BoardUI" node_paths=PackedStringArray("board")]
+[node name="Match3Animator" type="Node" parent="Match3Board" node_paths=PackedStringArray("board")]
 script = ExtResource("12_fov6k")
 board = NodePath("..")
 
-[node name="Match3Highlighter" type="Node" parent="Match3BoardUI" node_paths=PackedStringArray("board")]
+[node name="Match3Highlighter" type="Node" parent="Match3Board" node_paths=PackedStringArray("board")]
 script = ExtResource("13_dlgcr")
 board = NodePath("..")
 
-[node name="Match3LineConnector" type="Line2D" parent="Match3BoardUI" node_paths=PackedStringArray("board")]
+[node name="Match3LineConnector" type="Line2D" parent="Match3Board" node_paths=PackedStringArray("board")]
 width = 1.5
 default_color = Color(1, 1, 0.443137, 1)
 script = ExtResource("14_ktadd")

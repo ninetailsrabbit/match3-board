@@ -6,7 +6,7 @@ signal max_connected_pieces_reached(pieces: Array[Match3Piece])
 signal confirmed_match(pieces: Array[Match3Piece])
 signal canceled_match(pieces: Array[Match3Piece])
 
-@export var board: Match3BoardUI
+@export var board: Match3Board
 @export var confirm_match_input_action: StringName = &"ui_accept"
 @export var cancel_match_input_action: StringName = &"ui_cancel"
 
@@ -29,7 +29,7 @@ func _enter_tree() -> void:
 	
 func _ready() -> void:
 	if board == null:
-		get_tree().get_first_node_in_group(Match3BoardUI.GroupName)
+		get_tree().get_first_node_in_group(Match3Board.GroupName)
 	
 	set_process(false)
 	set_process_unhandled_input(false)

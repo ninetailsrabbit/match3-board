@@ -1,6 +1,6 @@
 class_name Match3Highlighter extends Node
 
-@export var board: Match3BoardUI
+@export var board: Match3Board
 
 var current_highlighted_cells: Array[Match3GridCell] = []
 var current_highlighted_pieces: Array[Match3Piece] = []
@@ -8,7 +8,7 @@ var current_highlighted_pieces: Array[Match3Piece] = []
 
 func _ready() -> void:
 	if board == null:
-		board = get_tree().get_first_node_in_group(Match3BoardUI.GroupName)
+		board = get_tree().get_first_node_in_group(Match3Board.GroupName)
 	
 	board.selected_piece.connect(on_selected_piece)
 	board.unselected_piece.connect(on_unselected_piece)

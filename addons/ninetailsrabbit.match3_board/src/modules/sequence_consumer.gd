@@ -1,12 +1,12 @@
 class_name Match3SequenceConsumer extends RefCounted
 
 
-var board: Match3BoardUI
+var board: Match3Board
 ## Dictionary with structure <RuleId, SequenceConsumeRule>
 var rules: Dictionary = {}
 
 
-func _init(_board: Match3BoardUI, consume_rules: Array[SequenceConsumeRule]):
+func _init(_board: Match3Board, consume_rules: Array[SequenceConsumeRule]):
 	board = _board
 
 	for rule: SequenceConsumeRule in consume_rules:

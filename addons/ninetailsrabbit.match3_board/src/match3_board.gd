@@ -1,4 +1,4 @@
-class_name Match3BoardUI extends Node2D
+class_name Match3Board extends Node2D
 
 const GroupName: StringName = &"match3-board"
 
@@ -95,10 +95,10 @@ func _enter_tree() -> void:
 
 
 func _ready() -> void:
-	assert(configuration != null, "Match3BoardUI: This board needs a configuration")
+	assert(configuration != null, "Match3Board: This board needs a configuration")
 	
 	if configuration.swap_mode_is_connect_line():
-		assert(line_connector != null, "Match3BoardUI: The swap mode ConnectLine needs a line connector in this board")
+		assert(line_connector != null, "Match3Board: The swap mode ConnectLine needs a line connector in this board")
 	
 	sequence_consumer = Match3SequenceConsumer.new(self, configuration.sequence_rules)
 	current_available_moves = configuration.available_moves_on_start
@@ -140,7 +140,7 @@ func unlock() -> void:
 
 
 #region Draw 
-func draw_cells() -> Match3BoardUI:
+func draw_cells() -> Match3Board:
 	if grid_cells.is_empty():
 		for column in configuration.grid_width:
 			grid_cells.append([])
@@ -169,8 +169,8 @@ func draw_cell(column: int, row: int) -> Match3GridCell:
 	return cell
 
 
-func draw_pieces() -> Match3BoardUI:
-	assert(configuration.available_pieces.size() > 0, "Match3BoardUI: No available pieces are set for this board, the pieces cannot be drawed")
+func draw_pieces() -> Match3Board:
+	assert(configuration.available_pieces.size() > 0, "Match3Board: No available pieces are set for this board, the pieces cannot be drawed")
 	
 	for cell: Match3GridCell in grid_cells_flattened:
 		draw_random_piece_on_cell(cell)
@@ -216,14 +216,14 @@ func _update_grid_cells_neighbours(grid_cells: Array[Match3GridCell] = grid_cell
 		grid_cell.diagonal_neighbour_bottom_left = finder.get_cell(grid_cell.column - 1, grid_cell.row + 1)
 
 
-func add_pieces_to_generator(pieces: Array[Match3PieceConfiguration]) -> Match3BoardUI:
+func add_pieces_to_generator(pieces: Array[Match3PieceConfiguration]) -> Match3Board:
 	for piece_configuration: Match3PieceConfiguration in pieces:
 		add_piece_to_generator(piece_configuration)
 	
 	return self
 
 
-func add_piece_to_generator(piece_configuration: Match3PieceConfiguration) -> Match3BoardUI:
+func add_piece_to_generator(piece_configuration: Match3PieceConfiguration) -> Match3Board:
 	assert(not piece_configuration.id.is_empty(), "Match3Board->add_piece: The ID of the piece to add is empty, the piece cannot be added")
 	
 	piece_generator.add_piece(piece_configuration)

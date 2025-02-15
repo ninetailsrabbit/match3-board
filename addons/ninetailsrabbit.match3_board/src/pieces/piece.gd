@@ -205,7 +205,7 @@ func match_with(other_piece: Match3Piece) -> bool:
 	return false
 
 ## Special pieces run this function when triggered from board
-func trigger(board: Match3BoardUI) -> Array[Match3Sequence]:
+func trigger(board: Match3Board) -> Array[Match3Sequence]:
 	if can_be_triggered:
 		triggered = true
 		
