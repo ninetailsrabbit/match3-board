@@ -4,6 +4,8 @@ extends EditorPlugin
 const UpdateNotifyToolScene = preload("updater/update_notify_tool.tscn")
 
 var update_notify_tool_instance: Node
+var inspector_plugin
+
 
 func _enter_tree() -> void:
 	MyPluginSettings.set_update_notification()
@@ -11,6 +13,9 @@ func _enter_tree() -> void:
 	
 	if not DirAccess.dir_exists_absolute(MyPluginSettings.PluginTemporaryReleaseUpdateDirectoryPath):
 		DirAccess.make_dir_recursive_absolute(MyPluginSettings.PluginTemporaryReleaseUpdateDirectoryPath)
+	
+	inspector_plugin = preload("res://addons/ninetailsrabbit.match3_board/inspector/inspector_button_plugin.gd").new()
+	add_inspector_plugin(inspector_plugin)
 	
 	add_custom_type("Match3Board", "Node2D", preload("res://addons/ninetailsrabbit.match3_board/src/match3_board.gd"), preload("assets/board.svg"))
 	add_custom_type("Match3BoardPreview", "Node2D", preload("res://addons/ninetailsrabbit.match3_board/src/tools/match3_preview.gd"), preload("assets/board_preview.svg"))
@@ -25,10 +30,13 @@ func _exit_tree() -> void:
 		update_notify_tool_instance.free()
 		update_notify_tool_instance = null
 
+	remove_inspector_plugin(inspector_plugin)
+
 	remove_custom_type("Match3Highlighter")
 	remove_custom_type("Match3Animator")
 	remove_custom_type("Match3BoardPreview")
 	remove_custom_type("Match3Board")
+	
 
 ## Update tool referenced from https://github.com/MikeSchulze/gdUnit4/blob/master/addons/gdUnit4
 func _setup_updater() -> void:

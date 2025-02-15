@@ -1,10 +1,7 @@
 @tool
 class_name Match3Preview extends Node2D
 
-@export var test: bool = false:
-	set(value):
-		test = false
-		draw_preview_cells()
+@export var button_Generate_Preview: String
 @export var board: Match3Board:
 	set(value):
 		if value != board:
@@ -16,12 +13,37 @@ class_name Match3Preview extends Node2D
 				remove_preview_cells()
 			
 @export_category("Editor Debug 🪲")
-@export var preview_cell_texture: Texture2D
-@export var texture_scale: float = 1.0
-@export var display_cell_position: bool = true
+@export var preview_cell_texture: Texture2D:
+	set(value):
+		if value != preview_cell_texture:
+			preview_cell_texture = value
+		
+			if preview_cell_texture:
+				draw_preview_cells()
+			else:
+				remove_preview_cells()
+				
+@export var texture_scale: float = 1.0:
+	set(value):
+		if value != texture_scale:
+			texture_scale = value
+		
+			if texture_scale:
+				draw_preview_cells()
+			else:
+				remove_preview_cells()
+@export var display_cell_position: bool = true:
+	set(value):
+		if value != display_cell_position:
+			display_cell_position = value
+		
+			if display_cell_position:
+				draw_preview_cells()
+			else:
+				remove_preview_cells()
 
 
-func _ready() -> void:
+func _enter_tree() -> void:
 	if Engine.is_editor_hint():
 		draw_preview_cells()
 	else:
@@ -65,3 +87,9 @@ func draw_preview_cells() -> Match3Preview:
 					Match3BoardPluginUtilities.set_owner_to_edited_scene_root(label)
 					
 	return self
+
+
+func _on_tool_button_pressed(text: String) -> void:
+	match text:
+		"Generate Preview":
+			draw_preview_cells()
