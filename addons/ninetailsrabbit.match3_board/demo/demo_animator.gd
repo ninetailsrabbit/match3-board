@@ -151,7 +151,20 @@ func trigger_special_piece(piece: Match3Piece) -> void:
 			await tween.finished
 			
 	animation_finished.emit(TriggerSpecialPieceAnimation)
+	
 
+func piece_drag_ended(piece: Match3Piece) -> void:
+	animation_started.emit(PieceDragEndedAnimation)
+	
+	if is_instance_valid(piece):
+		var tween: Tween = create_tween()
+		tween.tween_property(piece, "position", piece.cell.position, 0.25)\
+			.set_trans(Tween.TRANS_CIRC).set_ease(Tween.EASE_IN_OUT)
+			
+		await tween.finished
+		
+	animation_finished.emit(PieceDragEndedAnimation)
+	
 
 func on_animation_started(animation_name: StringName) -> void:
 	current_animation = animation_name

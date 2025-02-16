@@ -11,7 +11,9 @@ signal selected_piece(piece: Match3Piece)
 signal unselected_piece(piece: Match3Piece)
 signal piece_drag_started(piece: Match3Piece)
 signal piece_drag_ended(piece: Match3Piece)
-signal drawed_cells
+signal drawed_cell(cell: Match3GridCell)
+signal drawed_cells(piece: Match3Piece)
+signal drawed_piece
 signal drawed_pieces
 signal locked
 signal unlocked
@@ -166,6 +168,8 @@ func draw_cell(column: int, row: int) -> Match3GridCell:
 	cell.position = Vector2(configuration.cell_size.x * cell.column, configuration.cell_size.y * cell.row)
 	add_child(cell)
 	
+	drawed_cell.emit(cell)
+	
 	return cell
 
 
@@ -192,6 +196,7 @@ func draw_piece_on_cell(cell: Match3GridCell, piece: Match3Piece, replace: bool 
 		
 		if not piece.is_inside_tree():
 			add_child(piece)
+			drawed_piece.emit(piece)
 
 
 func draw_random_piece_on_cell(cell: Match3GridCell, replace: bool = false) -> Match3Piece:
@@ -587,6 +592,9 @@ func on_piece_drag_ended(piece: Match3Piece) -> void:
 		
 		if other_piece:
 			swap_pieces(current_selected_piece, other_piece)
+		else:
+			if animator and current_selected_piece.reset_position_on_drag_release:
+				await animator.piece_drag_ended(current_selected_piece)
 		
 		current_selected_piece.disable_drag()
 		piece_drag_ended.emit(current_selected_piece)
@@ -597,7 +605,11 @@ func on_swap_accepted(_from: Match3GridCell, _to: Match3GridCell) -> void:
 	lock()
 
 
-func on_swap_rejected(_from: Match3GridCell, _to: Match3GridCell) -> void:
+func on_swap_rejected(from: Match3GridCell, _to: Match3GridCell) -> void:
+	if configuration.click_mode_is_drag():
+		if animator and from.piece.reset_position_on_drag_release:
+			await animator.piece_drag_ended(from.piece)
+
 	unlock()
 	
 

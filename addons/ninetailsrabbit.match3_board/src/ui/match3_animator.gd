@@ -11,6 +11,7 @@ const FallPiecesAnimation: StringName = &"fall-pieces"
 const SpawnPieceAnimation: StringName = &"spawn-piece"
 const SpawnPiecesAnimation: StringName = &"spawn-pieces"
 const TriggerSpecialPieceAnimation: StringName = &"trigger-special-piece"
+const PieceDragEndedAnimation: StringName = &"piece-drag-ended"
 #endregion
 
 signal animation_started(animation_name: StringName)
@@ -74,6 +75,11 @@ func spawn_pieces(cells: Array[Match3GridCell]) -> void:
 func trigger_special_piece(piece: Match3Piece) -> void:
 	animation_started.emit(TriggerSpecialPieceAnimation)
 	animation_finished.emit(TriggerSpecialPieceAnimation)
+
+
+func piece_drag_ended(piece: Match3Piece) -> void:
+	animation_started.emit(PieceDragEndedAnimation)
+	animation_finished.emit(PieceDragEndedAnimation)
 
 
 func on_animation_started(animation_name: StringName) -> void:

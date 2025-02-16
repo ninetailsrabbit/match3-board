@@ -210,11 +210,6 @@ func trigger(board: Match3Board) -> Array[Match3Sequence]:
 		triggered = true
 		
 	return []
-
-## Useful if you want to create animations when coming back to position when drag ended
-func back_to_cell_position() -> void:
-	position = cell.position
-	
 #endregion
 
 
@@ -363,9 +358,6 @@ func on_mouse_region_holded() -> void:
 	
 
 func on_mouse_region_released() -> void:
-	if reset_position_on_drag_release:
-		back_to_cell_position()
-	
 	z_index = original_z_index
 	z_as_relative = true
 	
