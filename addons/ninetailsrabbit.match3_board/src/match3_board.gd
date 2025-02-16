@@ -120,6 +120,10 @@ func _ready() -> void:
 	if configuration.auto_start:
 		draw_cells().draw_pieces()
 		
+	const SPECIAL_BLUE_PIECE_CONFIGURATION = preload("res://addons/ninetailsrabbit.match3_board/demo/pieces/special/special_blue_piece_configuration.tres")
+	
+	draw_piece_on_cell(finder.get_cell(2, 2), Match3Piece.from_configuration(SPECIAL_BLUE_PIECE_CONFIGURATION), true)
+
 
 func distance() -> int:
 	return configuration.grid_width + configuration.grid_height
@@ -401,8 +405,8 @@ func fall_pieces() -> void:
 	else:
 		for movement in fall_movements:
 			movement.to_cell.piece.position = movement.to_cell.position
-	
-			
+
+
 func fill_pieces() -> void:
 	var filled_cells : Array[Match3GridCell] = filler.fill_empty_cells()
 		
@@ -443,6 +447,10 @@ func swap_pieces(from_piece: Match3Piece, to_piece: Match3Piece) -> void:
 			
 			await get_tree().process_frame
 			
+			if pending_special_pieces.size() > 0:
+				travel_to(BoardState.SpecialConsume)
+				return
+			
 			var matches: Array[Match3Sequence] = sequence_detector.find_board_sequences()
 					
 			if matches.size() > 0:
@@ -463,15 +471,31 @@ func swap_pieces(from_piece: Match3Piece, to_piece: Match3Piece) -> void:
 					from_piece.position = from_cell.position
 					to_piece.position = to_cell.position
 				
+				
 				swap_rejected.emit(from_cell, to_cell)
 	else:
 		swap_rejected.emit(from_cell, to_cell)
 			
 
 func swap_movement_is_valid(from_cell: Match3GridCell, to_cell: Match3GridCell) -> bool:
-	if from_cell.piece.match_with(to_cell.piece):
+	if not from_cell.can_swap_piece_with_cell(to_cell):
 		return false
 		
+	elif not from_cell.piece.is_special() and not to_cell.piece.is_special() and from_cell.piece.match_with(to_cell.piece):
+		return false
+	
+	elif from_cell.piece.is_special() and to_cell.piece.is_special():
+		add_special_pieces_to_queue([from_cell.piece, to_cell.piece])
+		return true
+		
+	elif from_cell.piece.is_special() and not to_cell.piece.is_special():
+		add_special_piece_to_queue(from_cell.piece)
+		return true
+		
+	elif not from_cell.piece.is_special() and to_cell.piece.is_special():
+		add_special_piece_to_queue(to_cell.piece)
+		return true
+	
 	match configuration.swap_mode:
 		Match3BoardConfiguration.BoardMovements.Adjacent:
 			return from_cell.is_adjacent_to(to_cell)
