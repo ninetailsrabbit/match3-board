@@ -108,9 +108,11 @@ enum AnimationFlow {
 ## The minimum amount of pieces to make a match valid
 
 @export_group("Animations")
-## Set the animation type when consuming sequences
+## When set to serial, the draw cell animation goes first and then the draw pieces animation
+@export var draw_cells_and_pieces_animation: AnimationFlow = AnimationFlow.Parallel
+## Set the animation type when consuming sequences in the board
 @export var sequence_animation: AnimationFlow = AnimationFlow.Parallel
-## Set the animation type when falling pieces
+## Set the animation type when falling pieces in the board
 @export var fall_animation: AnimationFlow = AnimationFlow.Parallel
 ## Set the animation type when filling the board with new pieces
 @export var fill_animation: AnimationFlow = AnimationFlow.Parallel
@@ -194,6 +196,14 @@ func swap_mode_is_connect_line() -> bool:
 	return swap_mode == BoardMovements.ConnectLine
 
 
+func draw_cells_and_pieces_animation_is_serial() -> bool:
+	return sequence_animation == AnimationFlow.Serial
+	
+	
+func draw_cells_and_pieces_animation_is_parallel() -> bool:
+	return sequence_animation == AnimationFlow.Parallel
+	
+	
 func sequence_animation_is_serial() -> bool:
 	return sequence_animation == AnimationFlow.Serial
 	

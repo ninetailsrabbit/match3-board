@@ -2,6 +2,8 @@ class_name Match3Animator extends Node
 
 
 #region Animation names
+const DrawPiecesAnimation: StringName = &"draw-pieces"
+const DrawCellsAnimation: StringName = &"draw-cells"
 const SwapPiecesAnimation: StringName = &"swap-pieces"
 const SwapRejectedPiecesAnimation: StringName = &"swap-pieces"
 const ConsumeSequenceAnimation: StringName = &"consume-sequence"
@@ -32,8 +34,18 @@ func _ready() -> void:
 	animation_finished.connect(on_animation_finished)
 
 
+func draw_pieces(pieces: Array[Match3Piece]) -> void:
+	animation_started.emit(DrawPiecesAnimation)
+	animation_finished.emit(DrawPiecesAnimation)
+
+
+func draw_cells(cells: Array[Match3GridCell]) -> void:
+	animation_started.emit(DrawCellsAnimation)
+	animation_finished.emit(DrawCellsAnimation)
+
+
 func swap_pieces(from_piece: Match3Piece, to_piece: Match3Piece, from_piece_position: Vector2, to_piece_position: Vector2):
-	animation_started.emit(SwapPiecesAnimation)	
+	animation_started.emit(SwapPiecesAnimation)
 	animation_finished.emit(SwapPiecesAnimation)
 	
 	

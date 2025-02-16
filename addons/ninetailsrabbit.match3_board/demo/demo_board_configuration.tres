@@ -52,6 +52,7 @@ horizontal_shape = true
 vertical_shape = true
 tshape = true
 lshape = true
+draw_cells_and_pieces_animation = 0
 sequence_animation = 1
 fall_animation = 1
 fill_animation = 1

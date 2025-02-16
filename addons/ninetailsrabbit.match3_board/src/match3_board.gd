@@ -11,10 +11,10 @@ signal selected_piece(piece: Match3Piece)
 signal unselected_piece(piece: Match3Piece)
 signal piece_drag_started(piece: Match3Piece)
 signal piece_drag_ended(piece: Match3Piece)
+signal drawed_cells(cells: Array[Match3GridCell])
 signal drawed_cell(cell: Match3GridCell)
-signal drawed_cells(piece: Match3Piece)
-signal drawed_piece
-signal drawed_pieces
+signal drawed_piece(piece: Match3Piece)
+signal drawed_pieces(pieces: Array[Match3Piece])
 signal locked
 signal unlocked
 signal movement_consumed
@@ -112,13 +112,15 @@ func _ready() -> void:
 	locked.connect(on_board_locked)
 	unlocked.connect(on_board_unlocked)
 	state_changed.connect(on_board_state_changed)
+	drawed_cells.connect(on_drawed_cells)
 	drawed_pieces.connect(on_drawed_pieces)
 	
 	if line_connector:
 		line_connector.canceled_match.connect(on_line_connector_canceled_match)
 	
 	if configuration.auto_start:
-		draw_cells().draw_pieces()
+		await draw_cells()
+		await draw_pieces()
 		
 	const SPECIAL_BLUE_PIECE_CONFIGURATION = preload("res://addons/ninetailsrabbit.match3_board/demo/pieces/special/special_blue_piece_configuration.tres")
 	
@@ -157,7 +159,13 @@ func draw_cells() -> Match3Board:
 		grid_cells_flattened.append_array(Match3BoardPluginUtilities.flatten(grid_cells))
 		_update_grid_cells_neighbours(grid_cells_flattened)
 		
-		drawed_cells.emit()
+		if animator:
+			if configuration.draw_cells_and_pieces_animation_is_serial():
+				await animator.draw_cells(grid_cells_flattened)
+			elif configuration.draw_cells_and_pieces_animation_is_parallel():
+				animator.draw_cells(grid_cells_flattened)
+				
+		drawed_cells.emit(grid_cells_flattened)
 		
 	return self
 
@@ -182,8 +190,14 @@ func draw_pieces() -> Match3Board:
 	
 	for cell: Match3GridCell in grid_cells_flattened:
 		draw_random_piece_on_cell(cell)
-	
-	drawed_pieces.emit()
+		
+	if animator:
+		if configuration.draw_cells_and_pieces_animation_is_serial():
+			await animator.draw_pieces(pieces())
+		elif configuration.draw_cells_and_pieces_animation_is_parallel():
+			animator.draw_pieces(pieces())
+			
+	drawed_pieces.emit(pieces())
 	
 	return self
 
@@ -536,15 +550,27 @@ func on_child_entered_tree(child: Node) -> void:
 			
 		if not child.drag_ended.is_connected(on_piece_drag_ended.bind(child)):
 			child.drag_ended.connect(on_piece_drag_ended.bind(child))
-			
 
-func on_drawed_pieces() -> void:
+
+func on_drawed_cells(cells: Array[Match3GridCell]) -> void:
+		if not configuration.auto_start:
+			await draw_cells()
+
+
+func on_drawed_pieces(pieces: Array[Match3Piece]) -> void:
 	if configuration.allow_matches_on_start:
+		
+		if not configuration.auto_start:
+			await draw_pieces()
+		
 		travel_to(BoardState.Consume)
 	else:
 		remove_matches_from_board()
 		
-		
+		if not configuration.auto_start:
+			await draw_pieces()
+
+
 func on_board_locked() -> void:
 	if is_inside_tree():
 		lock_all_pieces()
@@ -614,13 +640,14 @@ func on_piece_drag_ended(piece: Match3Piece) -> void:
 	elif configuration.click_mode_is_drag() and current_selected_piece == piece:
 		var other_piece = current_selected_piece.detect_near_piece()
 		
+		current_selected_piece.disable_drag()
+		
 		if other_piece:
 			swap_pieces(current_selected_piece, other_piece)
 		else:
 			if animator and current_selected_piece.reset_position_on_drag_release:
 				await animator.piece_drag_ended(current_selected_piece)
 		
-		current_selected_piece.disable_drag()
 		piece_drag_ended.emit(current_selected_piece)
 		current_selected_piece = null
 		
