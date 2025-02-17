@@ -123,12 +123,6 @@ func _ready() -> void:
 		await draw_cells()
 		await draw_pieces()
 	
-	await get_tree().create_timer(1.0).timeout
-	shuffle()
-	#const SPECIAL_BLUE_PIECE_CONFIGURATION = preload("res://addons/ninetailsrabbit.match3_board/demo/pieces/special/special_blue_piece_configuration.tres")
-	#
-	#draw_piece_on_cell(finder.get_cell(2, 2), Match3Piece.from_configuration(SPECIAL_BLUE_PIECE_CONFIGURATION), true)
-
 
 func distance() -> int:
 	return configuration.grid_width + configuration.grid_height
@@ -614,12 +608,12 @@ func on_selected_piece(piece: Match3Piece) -> void:
 	elif configuration.swap_mode_is_connect_line():
 		current_selected_piece = piece
 		
-		if configuration.click_mode_is_drag():
+		if configuration.is_selection_drag_mode() or configuration.is_selection_slide_mode():
 			current_selected_piece.drag_started.emit()
 			
 		lock()
 	
-	elif configuration.click_mode_is_selection() and not is_locked:
+	elif configuration.is_selection_click_mode() and not is_locked:
 		if current_selected_piece == null:
 			current_selected_piece = piece
 		
@@ -639,25 +633,25 @@ func on_piece_drag_started(piece: Match3Piece) -> void:
 	elif configuration.swap_mode_is_connect_line():
 		current_selected_piece = piece
 		
-		if configuration.click_mode_is_drag():
+		if configuration.is_selection_drag_mode() or configuration.is_selection_slide_mode():
 			piece_drag_started.emit(current_selected_piece)
 			
 		lock()
 		
-	elif configuration.click_mode_is_drag() and not is_locked:
+	elif (configuration.is_selection_drag_mode() or configuration.is_selection_slide_mode()) and not is_locked:
 		current_selected_piece = piece
-		current_selected_piece.enable_drag()
+		current_selected_piece.enable_drag(piece.detection_area if configuration.is_selection_slide_mode() else piece)
 			
 		piece_drag_started.emit(current_selected_piece)
 
 
 func on_piece_drag_ended(piece: Match3Piece) -> void:
 	if configuration.swap_mode_is_connect_line():
-		if configuration.click_mode_is_drag():
+		if configuration.is_selection_drag_mode() or configuration.is_selection_slide_mode():
 			piece_drag_ended.emit(current_selected_piece)
 			current_selected_piece = null
 
-	elif configuration.click_mode_is_drag() and current_selected_piece == piece:
+	elif (configuration.is_selection_drag_mode() or configuration.is_selection_slide_mode()) and current_selected_piece == piece:
 		var other_piece = current_selected_piece.detect_near_piece()
 		
 		current_selected_piece.disable_drag()
@@ -665,9 +659,12 @@ func on_piece_drag_ended(piece: Match3Piece) -> void:
 		if other_piece:
 			swap_pieces(current_selected_piece, other_piece)
 		else:
-			if animator and current_selected_piece.reset_position_on_drag_release:
-				await animator.piece_drag_ended(current_selected_piece)
-		
+			if current_selected_piece.reset_position_on_drag_release:
+				if animator:
+					await animator.piece_drag_ended(current_selected_piece)
+					
+				current_selected_piece.reset_drag_position()
+			
 		piece_drag_ended.emit(current_selected_piece)
 		current_selected_piece = null
 		
@@ -677,7 +674,7 @@ func on_swap_accepted(_from: Match3GridCell, _to: Match3GridCell) -> void:
 
 
 func on_swap_rejected(from: Match3GridCell, _to: Match3GridCell) -> void:
-	if configuration.click_mode_is_drag():
+	if configuration.is_selection_drag_mode():
 		if animator and from.piece.reset_position_on_drag_release:
 			await animator.piece_drag_ended(from.piece)
 

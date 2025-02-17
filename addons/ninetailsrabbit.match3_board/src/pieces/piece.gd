@@ -66,6 +66,7 @@ var original_z_index: int = 0
 var cell: Match3GridCell
 var piece_area: Area2D
 var detection_area: Area2D
+var drag_target: Node2D = self
 
 var triggered: bool = false
 var on_queue: bool = false
@@ -116,8 +117,8 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	if drag_enabled:
-		global_position = global_position.lerp(get_global_mouse_position(), drag_smooth_factor * delta) if drag_smooth_factor > 0 else get_global_mouse_position()
-		current_position = global_position + m_offset
+		drag_target.global_position = drag_target.global_position.lerp(get_global_mouse_position(), drag_smooth_factor * delta) if drag_smooth_factor > 0 else get_global_mouse_position()
+		current_position = drag_target.global_position + m_offset
 	
 
 func equals_to(other_piece: Match3Piece) -> bool:
@@ -234,14 +235,20 @@ func unlock() -> void:
 	is_locked = false
 
 
-func enable_drag() -> void:
+func enable_drag(target: Node2D = self) -> void:
+	drag_target = target
 	drag_enabled = true
 	
 	
 func disable_drag() -> void:
 	drag_enabled = false
-	
-	
+
+
+func reset_drag_position() -> void:
+	if cell and is_instance_valid(cell):
+		drag_target.position = cell.position
+
+
 func enable_piece_area() -> void:
 	piece_area.set_deferred("monitorable", true)
 
@@ -256,7 +263,6 @@ func enable_detection_area() -> void:
 	
 func disable_detection_area() -> void:
 	detection_area.set_deferred("monitoring", false)
-
 
 
 func calculate_texture_scale(texture: Texture2D, size: Vector2i = Vector2i(48, 48)) -> Vector2:
@@ -353,7 +359,7 @@ func on_mouse_region_holded() -> void:
 	
 	## We don't want to enable drag when connecting lines as the pieces needs to be static
 	#if not board.is_swap_mode_connect_line():
-	m_offset = transform.origin - get_global_mouse_position()
+	m_offset = drag_target.transform.origin - get_global_mouse_position()
 	drag_started.emit()
 	
 

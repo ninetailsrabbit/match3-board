@@ -29,7 +29,9 @@ enum BoardSelectionMode {
 	## The piece can be clicked or touch once to select & unselect
 	Click,
 	## Piece can be dragged keeping the input action and releasing it when not
-	Drag
+	Drag,
+	## Similar to drag but the piece is holded on the original position
+	Slide
 }
 
 enum BoardFillModes {
@@ -142,12 +144,16 @@ func special_piece_configuration_by_id(id: StringName) -> Match3PieceConfigurati
 	return configurations.front()
 
 #region Information
-func click_mode_is_selection() -> bool:
+func is_selection_click_mode() -> bool:
 	return selection_mode == BoardSelectionMode.Click
 	
 
-func click_mode_is_drag() -> bool:
+func is_selection_drag_mode() -> bool:
 	return selection_mode == BoardSelectionMode.Drag
+	
+	
+func is_selection_slide_mode() -> bool:
+	return selection_mode == BoardSelectionMode.Slide
 	
 
 func fill_mode_is_fall_down() -> bool:

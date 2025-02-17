@@ -19,7 +19,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if Input.is_action_just_pressed(cancel_match_input_action):
 		cancel_match()
 	
-	if board.configuration.click_mode_is_selection() and Input.is_action_just_pressed(confirm_match_input_action):
+	if board.configuration.is_selection_click_mode() and Input.is_action_just_pressed(confirm_match_input_action):
 		confirm_match()
 
 
