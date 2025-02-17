@@ -2,9 +2,20 @@ extends Node2D
 
 @onready var state_label: Label = $StateLabel
 @onready var match_3_board: Match3Board = $Match3Board
+
+#region UI
 @onready var selection_mode_option_button: OptionButton = %SelectionModeOptionButton
 @onready var swap_mode_option_button: OptionButton = %SwapModeOptionButton
 @onready var fill_mode_option_button: OptionButton = %FillModeOptionButton
+@onready var min_match_spin_box: SpinBox = %MinMatchSpinBox
+@onready var max_match_spin_box: SpinBox = %MaxMatchSpinBox
+@onready var horizontal_shape_checkbox: CheckBox = %HorizontalShape
+@onready var vertical_shape_checkbox: CheckBox = %VerticalShape
+@onready var tshape_checkbox: CheckBox = %TShape
+@onready var lshape_checkbox: CheckBox = %LShape
+
+#endregion
+
 
 #region UI configuration
 var selection_modes: Dictionary = {
@@ -38,12 +49,14 @@ func _ready() -> void:
 	
 	state_label.text = "WaitForInput"
 	match_3_board.state_changed.connect(on_state_changed)
-	
-	
+
+
 func prepare_demo_ui() -> void:
 	prepare_swap_mode()
 	prepare_selection_mode()
 	prepare_fill_mode()
+	prepare_min_max_match_spin_boxes()
+	prepare_allowed_shapes()
 
 
 func prepare_selection_mode() -> void:
@@ -86,7 +99,27 @@ func prepare_fill_mode() -> void:
 	for fill_mode_id in fill_modes:
 		if match_3_board.configuration.fill_mode == fill_modes[fill_mode_id]:
 			fill_mode_option_button.select(fill_mode_option_button.get_item_index(fill_mode_id))
-			
+
+
+func prepare_min_max_match_spin_boxes() -> void:
+	min_match_spin_box.value = match_3_board.configuration.min_match
+	max_match_spin_box.value = match_3_board.configuration.max_match
+	
+	min_match_spin_box.value_changed.connect(on_min_match_value_changed)
+	max_match_spin_box.value_changed.connect(on_max_match_value_changed)
+
+
+func prepare_allowed_shapes() -> void:
+	horizontal_shape_checkbox.button_pressed = match_3_board.configuration.horizontal_shape
+	vertical_shape_checkbox.button_pressed = match_3_board.configuration.vertical_shape
+	tshape_checkbox.button_pressed = match_3_board.configuration.tshape
+	lshape_checkbox.button_pressed = match_3_board.configuration.lshape
+	
+	horizontal_shape_checkbox.toggled.connect(on_allowed_shape_toggled.bind(&"horizontal"))
+	vertical_shape_checkbox.toggled.connect(on_allowed_shape_toggled.bind(&"vertical"))
+	tshape_checkbox.toggled.connect(on_allowed_shape_toggled.bind(&"tshape"))
+	lshape_checkbox.toggled.connect(on_allowed_shape_toggled.bind(&"lshape"))
+	
 	
 func on_selection_mode_selected(idx: int) -> void:
 	match_3_board.configuration.selection_mode = selection_modes[selection_mode_option_button.get_item_id(idx)]
@@ -98,6 +131,26 @@ func on_swap_mode_selected(idx: int) -> void:
 
 func on_fill_mode_selected(idx: int) -> void:
 	match_3_board.configuration.fill_mode = fill_modes[fill_mode_option_button.get_item_id(idx)]
+
+
+func on_min_match_value_changed(value: int) -> void:
+	match_3_board.configuration.min_match = value
+
+
+func on_max_match_value_changed(value: int) -> void:
+	match_3_board.configuration.max_match = value
+
+
+func on_allowed_shape_toggled(toggled_on: bool, shape: StringName) -> void:
+	match shape:
+		&"horizontal":
+			match_3_board.configuration.horizontal_shape = toggled_on
+		&"vertical":
+			match_3_board.configuration.vertical_shape = toggled_on
+		&"tshape":
+			match_3_board.configuration.tshape = toggled_on
+		&"lshape":
+			match_3_board.configuration.lshape = toggled_on
 
 
 func on_state_changed(from: Match3Board.BoardState, to: Match3Board.BoardState) -> void:

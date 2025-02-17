@@ -59,7 +59,7 @@ theme_override_constants/margin_bottom = 15
 
 [node name="HBoxContainer" type="HBoxContainer" parent="Match3BoardUIConfiguration/MarginContainer"]
 layout_mode = 2
-theme_override_constants/separation = 15
+theme_override_constants/separation = 20
 
 [node name="SelectionMode" type="VBoxContainer" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer"]
 layout_mode = 2
@@ -72,19 +72,17 @@ text = "Selection mode"
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="SwapMode" type="VBoxContainer" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer"]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/SwapMode"]
+[node name="Label2" type="Label" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/SelectionMode"]
 layout_mode = 2
 text = "Swap mode"
 
-[node name="SwapModeOptionButton" type="OptionButton" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/SwapMode"]
+[node name="SwapModeOptionButton" type="OptionButton" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/SelectionMode"]
 unique_name_in_owner = true
 layout_mode = 2
 
 [node name="FillMode" type="VBoxContainer" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer"]
 layout_mode = 2
+size_flags_vertical = 4
 
 [node name="Label" type="Label" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/FillMode"]
 layout_mode = 2
@@ -93,3 +91,56 @@ text = "Fill Mode"
 [node name="FillModeOptionButton" type="OptionButton" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/FillMode"]
 unique_name_in_owner = true
 layout_mode = 2
+
+[node name="VSeparator" type="VSeparator" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="MinMaxMatch" type="VBoxContainer" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="MinMatchLabel" type="Label" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/MinMaxMatch"]
+layout_mode = 2
+text = "Min Match"
+
+[node name="MinMatchSpinBox" type="SpinBox" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/MinMaxMatch"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 0
+min_value = 3.0
+value = 3.0
+alignment = 1
+
+[node name="MaxMatchLabel" type="Label" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/MinMaxMatch"]
+layout_mode = 2
+text = "Max Match"
+
+[node name="MaxMatchSpinBox" type="SpinBox" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/MinMaxMatch"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 0
+min_value = 3.0
+value = 5.0
+alignment = 1
+
+[node name="SequenceShapes" type="VBoxContainer" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="HorizontalShape" type="CheckBox" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/SequenceShapes"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Horizontal"
+
+[node name="VerticalShape" type="CheckBox" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/SequenceShapes"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Vertical"
+
+[node name="TShape" type="CheckBox" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/SequenceShapes"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "TShape"
+
+[node name="LShape" type="CheckBox" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/SequenceShapes"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "LShape"
