@@ -69,43 +69,44 @@ func draw_preview_cells() -> Match3Preview:
 			
 		for column in board.configuration.grid_width:
 			for row in board.configuration.grid_height:
-				var cell := draw_preview_cell(column, row)
-				add_child(cell)
-				Match3BoardPluginUtilities.set_owner_to_edited_scene_root(cell)
+				var spawn_position = Vector2(board.configuration.cell_size.x * column, board.configuration.cell_size.y * row)
+				
+				if preview_cell_texture:
+					var cell := draw_preview_cell(column, row)
+					add_child(cell)
+					Match3BoardPluginUtilities.set_owner_to_edited_scene_root(cell)
 				
 				if Match3BoardPluginUtilities.remove_falsy_values(preview_pieces).size() > 0:
-					var piece :=  draw_preview_piece(cell, column, row)
+					var piece :=  draw_preview_piece(spawn_position, column, row)
 					add_child(piece)
 					Match3BoardPluginUtilities.set_owner_to_edited_scene_root(piece)
 					
 				if display_cell_position:
-					var label := draw_label_cell_position(cell, column, row)
+					var label := draw_label_cell_position(spawn_position, column, row)
+					add_child(label)
 					Match3BoardPluginUtilities.set_owner_to_edited_scene_root(label)
 					
 	return self
 	
 	
 func draw_preview_cell(column: int, row: int) -> Sprite2D:
-	if preview_cell_texture:
-		var cell_sprite: Sprite2D = Sprite2D.new()
-		
-		cell_sprite.name = "Cell(%d,%d)" % [column, row]
-		cell_sprite.texture = preview_cell_texture
-		var cell_texture_size = cell_sprite.texture.get_size()
-		cell_sprite.scale = Vector2(
-			board.configuration.cell_size.x / cell_texture_size.x, 
-			board.configuration.cell_size.y / cell_texture_size.y
-			) * cell_texture_scale
+	var cell_sprite: Sprite2D = Sprite2D.new()
 	
-		cell_sprite.position = Vector2(board.configuration.cell_size.x * column, board.configuration.cell_size.y * row)
-		cell_sprite.z_index = 0
-		
-		return cell_sprite
-		
-	return null
+	cell_sprite.name = "Cell(%d,%d)" % [column, row]
+	cell_sprite.texture = preview_cell_texture
+	var cell_texture_size = cell_sprite.texture.get_size()
+	cell_sprite.scale = Vector2(
+		board.configuration.cell_size.x / cell_texture_size.x, 
+		board.configuration.cell_size.y / cell_texture_size.y
+		) * cell_texture_scale
 
+	cell_sprite.position = Vector2(board.configuration.cell_size.x * column, board.configuration.cell_size.y * row)
+	cell_sprite.z_index = 0
+	
+	return cell_sprite
+	
 
-func draw_preview_piece(cell: Sprite2D, column: int, row: int) -> Sprite2D:
+func draw_preview_piece(spawn_position: Vector2, column: int, row: int) -> Sprite2D:
 	var piece_sprite: Sprite2D = Sprite2D.new()
 	piece_sprite.name = "Piece(%d,%d)" % [column, row]
 	
@@ -116,18 +117,19 @@ func draw_preview_piece(cell: Sprite2D, column: int, row: int) -> Sprite2D:
 		board.configuration.cell_size.y / piece_texture_size.y
 		) * piece_texture_scale
 	
-	piece_sprite.position = cell.position
+	piece_sprite.position = spawn_position
 	piece_sprite.z_index = 1
 	
 	return piece_sprite
 	
 
-func draw_label_cell_position(cell: Sprite2D, column, row) -> Label:
+func draw_label_cell_position(spawn_position: Vector2, column, row) -> Label:
 	var label: Label = Label.new()
+	label.name = "Label(%d,%d)" % [column, row]
 	label.z_index = 2
 	label.text = "(%d,%d)" % [column, row]
 	label.add_theme_font_size_override("font_size", position_font_size)
-	cell.add_child(label)
+	label.position = spawn_position
 	label.set_anchors_preset(Control.PRESET_CENTER)
 	
 	return label

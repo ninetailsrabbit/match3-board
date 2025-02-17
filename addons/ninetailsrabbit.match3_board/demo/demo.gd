@@ -13,6 +13,10 @@ extends Node2D
 @onready var vertical_shape_checkbox: CheckBox = %VerticalShape
 @onready var tshape_checkbox: CheckBox = %TShape
 @onready var lshape_checkbox: CheckBox = %LShape
+@onready var consume_sequence_animation_flow_option_button: OptionButton = %ConsumeSequenceAnimationFlow
+@onready var fall_animation_flow_option_button: OptionButton = %FallAnimationFlow
+@onready var fill_animation_flow_option_button: OptionButton = %FillAnimationFlow
+@onready var shuffle_button: Button = %ShuffleButton
 
 #endregion
 
@@ -57,8 +61,16 @@ func prepare_demo_ui() -> void:
 	prepare_fill_mode()
 	prepare_min_max_match_spin_boxes()
 	prepare_allowed_shapes()
+	prepare_animation_flow()
+	prepare_shuffle_button()
+	
+	
+func prepare_shuffle_button() -> void:
+	shuffle_button.pressed.connect(on_shuffle_button_pressed)
+	match_3_board.shuffle_started.connect(func(): shuffle_button.disabled = true)
+	match_3_board.shuffle_ended.connect(func(): shuffle_button.disabled = false)
 
-
+	
 func prepare_selection_mode() -> void:
 	selection_mode_option_button.clear()
 	selection_mode_option_button.add_item("Click", 0)
@@ -120,7 +132,17 @@ func prepare_allowed_shapes() -> void:
 	tshape_checkbox.toggled.connect(on_allowed_shape_toggled.bind(&"tshape"))
 	lshape_checkbox.toggled.connect(on_allowed_shape_toggled.bind(&"lshape"))
 	
+
+func prepare_animation_flow() -> void:
+	consume_sequence_animation_flow_option_button.select(0 if match_3_board.configuration.sequence_animation_is_serial() else 1)
+	fall_animation_flow_option_button.select(0 if match_3_board.configuration.fall_animation_is_serial() else 1)
+	fill_animation_flow_option_button.select(0 if match_3_board.configuration.fill_animation_is_serial() else 1)
 	
+	consume_sequence_animation_flow_option_button.item_selected.connect(on_animation_flow_selected.bind(&"sequence"))
+	fall_animation_flow_option_button.item_selected.connect(on_animation_flow_selected.bind(&"fall"))
+	fill_animation_flow_option_button.item_selected.connect(on_animation_flow_selected.bind(&"fill"))
+
+
 func on_selection_mode_selected(idx: int) -> void:
 	match_3_board.configuration.selection_mode = selection_modes[selection_mode_option_button.get_item_id(idx)]
 
@@ -152,6 +174,20 @@ func on_allowed_shape_toggled(toggled_on: bool, shape: StringName) -> void:
 		&"lshape":
 			match_3_board.configuration.lshape = toggled_on
 
+
+func on_animation_flow_selected(idx: int, animation: StringName) -> void:
+	match animation:
+		&"sequence":
+			match_3_board.configuration.sequence_animation = match_3_board.configuration.AnimationFlow.Serial if idx == 0 else match_3_board.configuration.AnimationFlow.Parallel 
+		&"fall":
+			match_3_board.configuration.fall_animation = match_3_board.configuration.AnimationFlow.Serial if idx == 0 else match_3_board.configuration.AnimationFlow.Parallel 
+		&"fill":
+			match_3_board.configuration.fill_animation = match_3_board.configuration.AnimationFlow.Serial if idx == 0 else match_3_board.configuration.AnimationFlow.Parallel 
+
+
+func on_shuffle_button_pressed() -> void:
+	match_3_board.shuffle()
+	
 
 func on_state_changed(from: Match3Board.BoardState, to: Match3Board.BoardState) -> void:
 	var from_state: String = ""

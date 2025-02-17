@@ -15,6 +15,8 @@ signal drawed_cells(cells: Array[Match3GridCell])
 signal drawed_cell(cell: Match3GridCell)
 signal drawed_piece(piece: Match3Piece)
 signal drawed_pieces(pieces: Array[Match3Piece])
+signal shuffle_started
+signal shuffle_ended
 signal locked
 signal unlocked
 signal movement_consumed
@@ -280,21 +282,24 @@ func remove_matches_from_board() -> void:
 
 
 func shuffle() -> void:
-	lock_all_pieces()
-	
-	var shuffle_movements := shuffler.shuffle()
-	
-	if animator:
-		await animator.shuffle(shuffle_movements)
+	if current_state == BoardState.WaitForInput:
+		lock_all_pieces()
+		shuffle_started.emit()
 		
-	for shuffle_movement in shuffle_movements:
-		shuffle_movement.swap()
+		var shuffle_movements := shuffler.shuffle()
 		
-	if configuration.delay_after_shuffle > 0:
-		await get_tree().create_timer(configuration.delay_after_shuffle).timeout
-	
-	travel_to(BoardState.Consume)
-
+		if animator:
+			await animator.shuffle(shuffle_movements)
+			
+		for shuffle_movement in shuffle_movements:
+			shuffle_movement.swap()
+			
+		if configuration.delay_after_shuffle > 0:
+			await get_tree().create_timer(configuration.delay_after_shuffle).timeout
+		
+		shuffle_ended.emit()
+		travel_to(BoardState.Consume)
+		
 
 func pieces() -> Array[Match3Piece]:
 	var pieces: Array[Match3Piece] = []
