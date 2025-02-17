@@ -41,6 +41,7 @@ var fall_mover: Match3FallMover = Match3FallMover.new(self)
 var filler: Match3Filler = Match3Filler.new(self)
 var sequence_detector: Match3SequenceDetector = Match3SequenceDetector.new(self)
 var sequence_consumer: Match3SequenceConsumer
+var shuffler: Match3Shuffler = Match3Shuffler.new(self)
 var piece_generator: Match3PieceGenerator = Match3PieceGenerator.new()
 
 var current_available_moves: int = 0:
@@ -121,10 +122,12 @@ func _ready() -> void:
 	if configuration.auto_start:
 		await draw_cells()
 		await draw_pieces()
-		
-	const SPECIAL_BLUE_PIECE_CONFIGURATION = preload("res://addons/ninetailsrabbit.match3_board/demo/pieces/special/special_blue_piece_configuration.tres")
 	
-	draw_piece_on_cell(finder.get_cell(2, 2), Match3Piece.from_configuration(SPECIAL_BLUE_PIECE_CONFIGURATION), true)
+	await get_tree().create_timer(1.0).timeout
+	shuffle()
+	#const SPECIAL_BLUE_PIECE_CONFIGURATION = preload("res://addons/ninetailsrabbit.match3_board/demo/pieces/special/special_blue_piece_configuration.tres")
+	#
+	#draw_piece_on_cell(finder.get_cell(2, 2), Match3Piece.from_configuration(SPECIAL_BLUE_PIECE_CONFIGURATION), true)
 
 
 func distance() -> int:
@@ -280,6 +283,23 @@ func remove_matches_from_board() -> void:
 				draw_piece_on_cell(current_cell, Match3Piece.from_configuration(piece_generator.roll(piece_exceptions)))
 			
 		sequences = sequence_detector.find_board_sequences()
+
+
+func shuffle() -> void:
+	lock_all_pieces()
+	
+	var shuffle_movements := shuffler.shuffle()
+	
+	if animator:
+		await animator.shuffle(shuffle_movements)
+		
+	for shuffle_movement in shuffle_movements:
+		shuffle_movement.swap()
+		
+	if configuration.delay_after_shuffle > 0:
+		await get_tree().create_timer(configuration.delay_after_shuffle).timeout
+	
+	travel_to(BoardState.Consume)
 
 
 func pieces() -> Array[Match3Piece]:

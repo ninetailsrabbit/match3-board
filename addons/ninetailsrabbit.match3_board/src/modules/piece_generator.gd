@@ -2,6 +2,8 @@ class_name Match3PieceGenerator extends RefCounted
 
 
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()
+## It's preferred to have his own available pieces array to not depend on the board one so we can
+## decide what pieces are generated or not
 var available_pieces: Array[Match3PieceConfiguration] = []
 
 

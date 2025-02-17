@@ -165,6 +165,23 @@ func piece_drag_ended(piece: Match3Piece) -> void:
 		
 	animation_finished.emit(PieceDragEndedAnimation)
 	
+	
+func shuffle(movements: Array[Match3Shuffler.ShuffleMovement]) -> void:
+	animation_started.emit(ShufflePiecesAnimation)
+	
+	if movements.size() > 0:
+		var tween: Tween = create_tween().set_parallel(true)
+		
+		for movement in movements:
+			tween.tween_property(movement.from_cell.piece, "position", movement.to_cell.position, 0.4)\
+				.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
+			tween.tween_property(movement.to_cell.piece, "position", movement.from_cell.position, 0.4)\
+				.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
+		
+		await tween.finished
+		
+	animation_finished.emit(ShufflePiecesAnimation)
+
 
 func on_animation_started(animation_name: StringName) -> void:
 	current_animation = animation_name

@@ -14,6 +14,7 @@ const SpawnPieceAnimation: StringName = &"spawn-piece"
 const SpawnPiecesAnimation: StringName = &"spawn-pieces"
 const TriggerSpecialPieceAnimation: StringName = &"trigger-special-piece"
 const PieceDragEndedAnimation: StringName = &"piece-drag-ended"
+const ShufflePiecesAnimation: StringName = &"shuffle-pieces"
 #endregion
 
 signal animation_started(animation_name: StringName)
@@ -92,6 +93,11 @@ func trigger_special_piece(piece: Match3Piece) -> void:
 func piece_drag_ended(piece: Match3Piece) -> void:
 	animation_started.emit(PieceDragEndedAnimation)
 	animation_finished.emit(PieceDragEndedAnimation)
+
+
+func shuffle(movements: Array[Match3Shuffler.ShuffleMovement]) -> void:
+	animation_started.emit(ShufflePiecesAnimation)
+	animation_finished.emit(ShufflePiecesAnimation)
 
 
 func on_animation_started(animation_name: StringName) -> void:

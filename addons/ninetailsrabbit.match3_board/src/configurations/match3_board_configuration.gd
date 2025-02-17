@@ -116,6 +116,8 @@ enum AnimationFlow {
 @export var fall_animation: AnimationFlow = AnimationFlow.Parallel
 ## Set the animation type when filling the board with new pieces
 @export var fill_animation: AnimationFlow = AnimationFlow.Parallel
+## After shuffle the board, a delay is applied to be able to see the changes before travel to Consume state
+@export var delay_after_shuffle: float = 0.5
 
 
 func piece_configuration_by_id(id: StringName) -> Match3PieceConfiguration:
