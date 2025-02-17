@@ -37,7 +37,7 @@ enum BoardSelectionMode {
 enum BoardFillModes {
 	## Pieces fall down to fill the empty cells
 	FallDown,
-	## Pieces still fall down but the empty cell sides are taking into account
+	## Pieces still fall down but diagonal empty cell are taking into account
 	Side,
 	## Pieces appears in the same place they were removed
 	InPlace

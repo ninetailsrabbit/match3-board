@@ -11,14 +11,14 @@
 script = ExtResource("1_dqalp")
 
 [node name="StateLabel" type="Label" parent="."]
-offset_left = 534.0
-offset_top = 42.0
-offset_right = 581.0
-offset_bottom = 65.0
+offset_left = 252.0
+offset_top = 35.0
+offset_right = 299.0
+offset_bottom = 58.0
 text = "STATE"
 
 [node name="Match3Board" type="Node2D" parent="." node_paths=PackedStringArray("animator", "highlighter", "line_connector")]
-position = Vector2(270, 171)
+position = Vector2(271, 126)
 script = ExtResource("2_wxjdv")
 configuration = ExtResource("3_gr7lp")
 animator = NodePath("Match3Animator")
@@ -38,3 +38,58 @@ width = 1.5
 default_color = Color(1, 1, 0.443137, 1)
 script = ExtResource("14_ktadd")
 board = NodePath("..")
+
+[node name="Match3BoardUIConfiguration" type="Panel" parent="."]
+offset_left = 2.0
+offset_top = 507.0
+offset_right = 1156.0
+offset_bottom = 645.0
+
+[node name="MarginContainer" type="MarginContainer" parent="Match3BoardUIConfiguration"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 15
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Match3BoardUIConfiguration/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="SelectionMode" type="VBoxContainer" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/SelectionMode"]
+layout_mode = 2
+text = "Selection mode"
+
+[node name="SelectionModeOptionButton" type="OptionButton" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/SelectionMode"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="SwapMode" type="VBoxContainer" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/SwapMode"]
+layout_mode = 2
+text = "Swap mode"
+
+[node name="SwapModeOptionButton" type="OptionButton" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/SwapMode"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="FillMode" type="VBoxContainer" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/FillMode"]
+layout_mode = 2
+text = "Fill Mode"
+
+[node name="FillModeOptionButton" type="OptionButton" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/FillMode"]
+unique_name_in_owner = true
+layout_mode = 2

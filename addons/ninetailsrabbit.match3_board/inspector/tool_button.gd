@@ -19,7 +19,8 @@ func _init(obj: Object, text:String):
 		"Generate Preview":
 			emoji = "🖌️"
 	
-	button.size_flags_horizontal = SIZE_EXPAND_FILL
-	button.flat = false
-	button.text = "%s %s" % [emoji, text]
-	button.button_down.connect(object._on_tool_button_pressed.bind(text))
+	if obj.has_method("_on_tool_button_pressed"):
+		button.size_flags_horizontal = SIZE_EXPAND_FILL
+		button.flat = false
+		button.text = "%s %s" % [emoji, text]
+		button.button_down.connect(object._on_tool_button_pressed.bind(text))

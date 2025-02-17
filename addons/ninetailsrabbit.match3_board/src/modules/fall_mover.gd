@@ -11,6 +11,9 @@ func _init(_board: Match3Board) -> void:
 func fall_pieces() -> Array[FallMovement]:
 	var movements: Array[FallMovement] = []
 	
+	if board.configuration.fill_mode_is_in_place():
+		return movements
+	
 	for column in board.configuration.grid_width:
 		movements.append_array(calculate_fall_movements_on_column(column))
 
