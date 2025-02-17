@@ -68,6 +68,7 @@ var current_selected_piece: Match3Piece:
 	set(new_piece):
 		if new_piece != current_selected_piece:
 			var previous_piece := current_selected_piece
+			print("current selected set ", previous_piece, new_piece)
 			current_selected_piece = new_piece
 			
 			if current_selected_piece == null:
@@ -189,13 +190,16 @@ func draw_pieces() -> Match3Board:
 	
 	for cell: Match3GridCell in grid_cells_flattened:
 		draw_random_piece_on_cell(cell)
-		
+	
+	lock_all_pieces()
+	
 	if animator:
 		if configuration.draw_cells_and_pieces_animation_is_serial():
 			await animator.draw_pieces(pieces())
 		elif configuration.draw_cells_and_pieces_animation_is_parallel():
 			animator.draw_pieces(pieces())
-			
+	
+	unlock_all_pieces()
 	drawed_pieces.emit(pieces())
 	
 	return self
@@ -578,7 +582,6 @@ func on_drawed_cells(cells: Array[Match3GridCell]) -> void:
 
 func on_drawed_pieces(pieces: Array[Match3Piece]) -> void:
 	if configuration.allow_matches_on_start:
-		
 		if not configuration.auto_start:
 			await draw_pieces()
 		
@@ -624,9 +627,11 @@ func on_selected_piece(piece: Match3Piece) -> void:
 		
 		elif current_selected_piece == piece:
 			current_selected_piece = null
-			
+			print("no deberia entrar")
 		elif current_selected_piece and current_selected_piece != piece:
 			swap_pieces(current_selected_piece, piece)
+			print("no deberia entrar 2")
+			
 			current_selected_piece = null
 		
 
@@ -664,13 +669,13 @@ func on_piece_drag_ended(piece: Match3Piece) -> void:
 		if other_piece:
 			swap_pieces(current_selected_piece, other_piece)
 		else:
-			if current_selected_piece.reset_position_on_drag_release:
+			if piece.reset_position_on_drag_release:
 				if animator:
-					await animator.piece_drag_ended(current_selected_piece)
-					
-				current_selected_piece.reset_drag_position()
+					await animator.piece_drag_ended(piece)
 			
-		piece_drag_ended.emit(current_selected_piece)
+				piece.reset_drag_position()
+			
+		piece_drag_ended.emit(piece)
 		current_selected_piece = null
 		
 
