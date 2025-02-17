@@ -384,7 +384,7 @@ func consume_sequences(sequences: Array[Match3Sequence]) -> void:
 			if combo.sequence.contains_special_piece():
 				add_special_pieces_to_queue(combo.sequence.special_pieces())
 				
-			consumed_sequence.emit(combo.sequence)
+			consumed_sequence.emit(combo.sequence.duplicate())
 			combo.sequence.consume_normal_cells()
 			await get_tree().process_frame
 			

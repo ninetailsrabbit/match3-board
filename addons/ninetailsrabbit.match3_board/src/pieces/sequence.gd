@@ -35,7 +35,11 @@ static func create_from_pieces(pieces: Array[Match3Piece], selected_shape: Shape
 	
 	return Match3Sequence.new(cells, selected_shape)
 	
+	
+func duplicate() -> Match3Sequence:
+	return Match3Sequence.new(cells.duplicate(true))
 
+	
 func all_pieces_are_the_same() -> bool:
 	var origin_piece: Match3Piece = pieces().front()
 	

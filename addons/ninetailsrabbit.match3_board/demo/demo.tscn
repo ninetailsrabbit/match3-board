@@ -13,55 +13,233 @@
 [ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/demo/demo_highlighter.gd" id="13_dlgcr"]
 [ext_resource type="Script" path="res://addons/ninetailsrabbit.match3_board/src/pieces/line_connector.gd" id="14_ktadd"]
 
-[node name="Demo" type="Node2D"]
-script = ExtResource("1_dqalp")
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Match3BoardUIConfiguration" type="Panel" parent="."]
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Match3BoardUIConfiguration"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 0
+theme_override_constants/separation = 20
+
+[node name="SelectionMode" type="VBoxContainer" parent="Match3BoardUIConfiguration/HBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Match3BoardUIConfiguration/HBoxContainer/SelectionMode"]
+layout_mode = 2
+text = "Selection mode"
+
+[node name="SelectionModeOptionButton" type="OptionButton" parent="Match3BoardUIConfiguration/HBoxContainer/SelectionMode"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="Match3BoardUIConfiguration/HBoxContainer/SelectionMode"]
+layout_mode = 2
+text = "Swap mode"
+
+[node name="SwapModeOptionButton" type="OptionButton" parent="Match3BoardUIConfiguration/HBoxContainer/SelectionMode"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="FillMode" type="VBoxContainer" parent="Match3BoardUIConfiguration/HBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="Label" type="Label" parent="Match3BoardUIConfiguration/HBoxContainer/FillMode"]
+layout_mode = 2
+text = "Fill Mode"
+
+[node name="FillModeOptionButton" type="OptionButton" parent="Match3BoardUIConfiguration/HBoxContainer/FillMode"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="VSeparator" type="VSeparator" parent="Match3BoardUIConfiguration/HBoxContainer"]
+layout_mode = 2
+
+[node name="MinMaxMatch" type="VBoxContainer" parent="Match3BoardUIConfiguration/HBoxContainer"]
+layout_mode = 2
+
+[node name="MinMatchLabel" type="Label" parent="Match3BoardUIConfiguration/HBoxContainer/MinMaxMatch"]
+layout_mode = 2
+text = "Min Match"
+
+[node name="MinMatchSpinBox" type="SpinBox" parent="Match3BoardUIConfiguration/HBoxContainer/MinMaxMatch"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 0
+min_value = 3.0
+value = 3.0
+alignment = 1
+
+[node name="MaxMatchLabel" type="Label" parent="Match3BoardUIConfiguration/HBoxContainer/MinMaxMatch"]
+layout_mode = 2
+text = "Max Match"
+
+[node name="MaxMatchSpinBox" type="SpinBox" parent="Match3BoardUIConfiguration/HBoxContainer/MinMaxMatch"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 0
+min_value = 3.0
+value = 5.0
+alignment = 1
+
+[node name="SequenceShapes" type="VBoxContainer" parent="Match3BoardUIConfiguration/HBoxContainer"]
+layout_mode = 2
+
+[node name="HorizontalShape" type="CheckBox" parent="Match3BoardUIConfiguration/HBoxContainer/SequenceShapes"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Horizontal"
+
+[node name="VerticalShape" type="CheckBox" parent="Match3BoardUIConfiguration/HBoxContainer/SequenceShapes"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Vertical"
+
+[node name="TShape" type="CheckBox" parent="Match3BoardUIConfiguration/HBoxContainer/SequenceShapes"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "TShape"
+
+[node name="LShape" type="CheckBox" parent="Match3BoardUIConfiguration/HBoxContainer/SequenceShapes"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "LShape"
+
+[node name="VSeparator2" type="VSeparator" parent="Match3BoardUIConfiguration/HBoxContainer"]
+layout_mode = 2
+
+[node name="Animations" type="VBoxContainer" parent="Match3BoardUIConfiguration/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+
+[node name="Label" type="Label" parent="Match3BoardUIConfiguration/HBoxContainer/Animations"]
+layout_mode = 2
+text = "Consume sequence animation flow"
+
+[node name="ConsumeSequenceAnimationFlow" type="OptionButton" parent="Match3BoardUIConfiguration/HBoxContainer/Animations"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+selected = 1
+item_count = 2
+popup/item_0/text = "Serial"
+popup/item_1/text = "Parallel"
+popup/item_1/id = 1
+
+[node name="Label2" type="Label" parent="Match3BoardUIConfiguration/HBoxContainer/Animations"]
+layout_mode = 2
+text = "Fall animation flow"
+
+[node name="FallAnimationFlow" type="OptionButton" parent="Match3BoardUIConfiguration/HBoxContainer/Animations"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+item_count = 2
+popup/item_0/text = "Serial"
+popup/item_1/text = "Parallel"
+popup/item_1/id = 1
+
+[node name="Label3" type="Label" parent="Match3BoardUIConfiguration/HBoxContainer/Animations"]
+layout_mode = 2
+text = "Fill animation flow"
+
+[node name="FillAnimationFlow" type="OptionButton" parent="Match3BoardUIConfiguration/HBoxContainer/Animations"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+item_count = 2
+popup/item_0/text = "Serial"
+popup/item_1/text = "Parallel"
+popup/item_1/id = 1
+
+[node name="VSeparator3" type="VSeparator" parent="Match3BoardUIConfiguration/HBoxContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Match3BoardUIConfiguration/HBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="ShuffleButton" type="Button" parent="Match3BoardUIConfiguration/HBoxContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "🎲 Shuffle Board"
 
 [node name="StateLabel" type="Label" parent="."]
-offset_left = 448.0
-offset_top = 4.0
-offset_right = 495.0
-offset_bottom = 27.0
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -23.5
+offset_right = 23.5
+offset_bottom = 23.0
+grow_horizontal = 2
 text = "STATE"
 
-[node name="Match3Board" type="Node2D" parent="." node_paths=PackedStringArray("animator", "highlighter", "line_connector")]
-position = Vector2(199, 59)
+[node name="Demo" type="Node2D" parent="."]
+position = Vector2(236, 58)
+script = ExtResource("1_dqalp")
+
+[node name="Match3Board" type="Node2D" parent="Demo" node_paths=PackedStringArray("animator", "highlighter", "line_connector")]
+unique_name_in_owner = true
 script = ExtResource("2_wxjdv")
 configuration = ExtResource("3_gr7lp")
 animator = NodePath("Match3Animator")
 highlighter = NodePath("Match3Highlighter")
 line_connector = NodePath("Match3LineConnector")
 
-[node name="Match3Animator" type="Node" parent="Match3Board" node_paths=PackedStringArray("board")]
+[node name="Match3Animator" type="Node" parent="Demo/Match3Board" node_paths=PackedStringArray("board")]
 script = ExtResource("12_fov6k")
 board = NodePath("..")
 
-[node name="Match3Highlighter" type="Node" parent="Match3Board" node_paths=PackedStringArray("board")]
+[node name="Match3Highlighter" type="Node" parent="Demo/Match3Board" node_paths=PackedStringArray("board")]
 script = ExtResource("13_dlgcr")
 board = NodePath("..")
 
-[node name="Match3LineConnector" type="Line2D" parent="Match3Board" node_paths=PackedStringArray("board")]
+[node name="Match3LineConnector" type="Line2D" parent="Demo/Match3Board" node_paths=PackedStringArray("board")]
 width = 1.5
 default_color = Color(1, 1, 0.443137, 1)
 script = ExtResource("14_ktadd")
 board = NodePath("..")
 
-[node name="Match3Preview" type="Node2D" parent="Match3Board" node_paths=PackedStringArray("board")]
+[node name="Match3Preview" type="Node2D" parent="Demo/Match3Board" node_paths=PackedStringArray("board")]
 script = ExtResource("7_l3rww")
 board = NodePath("..")
 preview_pieces = Array[Texture2D]([ExtResource("8_i3omk"), ExtResource("9_yhgbj"), ExtResource("10_rdkci"), ExtResource("11_djm0a")])
 preview_cell_texture = ExtResource("12_sg7kf")
 position_font_size = 16
 
-[node name="Cell(0,0)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(0,0)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(0,0)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(0,0)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 scale = Vector2(0.6375, 0.6375)
 texture = ExtResource("11_djm0a")
 
-[node name="Label(0,0)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(0,0)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -71,18 +249,18 @@ anchor_bottom = 0.5
 theme_override_font_sizes/font_size = 16
 text = "(0,0)"
 
-[node name="Cell(0,1)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(0,1)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(0, 48)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(0,1)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(0,1)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(0, 48)
-scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("8_i3omk")
+scale = Vector2(0.6375, 0.8)
+texture = ExtResource("10_rdkci")
 
-[node name="Label(0,1)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(0,1)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -94,18 +272,18 @@ offset_bottom = 48.0
 theme_override_font_sizes/font_size = 16
 text = "(0,1)"
 
-[node name="Cell(0,2)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(0,2)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(0, 96)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(0,2)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(0,2)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(0, 96)
 scale = Vector2(0.6375, 0.6375)
 texture = ExtResource("8_i3omk")
 
-[node name="Label(0,2)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(0,2)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -117,18 +295,18 @@ offset_bottom = 96.0
 theme_override_font_sizes/font_size = 16
 text = "(0,2)"
 
-[node name="Cell(0,3)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(0,3)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(0, 144)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(0,3)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(0,3)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(0, 144)
 scale = Vector2(0.6375, 0.6375)
 texture = ExtResource("11_djm0a")
 
-[node name="Label(0,3)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(0,3)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -140,18 +318,18 @@ offset_bottom = 144.0
 theme_override_font_sizes/font_size = 16
 text = "(0,3)"
 
-[node name="Cell(0,4)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(0,4)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(0, 192)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(0,4)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(0,4)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(0, 192)
 scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("8_i3omk")
+texture = ExtResource("9_yhgbj")
 
-[node name="Label(0,4)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(0,4)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -163,18 +341,18 @@ offset_bottom = 192.0
 theme_override_font_sizes/font_size = 16
 text = "(0,4)"
 
-[node name="Cell(0,5)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(0,5)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(0, 240)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(0,5)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(0,5)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(0, 240)
-scale = Vector2(0.6375, 0.8)
-texture = ExtResource("10_rdkci")
+scale = Vector2(0.6375, 0.6375)
+texture = ExtResource("9_yhgbj")
 
-[node name="Label(0,5)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(0,5)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -186,18 +364,18 @@ offset_bottom = 240.0
 theme_override_font_sizes/font_size = 16
 text = "(0,5)"
 
-[node name="Cell(0,6)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(0,6)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(0, 288)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(0,6)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(0,6)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(0, 288)
-scale = Vector2(0.6375, 0.8)
-texture = ExtResource("10_rdkci")
+scale = Vector2(0.6375, 0.6375)
+texture = ExtResource("9_yhgbj")
 
-[node name="Label(0,6)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(0,6)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -209,18 +387,18 @@ offset_bottom = 288.0
 theme_override_font_sizes/font_size = 16
 text = "(0,6)"
 
-[node name="Cell(0,7)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(0,7)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(0, 336)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(0,7)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(0,7)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(0, 336)
 scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("11_djm0a")
+texture = ExtResource("9_yhgbj")
 
-[node name="Label(0,7)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(0,7)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -232,18 +410,18 @@ offset_bottom = 336.0
 theme_override_font_sizes/font_size = 16
 text = "(0,7)"
 
-[node name="Cell(1,0)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(1,0)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(48, 0)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(1,0)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(1,0)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(48, 0)
 scale = Vector2(0.6375, 0.8)
 texture = ExtResource("10_rdkci")
 
-[node name="Label(1,0)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(1,0)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -255,18 +433,18 @@ offset_right = 48.0
 theme_override_font_sizes/font_size = 16
 text = "(1,0)"
 
-[node name="Cell(1,1)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(1,1)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(48, 48)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(1,1)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(1,1)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(48, 48)
 scale = Vector2(0.6375, 0.6375)
 texture = ExtResource("9_yhgbj")
 
-[node name="Label(1,1)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(1,1)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -280,18 +458,18 @@ offset_bottom = 48.0
 theme_override_font_sizes/font_size = 16
 text = "(1,1)"
 
-[node name="Cell(1,2)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(1,2)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(48, 96)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(1,2)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(1,2)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(48, 96)
-scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("8_i3omk")
+scale = Vector2(0.6375, 0.8)
+texture = ExtResource("10_rdkci")
 
-[node name="Label(1,2)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(1,2)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -305,18 +483,18 @@ offset_bottom = 96.0
 theme_override_font_sizes/font_size = 16
 text = "(1,2)"
 
-[node name="Cell(1,3)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(1,3)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(48, 144)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(1,3)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(1,3)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(48, 144)
 scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("9_yhgbj")
+texture = ExtResource("8_i3omk")
 
-[node name="Label(1,3)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(1,3)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -330,18 +508,18 @@ offset_bottom = 144.0
 theme_override_font_sizes/font_size = 16
 text = "(1,3)"
 
-[node name="Cell(1,4)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(1,4)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(48, 192)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(1,4)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(1,4)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(48, 192)
 scale = Vector2(0.6375, 0.8)
 texture = ExtResource("10_rdkci")
 
-[node name="Label(1,4)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(1,4)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -355,18 +533,18 @@ offset_bottom = 192.0
 theme_override_font_sizes/font_size = 16
 text = "(1,4)"
 
-[node name="Cell(1,5)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(1,5)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(48, 240)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(1,5)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(1,5)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(48, 240)
 scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("9_yhgbj")
+texture = ExtResource("11_djm0a")
 
-[node name="Label(1,5)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(1,5)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -380,18 +558,18 @@ offset_bottom = 240.0
 theme_override_font_sizes/font_size = 16
 text = "(1,5)"
 
-[node name="Cell(1,6)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(1,6)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(48, 288)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(1,6)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(1,6)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(48, 288)
 scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("8_i3omk")
+texture = ExtResource("9_yhgbj")
 
-[node name="Label(1,6)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(1,6)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -405,18 +583,18 @@ offset_bottom = 288.0
 theme_override_font_sizes/font_size = 16
 text = "(1,6)"
 
-[node name="Cell(1,7)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(1,7)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(48, 336)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(1,7)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(1,7)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(48, 336)
 scale = Vector2(0.6375, 0.8)
 texture = ExtResource("10_rdkci")
 
-[node name="Label(1,7)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(1,7)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -430,18 +608,18 @@ offset_bottom = 336.0
 theme_override_font_sizes/font_size = 16
 text = "(1,7)"
 
-[node name="Cell(2,0)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(2,0)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(96, 0)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(2,0)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(2,0)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(96, 0)
 scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("8_i3omk")
+texture = ExtResource("11_djm0a")
 
-[node name="Label(2,0)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(2,0)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -453,18 +631,18 @@ offset_right = 96.0
 theme_override_font_sizes/font_size = 16
 text = "(2,0)"
 
-[node name="Cell(2,1)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(2,1)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(96, 48)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(2,1)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(2,1)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(96, 48)
 scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("11_djm0a")
+texture = ExtResource("8_i3omk")
 
-[node name="Label(2,1)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(2,1)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -478,18 +656,18 @@ offset_bottom = 48.0
 theme_override_font_sizes/font_size = 16
 text = "(2,1)"
 
-[node name="Cell(2,2)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(2,2)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(96, 96)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(2,2)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(2,2)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(96, 96)
 scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("11_djm0a")
+texture = ExtResource("8_i3omk")
 
-[node name="Label(2,2)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(2,2)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -503,18 +681,18 @@ offset_bottom = 96.0
 theme_override_font_sizes/font_size = 16
 text = "(2,2)"
 
-[node name="Cell(2,3)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(2,3)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(96, 144)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(2,3)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(2,3)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(96, 144)
 scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("9_yhgbj")
+texture = ExtResource("11_djm0a")
 
-[node name="Label(2,3)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(2,3)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -528,18 +706,18 @@ offset_bottom = 144.0
 theme_override_font_sizes/font_size = 16
 text = "(2,3)"
 
-[node name="Cell(2,4)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(2,4)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(96, 192)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(2,4)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(2,4)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(96, 192)
-scale = Vector2(0.6375, 0.8)
-texture = ExtResource("10_rdkci")
+scale = Vector2(0.6375, 0.6375)
+texture = ExtResource("11_djm0a")
 
-[node name="Label(2,4)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(2,4)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -553,18 +731,18 @@ offset_bottom = 192.0
 theme_override_font_sizes/font_size = 16
 text = "(2,4)"
 
-[node name="Cell(2,5)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(2,5)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(96, 240)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(2,5)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(2,5)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(96, 240)
 scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("11_djm0a")
+texture = ExtResource("8_i3omk")
 
-[node name="Label(2,5)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(2,5)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -578,18 +756,18 @@ offset_bottom = 240.0
 theme_override_font_sizes/font_size = 16
 text = "(2,5)"
 
-[node name="Cell(2,6)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(2,6)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(96, 288)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(2,6)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(2,6)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(96, 288)
 scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("11_djm0a")
+texture = ExtResource("8_i3omk")
 
-[node name="Label(2,6)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(2,6)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -603,18 +781,18 @@ offset_bottom = 288.0
 theme_override_font_sizes/font_size = 16
 text = "(2,6)"
 
-[node name="Cell(2,7)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(2,7)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(96, 336)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(2,7)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(2,7)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(96, 336)
 scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("9_yhgbj")
+texture = ExtResource("8_i3omk")
 
-[node name="Label(2,7)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(2,7)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -628,18 +806,18 @@ offset_bottom = 336.0
 theme_override_font_sizes/font_size = 16
 text = "(2,7)"
 
-[node name="Cell(3,0)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(3,0)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(144, 0)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(3,0)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(3,0)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(144, 0)
-scale = Vector2(0.6375, 0.8)
-texture = ExtResource("10_rdkci")
+scale = Vector2(0.6375, 0.6375)
+texture = ExtResource("11_djm0a")
 
-[node name="Label(3,0)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(3,0)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -651,18 +829,18 @@ offset_right = 144.0
 theme_override_font_sizes/font_size = 16
 text = "(3,0)"
 
-[node name="Cell(3,1)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(3,1)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(144, 48)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(3,1)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(3,1)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(144, 48)
-scale = Vector2(0.6375, 0.8)
-texture = ExtResource("10_rdkci")
+scale = Vector2(0.6375, 0.6375)
+texture = ExtResource("11_djm0a")
 
-[node name="Label(3,1)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(3,1)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -676,18 +854,18 @@ offset_bottom = 48.0
 theme_override_font_sizes/font_size = 16
 text = "(3,1)"
 
-[node name="Cell(3,2)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(3,2)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(144, 96)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(3,2)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(3,2)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(144, 96)
-scale = Vector2(0.6375, 0.8)
-texture = ExtResource("10_rdkci")
+scale = Vector2(0.6375, 0.6375)
+texture = ExtResource("8_i3omk")
 
-[node name="Label(3,2)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(3,2)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -701,18 +879,18 @@ offset_bottom = 96.0
 theme_override_font_sizes/font_size = 16
 text = "(3,2)"
 
-[node name="Cell(3,3)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(3,3)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(144, 144)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(3,3)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(3,3)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(144, 144)
 scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("11_djm0a")
+texture = ExtResource("9_yhgbj")
 
-[node name="Label(3,3)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(3,3)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -726,18 +904,18 @@ offset_bottom = 144.0
 theme_override_font_sizes/font_size = 16
 text = "(3,3)"
 
-[node name="Cell(3,4)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(3,4)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(144, 192)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(3,4)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(3,4)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(144, 192)
 scale = Vector2(0.6375, 0.6375)
 texture = ExtResource("8_i3omk")
 
-[node name="Label(3,4)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(3,4)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -751,18 +929,18 @@ offset_bottom = 192.0
 theme_override_font_sizes/font_size = 16
 text = "(3,4)"
 
-[node name="Cell(3,5)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(3,5)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(144, 240)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(3,5)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(3,5)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(144, 240)
 scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("8_i3omk")
+texture = ExtResource("9_yhgbj")
 
-[node name="Label(3,5)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(3,5)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -776,18 +954,18 @@ offset_bottom = 240.0
 theme_override_font_sizes/font_size = 16
 text = "(3,5)"
 
-[node name="Cell(3,6)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(3,6)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(144, 288)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(3,6)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(3,6)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(144, 288)
-scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("9_yhgbj")
+scale = Vector2(0.6375, 0.8)
+texture = ExtResource("10_rdkci")
 
-[node name="Label(3,6)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(3,6)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -801,18 +979,18 @@ offset_bottom = 288.0
 theme_override_font_sizes/font_size = 16
 text = "(3,6)"
 
-[node name="Cell(3,7)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(3,7)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(144, 336)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(3,7)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(3,7)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(144, 336)
-scale = Vector2(0.6375, 0.8)
-texture = ExtResource("10_rdkci")
+scale = Vector2(0.6375, 0.6375)
+texture = ExtResource("8_i3omk")
 
-[node name="Label(3,7)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(3,7)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -826,18 +1004,18 @@ offset_bottom = 336.0
 theme_override_font_sizes/font_size = 16
 text = "(3,7)"
 
-[node name="Cell(4,0)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(4,0)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(192, 0)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(4,0)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(4,0)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(192, 0)
-scale = Vector2(0.6375, 0.8)
-texture = ExtResource("10_rdkci")
+scale = Vector2(0.6375, 0.6375)
+texture = ExtResource("9_yhgbj")
 
-[node name="Label(4,0)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(4,0)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -849,18 +1027,18 @@ offset_right = 192.0
 theme_override_font_sizes/font_size = 16
 text = "(4,0)"
 
-[node name="Cell(4,1)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(4,1)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(192, 48)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(4,1)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(4,1)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(192, 48)
 scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("11_djm0a")
+texture = ExtResource("8_i3omk")
 
-[node name="Label(4,1)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(4,1)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -874,18 +1052,18 @@ offset_bottom = 48.0
 theme_override_font_sizes/font_size = 16
 text = "(4,1)"
 
-[node name="Cell(4,2)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(4,2)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(192, 96)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(4,2)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(4,2)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(192, 96)
-scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("8_i3omk")
+scale = Vector2(0.6375, 0.8)
+texture = ExtResource("10_rdkci")
 
-[node name="Label(4,2)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(4,2)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -899,18 +1077,18 @@ offset_bottom = 96.0
 theme_override_font_sizes/font_size = 16
 text = "(4,2)"
 
-[node name="Cell(4,3)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(4,3)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(192, 144)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(4,3)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(4,3)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(192, 144)
-scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("11_djm0a")
+scale = Vector2(0.6375, 0.8)
+texture = ExtResource("10_rdkci")
 
-[node name="Label(4,3)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(4,3)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -924,18 +1102,18 @@ offset_bottom = 144.0
 theme_override_font_sizes/font_size = 16
 text = "(4,3)"
 
-[node name="Cell(4,4)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(4,4)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(192, 192)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(4,4)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(4,4)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(192, 192)
-scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("11_djm0a")
+scale = Vector2(0.6375, 0.8)
+texture = ExtResource("10_rdkci")
 
-[node name="Label(4,4)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(4,4)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -949,18 +1127,18 @@ offset_bottom = 192.0
 theme_override_font_sizes/font_size = 16
 text = "(4,4)"
 
-[node name="Cell(4,5)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(4,5)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(192, 240)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(4,5)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(4,5)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(192, 240)
 scale = Vector2(0.6375, 0.6375)
 texture = ExtResource("9_yhgbj")
 
-[node name="Label(4,5)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(4,5)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -974,18 +1152,18 @@ offset_bottom = 240.0
 theme_override_font_sizes/font_size = 16
 text = "(4,5)"
 
-[node name="Cell(4,6)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(4,6)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(192, 288)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(4,6)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(4,6)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(192, 288)
 scale = Vector2(0.6375, 0.8)
 texture = ExtResource("10_rdkci")
 
-[node name="Label(4,6)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(4,6)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -999,18 +1177,18 @@ offset_bottom = 288.0
 theme_override_font_sizes/font_size = 16
 text = "(4,6)"
 
-[node name="Cell(4,7)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(4,7)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(192, 336)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(4,7)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(4,7)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(192, 336)
 scale = Vector2(0.6375, 0.8)
 texture = ExtResource("10_rdkci")
 
-[node name="Label(4,7)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(4,7)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1024,18 +1202,18 @@ offset_bottom = 336.0
 theme_override_font_sizes/font_size = 16
 text = "(4,7)"
 
-[node name="Cell(5,0)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(5,0)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(240, 0)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(5,0)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(5,0)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(240, 0)
-scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("8_i3omk")
+scale = Vector2(0.6375, 0.8)
+texture = ExtResource("10_rdkci")
 
-[node name="Label(5,0)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(5,0)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1047,18 +1225,18 @@ offset_right = 240.0
 theme_override_font_sizes/font_size = 16
 text = "(5,0)"
 
-[node name="Cell(5,1)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(5,1)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(240, 48)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(5,1)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(5,1)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(240, 48)
-scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("8_i3omk")
+scale = Vector2(0.6375, 0.8)
+texture = ExtResource("10_rdkci")
 
-[node name="Label(5,1)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(5,1)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1072,18 +1250,18 @@ offset_bottom = 48.0
 theme_override_font_sizes/font_size = 16
 text = "(5,1)"
 
-[node name="Cell(5,2)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(5,2)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(240, 96)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(5,2)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(5,2)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(240, 96)
 scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("8_i3omk")
+texture = ExtResource("9_yhgbj")
 
-[node name="Label(5,2)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(5,2)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1097,18 +1275,18 @@ offset_bottom = 96.0
 theme_override_font_sizes/font_size = 16
 text = "(5,2)"
 
-[node name="Cell(5,3)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(5,3)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(240, 144)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(5,3)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(5,3)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(240, 144)
-scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("11_djm0a")
+scale = Vector2(0.6375, 0.8)
+texture = ExtResource("10_rdkci")
 
-[node name="Label(5,3)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(5,3)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1122,18 +1300,18 @@ offset_bottom = 144.0
 theme_override_font_sizes/font_size = 16
 text = "(5,3)"
 
-[node name="Cell(5,4)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(5,4)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(240, 192)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(5,4)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(5,4)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(240, 192)
 scale = Vector2(0.6375, 0.6375)
 texture = ExtResource("9_yhgbj")
 
-[node name="Label(5,4)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(5,4)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1147,18 +1325,18 @@ offset_bottom = 192.0
 theme_override_font_sizes/font_size = 16
 text = "(5,4)"
 
-[node name="Cell(5,5)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(5,5)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(240, 240)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(5,5)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(5,5)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(240, 240)
 scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("8_i3omk")
+texture = ExtResource("9_yhgbj")
 
-[node name="Label(5,5)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(5,5)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1172,18 +1350,18 @@ offset_bottom = 240.0
 theme_override_font_sizes/font_size = 16
 text = "(5,5)"
 
-[node name="Cell(5,6)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(5,6)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(240, 288)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(5,6)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(5,6)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(240, 288)
 scale = Vector2(0.6375, 0.8)
 texture = ExtResource("10_rdkci")
 
-[node name="Label(5,6)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(5,6)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1197,18 +1375,18 @@ offset_bottom = 288.0
 theme_override_font_sizes/font_size = 16
 text = "(5,6)"
 
-[node name="Cell(5,7)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(5,7)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(240, 336)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(5,7)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(5,7)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(240, 336)
-scale = Vector2(0.6375, 0.8)
-texture = ExtResource("10_rdkci")
+scale = Vector2(0.6375, 0.6375)
+texture = ExtResource("8_i3omk")
 
-[node name="Label(5,7)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(5,7)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1222,18 +1400,18 @@ offset_bottom = 336.0
 theme_override_font_sizes/font_size = 16
 text = "(5,7)"
 
-[node name="Cell(6,0)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(6,0)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(288, 0)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(6,0)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(6,0)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(288, 0)
 scale = Vector2(0.6375, 0.6375)
 texture = ExtResource("9_yhgbj")
 
-[node name="Label(6,0)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(6,0)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1245,18 +1423,18 @@ offset_right = 288.0
 theme_override_font_sizes/font_size = 16
 text = "(6,0)"
 
-[node name="Cell(6,1)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(6,1)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(288, 48)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(6,1)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(6,1)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(288, 48)
-scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("9_yhgbj")
+scale = Vector2(0.6375, 0.8)
+texture = ExtResource("10_rdkci")
 
-[node name="Label(6,1)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(6,1)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1270,18 +1448,18 @@ offset_bottom = 48.0
 theme_override_font_sizes/font_size = 16
 text = "(6,1)"
 
-[node name="Cell(6,2)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(6,2)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(288, 96)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(6,2)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(6,2)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(288, 96)
-scale = Vector2(0.6375, 0.8)
-texture = ExtResource("10_rdkci")
+scale = Vector2(0.6375, 0.6375)
+texture = ExtResource("9_yhgbj")
 
-[node name="Label(6,2)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(6,2)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1295,18 +1473,18 @@ offset_bottom = 96.0
 theme_override_font_sizes/font_size = 16
 text = "(6,2)"
 
-[node name="Cell(6,3)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(6,3)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(288, 144)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(6,3)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(6,3)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(288, 144)
-scale = Vector2(0.6375, 0.8)
-texture = ExtResource("10_rdkci")
+scale = Vector2(0.6375, 0.6375)
+texture = ExtResource("11_djm0a")
 
-[node name="Label(6,3)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(6,3)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1320,18 +1498,18 @@ offset_bottom = 144.0
 theme_override_font_sizes/font_size = 16
 text = "(6,3)"
 
-[node name="Cell(6,4)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(6,4)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(288, 192)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(6,4)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(6,4)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(288, 192)
 scale = Vector2(0.6375, 0.6375)
 texture = ExtResource("8_i3omk")
 
-[node name="Label(6,4)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(6,4)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1345,18 +1523,18 @@ offset_bottom = 192.0
 theme_override_font_sizes/font_size = 16
 text = "(6,4)"
 
-[node name="Cell(6,5)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(6,5)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(288, 240)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(6,5)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(6,5)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(288, 240)
-scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("9_yhgbj")
+scale = Vector2(0.6375, 0.8)
+texture = ExtResource("10_rdkci")
 
-[node name="Label(6,5)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(6,5)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1370,18 +1548,18 @@ offset_bottom = 240.0
 theme_override_font_sizes/font_size = 16
 text = "(6,5)"
 
-[node name="Cell(6,6)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(6,6)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(288, 288)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(6,6)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(6,6)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(288, 288)
 scale = Vector2(0.6375, 0.8)
 texture = ExtResource("10_rdkci")
 
-[node name="Label(6,6)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(6,6)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1395,18 +1573,18 @@ offset_bottom = 288.0
 theme_override_font_sizes/font_size = 16
 text = "(6,6)"
 
-[node name="Cell(6,7)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(6,7)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(288, 336)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(6,7)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(6,7)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(288, 336)
 scale = Vector2(0.6375, 0.6375)
 texture = ExtResource("9_yhgbj")
 
-[node name="Label(6,7)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(6,7)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1420,18 +1598,18 @@ offset_bottom = 336.0
 theme_override_font_sizes/font_size = 16
 text = "(6,7)"
 
-[node name="Cell(7,0)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(7,0)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(336, 0)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(7,0)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(7,0)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(336, 0)
 scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("9_yhgbj")
+texture = ExtResource("8_i3omk")
 
-[node name="Label(7,0)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(7,0)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1443,18 +1621,18 @@ offset_right = 336.0
 theme_override_font_sizes/font_size = 16
 text = "(7,0)"
 
-[node name="Cell(7,1)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(7,1)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(336, 48)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(7,1)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(7,1)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(336, 48)
-scale = Vector2(0.6375, 0.8)
-texture = ExtResource("10_rdkci")
+scale = Vector2(0.6375, 0.6375)
+texture = ExtResource("8_i3omk")
 
-[node name="Label(7,1)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(7,1)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1468,18 +1646,18 @@ offset_bottom = 48.0
 theme_override_font_sizes/font_size = 16
 text = "(7,1)"
 
-[node name="Cell(7,2)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(7,2)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(336, 96)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(7,2)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(7,2)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(336, 96)
 scale = Vector2(0.6375, 0.8)
 texture = ExtResource("10_rdkci")
 
-[node name="Label(7,2)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(7,2)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1493,18 +1671,18 @@ offset_bottom = 96.0
 theme_override_font_sizes/font_size = 16
 text = "(7,2)"
 
-[node name="Cell(7,3)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(7,3)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(336, 144)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(7,3)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(7,3)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(336, 144)
 scale = Vector2(0.6375, 0.6375)
 texture = ExtResource("8_i3omk")
 
-[node name="Label(7,3)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(7,3)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1518,18 +1696,18 @@ offset_bottom = 144.0
 theme_override_font_sizes/font_size = 16
 text = "(7,3)"
 
-[node name="Cell(7,4)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(7,4)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(336, 192)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(7,4)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(7,4)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(336, 192)
-scale = Vector2(0.6375, 0.8)
-texture = ExtResource("10_rdkci")
+scale = Vector2(0.6375, 0.6375)
+texture = ExtResource("11_djm0a")
 
-[node name="Label(7,4)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(7,4)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1543,18 +1721,18 @@ offset_bottom = 192.0
 theme_override_font_sizes/font_size = 16
 text = "(7,4)"
 
-[node name="Cell(7,5)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(7,5)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(336, 240)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(7,5)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(7,5)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(336, 240)
-scale = Vector2(0.6375, 0.8)
-texture = ExtResource("10_rdkci")
+scale = Vector2(0.6375, 0.6375)
+texture = ExtResource("9_yhgbj")
 
-[node name="Label(7,5)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(7,5)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1568,18 +1746,18 @@ offset_bottom = 240.0
 theme_override_font_sizes/font_size = 16
 text = "(7,5)"
 
-[node name="Cell(7,6)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(7,6)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(336, 288)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(7,6)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(7,6)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(336, 288)
-scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("11_djm0a")
+scale = Vector2(0.6375, 0.8)
+texture = ExtResource("10_rdkci")
 
-[node name="Label(7,6)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(7,6)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1593,18 +1771,18 @@ offset_bottom = 288.0
 theme_override_font_sizes/font_size = 16
 text = "(7,6)"
 
-[node name="Cell(7,7)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(7,7)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(336, 336)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(7,7)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(7,7)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(336, 336)
 scale = Vector2(0.6375, 0.6375)
 texture = ExtResource("8_i3omk")
 
-[node name="Label(7,7)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(7,7)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1618,18 +1796,18 @@ offset_bottom = 336.0
 theme_override_font_sizes/font_size = 16
 text = "(7,7)"
 
-[node name="Cell(8,0)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(8,0)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(384, 0)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(8,0)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(8,0)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(384, 0)
-scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("8_i3omk")
+scale = Vector2(0.6375, 0.8)
+texture = ExtResource("10_rdkci")
 
-[node name="Label(8,0)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(8,0)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1641,18 +1819,18 @@ offset_right = 384.0
 theme_override_font_sizes/font_size = 16
 text = "(8,0)"
 
-[node name="Cell(8,1)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(8,1)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(384, 48)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(8,1)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(8,1)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(384, 48)
-scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("8_i3omk")
+scale = Vector2(0.6375, 0.8)
+texture = ExtResource("10_rdkci")
 
-[node name="Label(8,1)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(8,1)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1666,18 +1844,18 @@ offset_bottom = 48.0
 theme_override_font_sizes/font_size = 16
 text = "(8,1)"
 
-[node name="Cell(8,2)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(8,2)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(384, 96)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(8,2)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(8,2)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(384, 96)
 scale = Vector2(0.6375, 0.6375)
 texture = ExtResource("11_djm0a")
 
-[node name="Label(8,2)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(8,2)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1691,18 +1869,18 @@ offset_bottom = 96.0
 theme_override_font_sizes/font_size = 16
 text = "(8,2)"
 
-[node name="Cell(8,3)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(8,3)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(384, 144)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(8,3)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(8,3)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(384, 144)
 scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("8_i3omk")
+texture = ExtResource("9_yhgbj")
 
-[node name="Label(8,3)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(8,3)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1716,18 +1894,18 @@ offset_bottom = 144.0
 theme_override_font_sizes/font_size = 16
 text = "(8,3)"
 
-[node name="Cell(8,4)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(8,4)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(384, 192)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(8,4)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(8,4)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(384, 192)
 scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("8_i3omk")
+texture = ExtResource("11_djm0a")
 
-[node name="Label(8,4)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(8,4)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1741,18 +1919,18 @@ offset_bottom = 192.0
 theme_override_font_sizes/font_size = 16
 text = "(8,4)"
 
-[node name="Cell(8,5)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(8,5)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(384, 240)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(8,5)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(8,5)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(384, 240)
-scale = Vector2(0.6375, 0.8)
-texture = ExtResource("10_rdkci")
+scale = Vector2(0.6375, 0.6375)
+texture = ExtResource("11_djm0a")
 
-[node name="Label(8,5)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(8,5)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1766,18 +1944,18 @@ offset_bottom = 240.0
 theme_override_font_sizes/font_size = 16
 text = "(8,5)"
 
-[node name="Cell(8,6)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(8,6)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(384, 288)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(8,6)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(8,6)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(384, 288)
-scale = Vector2(0.6375, 0.8)
-texture = ExtResource("10_rdkci")
+scale = Vector2(0.6375, 0.6375)
+texture = ExtResource("8_i3omk")
 
-[node name="Label(8,6)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(8,6)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1791,18 +1969,18 @@ offset_bottom = 288.0
 theme_override_font_sizes/font_size = 16
 text = "(8,6)"
 
-[node name="Cell(8,7)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(8,7)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(384, 336)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(8,7)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(8,7)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(384, 336)
-scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("9_yhgbj")
+scale = Vector2(0.6375, 0.8)
+texture = ExtResource("10_rdkci")
 
-[node name="Label(8,7)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(8,7)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1816,18 +1994,18 @@ offset_bottom = 336.0
 theme_override_font_sizes/font_size = 16
 text = "(8,7)"
 
-[node name="Cell(9,0)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(9,0)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(432, 0)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(9,0)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(9,0)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(432, 0)
 scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("9_yhgbj")
+texture = ExtResource("11_djm0a")
 
-[node name="Label(9,0)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(9,0)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1839,18 +2017,18 @@ offset_right = 432.0
 theme_override_font_sizes/font_size = 16
 text = "(9,0)"
 
-[node name="Cell(9,1)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(9,1)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(432, 48)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(9,1)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(9,1)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(432, 48)
 scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("9_yhgbj")
+texture = ExtResource("8_i3omk")
 
-[node name="Label(9,1)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(9,1)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1864,18 +2042,18 @@ offset_bottom = 48.0
 theme_override_font_sizes/font_size = 16
 text = "(9,1)"
 
-[node name="Cell(9,2)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(9,2)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(432, 96)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(9,2)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(9,2)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(432, 96)
-scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("11_djm0a")
+scale = Vector2(0.6375, 0.8)
+texture = ExtResource("10_rdkci")
 
-[node name="Label(9,2)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(9,2)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1889,18 +2067,18 @@ offset_bottom = 96.0
 theme_override_font_sizes/font_size = 16
 text = "(9,2)"
 
-[node name="Cell(9,3)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(9,3)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(432, 144)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(9,3)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(9,3)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(432, 144)
 scale = Vector2(0.6375, 0.6375)
 texture = ExtResource("11_djm0a")
 
-[node name="Label(9,3)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(9,3)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1914,18 +2092,18 @@ offset_bottom = 144.0
 theme_override_font_sizes/font_size = 16
 text = "(9,3)"
 
-[node name="Cell(9,4)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(9,4)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(432, 192)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(9,4)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(9,4)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(432, 192)
 scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("11_djm0a")
+texture = ExtResource("8_i3omk")
 
-[node name="Label(9,4)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(9,4)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1939,18 +2117,18 @@ offset_bottom = 192.0
 theme_override_font_sizes/font_size = 16
 text = "(9,4)"
 
-[node name="Cell(9,5)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(9,5)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(432, 240)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(9,5)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(9,5)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(432, 240)
 scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("11_djm0a")
+texture = ExtResource("8_i3omk")
 
-[node name="Label(9,5)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(9,5)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1964,18 +2142,18 @@ offset_bottom = 240.0
 theme_override_font_sizes/font_size = 16
 text = "(9,5)"
 
-[node name="Cell(9,6)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(9,6)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(432, 288)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(9,6)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(9,6)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(432, 288)
-scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("8_i3omk")
+scale = Vector2(0.6375, 0.8)
+texture = ExtResource("10_rdkci")
 
-[node name="Label(9,6)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(9,6)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -1989,18 +2167,18 @@ offset_bottom = 288.0
 theme_override_font_sizes/font_size = 16
 text = "(9,6)"
 
-[node name="Cell(9,7)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(9,7)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(432, 336)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(9,7)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(9,7)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(432, 336)
 scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("8_i3omk")
+texture = ExtResource("11_djm0a")
 
-[node name="Label(9,7)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(9,7)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2014,18 +2192,18 @@ offset_bottom = 336.0
 theme_override_font_sizes/font_size = 16
 text = "(9,7)"
 
-[node name="Cell(10,0)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(10,0)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(480, 0)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(10,0)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(10,0)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(480, 0)
-scale = Vector2(0.6375, 0.8)
-texture = ExtResource("10_rdkci")
+scale = Vector2(0.6375, 0.6375)
+texture = ExtResource("9_yhgbj")
 
-[node name="Label(10,0)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(10,0)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2037,18 +2215,18 @@ offset_right = 480.0
 theme_override_font_sizes/font_size = 16
 text = "(10,0)"
 
-[node name="Cell(10,1)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(10,1)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(480, 48)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(10,1)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(10,1)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(480, 48)
 scale = Vector2(0.6375, 0.6375)
 texture = ExtResource("8_i3omk")
 
-[node name="Label(10,1)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(10,1)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2062,18 +2240,18 @@ offset_bottom = 48.0
 theme_override_font_sizes/font_size = 16
 text = "(10,1)"
 
-[node name="Cell(10,2)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(10,2)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(480, 96)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(10,2)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(10,2)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(480, 96)
 scale = Vector2(0.6375, 0.6375)
 texture = ExtResource("11_djm0a")
 
-[node name="Label(10,2)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(10,2)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2087,18 +2265,18 @@ offset_bottom = 96.0
 theme_override_font_sizes/font_size = 16
 text = "(10,2)"
 
-[node name="Cell(10,3)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(10,3)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(480, 144)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(10,3)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(10,3)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(480, 144)
-scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("11_djm0a")
+scale = Vector2(0.6375, 0.8)
+texture = ExtResource("10_rdkci")
 
-[node name="Label(10,3)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(10,3)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2112,18 +2290,18 @@ offset_bottom = 144.0
 theme_override_font_sizes/font_size = 16
 text = "(10,3)"
 
-[node name="Cell(10,4)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(10,4)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(480, 192)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(10,4)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(10,4)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(480, 192)
 scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("9_yhgbj")
+texture = ExtResource("11_djm0a")
 
-[node name="Label(10,4)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(10,4)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2137,18 +2315,18 @@ offset_bottom = 192.0
 theme_override_font_sizes/font_size = 16
 text = "(10,4)"
 
-[node name="Cell(10,5)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(10,5)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(480, 240)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(10,5)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(10,5)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(480, 240)
-scale = Vector2(0.6375, 0.8)
-texture = ExtResource("10_rdkci")
+scale = Vector2(0.6375, 0.6375)
+texture = ExtResource("9_yhgbj")
 
-[node name="Label(10,5)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(10,5)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2162,18 +2340,18 @@ offset_bottom = 240.0
 theme_override_font_sizes/font_size = 16
 text = "(10,5)"
 
-[node name="Cell(10,6)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(10,6)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(480, 288)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(10,6)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(10,6)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(480, 288)
-scale = Vector2(0.6375, 0.8)
-texture = ExtResource("10_rdkci")
+scale = Vector2(0.6375, 0.6375)
+texture = ExtResource("11_djm0a")
 
-[node name="Label(10,6)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(10,6)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2187,18 +2365,18 @@ offset_bottom = 288.0
 theme_override_font_sizes/font_size = 16
 text = "(10,6)"
 
-[node name="Cell(10,7)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(10,7)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(480, 336)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(10,7)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(10,7)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(480, 336)
-scale = Vector2(0.6375, 0.8)
-texture = ExtResource("10_rdkci")
+scale = Vector2(0.6375, 0.6375)
+texture = ExtResource("11_djm0a")
 
-[node name="Label(10,7)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(10,7)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2212,18 +2390,18 @@ offset_bottom = 336.0
 theme_override_font_sizes/font_size = 16
 text = "(10,7)"
 
-[node name="Cell(11,0)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(11,0)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(528, 0)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(11,0)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(11,0)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(528, 0)
 scale = Vector2(0.6375, 0.6375)
 texture = ExtResource("9_yhgbj")
 
-[node name="Label(11,0)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(11,0)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2235,18 +2413,18 @@ offset_right = 528.0
 theme_override_font_sizes/font_size = 16
 text = "(11,0)"
 
-[node name="Cell(11,1)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(11,1)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(528, 48)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(11,1)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(11,1)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(528, 48)
 scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("9_yhgbj")
+texture = ExtResource("8_i3omk")
 
-[node name="Label(11,1)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(11,1)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2260,18 +2438,18 @@ offset_bottom = 48.0
 theme_override_font_sizes/font_size = 16
 text = "(11,1)"
 
-[node name="Cell(11,2)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(11,2)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(528, 96)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(11,2)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(11,2)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(528, 96)
 scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("9_yhgbj")
+texture = ExtResource("11_djm0a")
 
-[node name="Label(11,2)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(11,2)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2285,18 +2463,18 @@ offset_bottom = 96.0
 theme_override_font_sizes/font_size = 16
 text = "(11,2)"
 
-[node name="Cell(11,3)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(11,3)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(528, 144)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(11,3)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(11,3)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(528, 144)
 scale = Vector2(0.6375, 0.6375)
 texture = ExtResource("11_djm0a")
 
-[node name="Label(11,3)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(11,3)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2310,18 +2488,18 @@ offset_bottom = 144.0
 theme_override_font_sizes/font_size = 16
 text = "(11,3)"
 
-[node name="Cell(11,4)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(11,4)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(528, 192)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(11,4)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(11,4)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(528, 192)
 scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("11_djm0a")
+texture = ExtResource("9_yhgbj")
 
-[node name="Label(11,4)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(11,4)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2335,18 +2513,18 @@ offset_bottom = 192.0
 theme_override_font_sizes/font_size = 16
 text = "(11,4)"
 
-[node name="Cell(11,5)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(11,5)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(528, 240)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(11,5)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(11,5)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(528, 240)
-scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("11_djm0a")
+scale = Vector2(0.6375, 0.8)
+texture = ExtResource("10_rdkci")
 
-[node name="Label(11,5)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(11,5)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2360,18 +2538,18 @@ offset_bottom = 240.0
 theme_override_font_sizes/font_size = 16
 text = "(11,5)"
 
-[node name="Cell(11,6)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(11,6)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(528, 288)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(11,6)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(11,6)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(528, 288)
 scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("8_i3omk")
+texture = ExtResource("9_yhgbj")
 
-[node name="Label(11,6)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(11,6)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2385,18 +2563,18 @@ offset_bottom = 288.0
 theme_override_font_sizes/font_size = 16
 text = "(11,6)"
 
-[node name="Cell(11,7)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(11,7)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(528, 336)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(11,7)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(11,7)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(528, 336)
-scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("11_djm0a")
+scale = Vector2(0.6375, 0.8)
+texture = ExtResource("10_rdkci")
 
-[node name="Label(11,7)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(11,7)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2410,18 +2588,18 @@ offset_bottom = 336.0
 theme_override_font_sizes/font_size = 16
 text = "(11,7)"
 
-[node name="Cell(12,0)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(12,0)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(576, 0)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(12,0)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(12,0)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(576, 0)
 scale = Vector2(0.6375, 0.8)
 texture = ExtResource("10_rdkci")
 
-[node name="Label(12,0)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(12,0)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2433,18 +2611,18 @@ offset_right = 576.0
 theme_override_font_sizes/font_size = 16
 text = "(12,0)"
 
-[node name="Cell(12,1)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(12,1)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(576, 48)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(12,1)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(12,1)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(576, 48)
 scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("9_yhgbj")
+texture = ExtResource("11_djm0a")
 
-[node name="Label(12,1)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(12,1)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2458,18 +2636,18 @@ offset_bottom = 48.0
 theme_override_font_sizes/font_size = 16
 text = "(12,1)"
 
-[node name="Cell(12,2)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(12,2)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(576, 96)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(12,2)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(12,2)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(576, 96)
 scale = Vector2(0.6375, 0.6375)
 texture = ExtResource("8_i3omk")
 
-[node name="Label(12,2)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(12,2)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2483,18 +2661,18 @@ offset_bottom = 96.0
 theme_override_font_sizes/font_size = 16
 text = "(12,2)"
 
-[node name="Cell(12,3)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(12,3)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(576, 144)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(12,3)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(12,3)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(576, 144)
 scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("8_i3omk")
+texture = ExtResource("11_djm0a")
 
-[node name="Label(12,3)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(12,3)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2508,18 +2686,18 @@ offset_bottom = 144.0
 theme_override_font_sizes/font_size = 16
 text = "(12,3)"
 
-[node name="Cell(12,4)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(12,4)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(576, 192)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(12,4)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(12,4)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(576, 192)
 scale = Vector2(0.6375, 0.8)
 texture = ExtResource("10_rdkci")
 
-[node name="Label(12,4)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(12,4)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2533,18 +2711,18 @@ offset_bottom = 192.0
 theme_override_font_sizes/font_size = 16
 text = "(12,4)"
 
-[node name="Cell(12,5)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(12,5)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(576, 240)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(12,5)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(12,5)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(576, 240)
 scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("8_i3omk")
+texture = ExtResource("11_djm0a")
 
-[node name="Label(12,5)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(12,5)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2558,18 +2736,18 @@ offset_bottom = 240.0
 theme_override_font_sizes/font_size = 16
 text = "(12,5)"
 
-[node name="Cell(12,6)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(12,6)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(576, 288)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(12,6)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(12,6)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(576, 288)
-scale = Vector2(0.6375, 0.8)
-texture = ExtResource("10_rdkci")
+scale = Vector2(0.6375, 0.6375)
+texture = ExtResource("9_yhgbj")
 
-[node name="Label(12,6)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(12,6)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2583,18 +2761,18 @@ offset_bottom = 288.0
 theme_override_font_sizes/font_size = 16
 text = "(12,6)"
 
-[node name="Cell(12,7)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(12,7)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(576, 336)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(12,7)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(12,7)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(576, 336)
 scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("11_djm0a")
+texture = ExtResource("9_yhgbj")
 
-[node name="Label(12,7)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(12,7)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2608,18 +2786,18 @@ offset_bottom = 336.0
 theme_override_font_sizes/font_size = 16
 text = "(12,7)"
 
-[node name="Cell(13,0)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(13,0)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(624, 0)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(13,0)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(13,0)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(624, 0)
-scale = Vector2(0.6375, 0.8)
-texture = ExtResource("10_rdkci")
+scale = Vector2(0.6375, 0.6375)
+texture = ExtResource("11_djm0a")
 
-[node name="Label(13,0)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(13,0)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2631,18 +2809,18 @@ offset_right = 624.0
 theme_override_font_sizes/font_size = 16
 text = "(13,0)"
 
-[node name="Cell(13,1)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(13,1)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(624, 48)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(13,1)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(13,1)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(624, 48)
 scale = Vector2(0.6375, 0.6375)
 texture = ExtResource("8_i3omk")
 
-[node name="Label(13,1)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(13,1)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2656,18 +2834,18 @@ offset_bottom = 48.0
 theme_override_font_sizes/font_size = 16
 text = "(13,1)"
 
-[node name="Cell(13,2)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(13,2)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(624, 96)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(13,2)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(13,2)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(624, 96)
 scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("9_yhgbj")
+texture = ExtResource("8_i3omk")
 
-[node name="Label(13,2)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(13,2)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2681,18 +2859,18 @@ offset_bottom = 96.0
 theme_override_font_sizes/font_size = 16
 text = "(13,2)"
 
-[node name="Cell(13,3)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(13,3)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(624, 144)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(13,3)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(13,3)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(624, 144)
 scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("9_yhgbj")
+texture = ExtResource("8_i3omk")
 
-[node name="Label(13,3)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(13,3)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2706,18 +2884,18 @@ offset_bottom = 144.0
 theme_override_font_sizes/font_size = 16
 text = "(13,3)"
 
-[node name="Cell(13,4)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(13,4)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(624, 192)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(13,4)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(13,4)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(624, 192)
 scale = Vector2(0.6375, 0.8)
 texture = ExtResource("10_rdkci")
 
-[node name="Label(13,4)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(13,4)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2731,18 +2909,18 @@ offset_bottom = 192.0
 theme_override_font_sizes/font_size = 16
 text = "(13,4)"
 
-[node name="Cell(13,5)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(13,5)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(624, 240)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(13,5)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(13,5)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(624, 240)
 scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("11_djm0a")
+texture = ExtResource("9_yhgbj")
 
-[node name="Label(13,5)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(13,5)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2756,18 +2934,18 @@ offset_bottom = 240.0
 theme_override_font_sizes/font_size = 16
 text = "(13,5)"
 
-[node name="Cell(13,6)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(13,6)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(624, 288)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(13,6)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(13,6)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(624, 288)
 scale = Vector2(0.6375, 0.6375)
 texture = ExtResource("8_i3omk")
 
-[node name="Label(13,6)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(13,6)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2781,18 +2959,18 @@ offset_bottom = 288.0
 theme_override_font_sizes/font_size = 16
 text = "(13,6)"
 
-[node name="Cell(13,7)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(13,7)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(624, 336)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(13,7)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(13,7)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(624, 336)
-scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("8_i3omk")
+scale = Vector2(0.6375, 0.8)
+texture = ExtResource("10_rdkci")
 
-[node name="Label(13,7)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(13,7)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2806,18 +2984,18 @@ offset_bottom = 336.0
 theme_override_font_sizes/font_size = 16
 text = "(13,7)"
 
-[node name="Cell(14,0)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(14,0)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(672, 0)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(14,0)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(14,0)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(672, 0)
 scale = Vector2(0.6375, 0.6375)
 texture = ExtResource("11_djm0a")
 
-[node name="Label(14,0)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(14,0)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2829,18 +3007,18 @@ offset_right = 672.0
 theme_override_font_sizes/font_size = 16
 text = "(14,0)"
 
-[node name="Cell(14,1)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(14,1)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(672, 48)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(14,1)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(14,1)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(672, 48)
 scale = Vector2(0.6375, 0.6375)
 texture = ExtResource("9_yhgbj")
 
-[node name="Label(14,1)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(14,1)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2854,18 +3032,18 @@ offset_bottom = 48.0
 theme_override_font_sizes/font_size = 16
 text = "(14,1)"
 
-[node name="Cell(14,2)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(14,2)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(672, 96)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(14,2)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(14,2)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(672, 96)
-scale = Vector2(0.6375, 0.8)
-texture = ExtResource("10_rdkci")
+scale = Vector2(0.6375, 0.6375)
+texture = ExtResource("8_i3omk")
 
-[node name="Label(14,2)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(14,2)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2879,18 +3057,18 @@ offset_bottom = 96.0
 theme_override_font_sizes/font_size = 16
 text = "(14,2)"
 
-[node name="Cell(14,3)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(14,3)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(672, 144)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(14,3)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(14,3)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(672, 144)
 scale = Vector2(0.6375, 0.6375)
 texture = ExtResource("11_djm0a")
 
-[node name="Label(14,3)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(14,3)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2904,18 +3082,18 @@ offset_bottom = 144.0
 theme_override_font_sizes/font_size = 16
 text = "(14,3)"
 
-[node name="Cell(14,4)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(14,4)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(672, 192)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(14,4)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(14,4)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(672, 192)
 scale = Vector2(0.6375, 0.6375)
 texture = ExtResource("8_i3omk")
 
-[node name="Label(14,4)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(14,4)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2929,18 +3107,18 @@ offset_bottom = 192.0
 theme_override_font_sizes/font_size = 16
 text = "(14,4)"
 
-[node name="Cell(14,5)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(14,5)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(672, 240)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(14,5)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(14,5)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(672, 240)
 scale = Vector2(0.6375, 0.6375)
-texture = ExtResource("9_yhgbj")
+texture = ExtResource("11_djm0a")
 
-[node name="Label(14,5)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(14,5)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2954,18 +3132,18 @@ offset_bottom = 240.0
 theme_override_font_sizes/font_size = 16
 text = "(14,5)"
 
-[node name="Cell(14,6)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(14,6)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(672, 288)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(14,6)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(14,6)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(672, 288)
-scale = Vector2(0.6375, 0.8)
-texture = ExtResource("10_rdkci")
+scale = Vector2(0.6375, 0.6375)
+texture = ExtResource("8_i3omk")
 
-[node name="Label(14,6)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(14,6)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -2979,18 +3157,18 @@ offset_bottom = 288.0
 theme_override_font_sizes/font_size = 16
 text = "(14,6)"
 
-[node name="Cell(14,7)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Cell(14,7)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 position = Vector2(672, 336)
 scale = Vector2(0.309677, 0.309677)
 texture = ExtResource("12_sg7kf")
 
-[node name="Piece(14,7)" type="Sprite2D" parent="Match3Board/Match3Preview"]
+[node name="Piece(14,7)" type="Sprite2D" parent="Demo/Match3Board/Match3Preview"]
 z_index = 1
 position = Vector2(672, 336)
 scale = Vector2(0.6375, 0.6375)
 texture = ExtResource("11_djm0a")
 
-[node name="Label(14,7)" type="Label" parent="Match3Board/Match3Preview"]
+[node name="Label(14,7)" type="Label" parent="Demo/Match3Board/Match3Preview"]
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -3003,170 +3181,3 @@ offset_right = 672.0
 offset_bottom = 336.0
 theme_override_font_sizes/font_size = 16
 text = "(14,7)"
-
-[node name="Match3BoardUIConfiguration" type="Panel" parent="."]
-offset_left = 2.0
-offset_top = 444.0
-offset_right = 1156.0
-offset_bottom = 645.0
-
-[node name="MarginContainer" type="MarginContainer" parent="Match3BoardUIConfiguration"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/margin_left = 15
-theme_override_constants/margin_top = 15
-theme_override_constants/margin_right = 15
-theme_override_constants/margin_bottom = 15
-
-[node name="HBoxContainer" type="HBoxContainer" parent="Match3BoardUIConfiguration/MarginContainer"]
-layout_mode = 2
-size_flags_horizontal = 0
-theme_override_constants/separation = 20
-
-[node name="SelectionMode" type="VBoxContainer" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer"]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/SelectionMode"]
-layout_mode = 2
-text = "Selection mode"
-
-[node name="SelectionModeOptionButton" type="OptionButton" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/SelectionMode"]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="Label2" type="Label" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/SelectionMode"]
-layout_mode = 2
-text = "Swap mode"
-
-[node name="SwapModeOptionButton" type="OptionButton" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/SelectionMode"]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="FillMode" type="VBoxContainer" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 4
-
-[node name="Label" type="Label" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/FillMode"]
-layout_mode = 2
-text = "Fill Mode"
-
-[node name="FillModeOptionButton" type="OptionButton" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/FillMode"]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="VSeparator" type="VSeparator" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer"]
-layout_mode = 2
-
-[node name="MinMaxMatch" type="VBoxContainer" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer"]
-layout_mode = 2
-
-[node name="MinMatchLabel" type="Label" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/MinMaxMatch"]
-layout_mode = 2
-text = "Min Match"
-
-[node name="MinMatchSpinBox" type="SpinBox" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/MinMaxMatch"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 0
-min_value = 3.0
-value = 3.0
-alignment = 1
-
-[node name="MaxMatchLabel" type="Label" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/MinMaxMatch"]
-layout_mode = 2
-text = "Max Match"
-
-[node name="MaxMatchSpinBox" type="SpinBox" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/MinMaxMatch"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 0
-min_value = 3.0
-value = 5.0
-alignment = 1
-
-[node name="SequenceShapes" type="VBoxContainer" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer"]
-layout_mode = 2
-
-[node name="HorizontalShape" type="CheckBox" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/SequenceShapes"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Horizontal"
-
-[node name="VerticalShape" type="CheckBox" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/SequenceShapes"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Vertical"
-
-[node name="TShape" type="CheckBox" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/SequenceShapes"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "TShape"
-
-[node name="LShape" type="CheckBox" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/SequenceShapes"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "LShape"
-
-[node name="VSeparator2" type="VSeparator" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer"]
-layout_mode = 2
-
-[node name="Animations" type="VBoxContainer" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 0
-size_flags_vertical = 0
-
-[node name="Label" type="Label" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/Animations"]
-layout_mode = 2
-text = "Consume sequence animation flow"
-
-[node name="ConsumeSequenceAnimationFlow" type="OptionButton" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/Animations"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 0
-selected = 1
-item_count = 2
-popup/item_0/text = "Serial"
-popup/item_1/text = "Parallel"
-popup/item_1/id = 1
-
-[node name="Label2" type="Label" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/Animations"]
-layout_mode = 2
-text = "Fall animation flow"
-
-[node name="FallAnimationFlow" type="OptionButton" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/Animations"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 0
-item_count = 2
-popup/item_0/text = "Serial"
-popup/item_1/text = "Parallel"
-popup/item_1/id = 1
-
-[node name="Label3" type="Label" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/Animations"]
-layout_mode = 2
-text = "Fill animation flow"
-
-[node name="FillAnimationFlow" type="OptionButton" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/Animations"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 0
-item_count = 2
-popup/item_0/text = "Serial"
-popup/item_1/text = "Parallel"
-popup/item_1/id = 1
-
-[node name="VSeparator3" type="VSeparator" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer"]
-layout_mode = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 4
-
-[node name="ShuffleButton" type="Button" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/VBoxContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "🎲 Shuffle Board"

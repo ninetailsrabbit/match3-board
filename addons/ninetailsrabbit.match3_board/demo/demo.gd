@@ -1,9 +1,9 @@
 extends Node2D
 
-@onready var state_label: Label = $StateLabel
-@onready var match_3_board: Match3Board = $Match3Board
+@onready var match_3_board: Match3Board = %Match3Board
 
 #region UI
+@onready var state_label: Label = %StateLabel
 @onready var selection_mode_option_button: OptionButton = %SelectionModeOptionButton
 @onready var swap_mode_option_button: OptionButton = %SwapModeOptionButton
 @onready var fill_mode_option_button: OptionButton = %FillModeOptionButton
