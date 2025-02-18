@@ -49,7 +49,6 @@ func grid_cells_from_column(column: int, only_usables: bool = false) -> Array[Ma
 	return cells.filter(_is_usable_cell) if only_usables else cells
 
 	
-
 func top_cells_from(origin_cell: Match3GridCell, only_usables: bool = false) -> Array[Match3GridCell]:
 	var cells: Array[Match3GridCell] = []
 	var current_cell: Match3GridCell = origin_cell
@@ -191,7 +190,70 @@ func empty_cells() -> Array[Match3GridCell]:
 	cells.assign(board.grid_cells_flattened.filter(_is_empty_cell))
 	
 	return cells
+	
+	
+func cell_with_pieces_of_id(id: StringName) -> Array[Match3GridCell]:
+	var cells: Array[Match3GridCell] = []
+	cells.assign(pieces_of_id(id).map(func(piece: Match3Piece): return piece.cell))
+	
+	return cells
+	
+	
+func cell_with_pieces_of_shape(shape: StringName) -> Array[Match3GridCell]:
+	var cells: Array[Match3GridCell] = []
+	cells.assign(pieces_of_shape(shape).map(func(piece: Match3Piece): return piece.cell))
+	
+	return cells
 
+
+func cell_with_pieces_of_type(type: Match3PieceConfiguration.PieceType) -> Array[Match3GridCell]:
+	var cells: Array[Match3GridCell] = []
+	cells.assign(pieces_of_type(type).map(func(piece: Match3Piece): return piece.cell))
+	
+	return cells
+
+
+func cell_with_pieces_of_color(color: Match3PieceConfiguration.PieceType) -> Array[Match3GridCell]:
+	var cells: Array[Match3GridCell] = []
+	cells.assign(pieces_of_color(color).map(func(piece: Match3Piece): return piece.cell))
+	
+	return cells
+
+
+func pieces_of_id(id: StringName) -> Array[Match3Piece]:
+	var pieces: Array[Match3Piece] = []
+	pieces.assign(board.pieces().filter(func(piece: Match3Piece): return piece.id == id))
+	
+	return pieces
+
+
+func pieces_of_shape(shape: StringName) -> Array[Match3Piece]:
+	var pieces: Array[Match3Piece] = []
+	pieces.assign(board.pieces().filter(func(piece: Match3Piece): return piece.shape == shape))
+	
+	return pieces
+
+
+func pieces_of_type(type: Match3PieceConfiguration.PieceType) -> Array[Match3Piece]:
+	var pieces: Array[Match3Piece] = []
+	
+	match type:
+		Match3PieceConfiguration.PieceType.Normal:
+			pieces.assign(board.get_tree().get_nodes_in_group(Match3Piece.GroupName))
+		Match3PieceConfiguration.PieceType.Special:
+			pieces.assign(board.get_tree().get_nodes_in_group(Match3Piece.SpecialGroupName))
+		Match3PieceConfiguration.PieceType.Obstacle:
+			pieces.assign(board.get_tree().get_nodes_in_group(Match3Piece.ObstacleGroupName))
+			
+	return pieces
+
+
+func pieces_of_color(color: Color) -> Array[Match3Piece]:
+	var pieces: Array[Match3Piece] = []
+	pieces.assign(board.pieces().filter(func(piece: Match3Piece): return piece.color.is_equal_approx(color)))
+	
+	return pieces
+	
 
 func _is_empty_cell(cell: Match3GridCell) -> bool:
 	return cell.can_contain_piece and cell.is_empty()

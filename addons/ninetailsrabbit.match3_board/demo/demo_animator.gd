@@ -149,6 +149,12 @@ func trigger_special_piece(piece: Match3Piece) -> void:
 				.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO)
 			
 			await tween.finished
+		&"special-blue-triangle-5":
+			var tween: Tween = create_tween()
+			tween.tween_property(piece, "rotation", TAU, 0.5).set_ease(Tween.EASE_IN)
+			tween.set_loops(2)
+			
+			await tween.loop_finished
 			
 	animation_finished.emit(TriggerSpecialPieceAnimation)
 	
