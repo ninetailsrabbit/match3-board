@@ -125,10 +125,6 @@ func _ready() -> void:
 		await draw_cells()
 		await draw_pieces()
 	
-	const SPECIAL_BLUE_PIECE_5_CONFIGURATION = preload("res://addons/ninetailsrabbit.match3_board/demo/pieces/special/special_blue_piece_5_configuration.tres")
-	
-	draw_piece_on_cell(finder.get_cell(5, 4), Match3Piece.from_configuration(SPECIAL_BLUE_PIECE_5_CONFIGURATION), true)
-
 
 func distance() -> int:
 	return configuration.grid_width + configuration.grid_height
