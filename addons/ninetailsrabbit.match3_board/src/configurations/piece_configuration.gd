@@ -21,9 +21,6 @@ enum PieceType {
 @export var priority: int = 0:
 	set(value):
 		priority = maxi(0, value)
-@export var pieces_collision_layer: int = 8:
-	set(value):
-		pieces_collision_layer = clampi(value, 0, 32)
 @export var can_be_swapped: bool = true
 @export var can_be_moved: bool = true
 @export var can_be_shuffled: bool = true
@@ -31,6 +28,11 @@ enum PieceType {
 @export var can_be_replaced: bool = true
 @export var can_be_consumed: bool = true
 
+
+var pieces_collision_layer: int = 8:
+	set(value):
+		pieces_collision_layer = clampi(value, 0, 32)
+		
 
 func is_normal() -> bool:
 	return type == PieceType.Normal

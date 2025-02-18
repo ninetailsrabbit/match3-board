@@ -21,17 +21,18 @@
   - [Download and enable the plugin](#download-and-enable-the-plugin)
   - [Add the `Match3Board` node to your scene](#add-the-match3board-node-to-your-scene)
   - [Create a `Match3BoardConfiguration` resource](#create-a-match3boardconfiguration-resource)
-    - [Available pieces](#available-pieces)
-      - [Scene](#scene)
-      - [ID](#id)
-      - [Name \& Description](#name--description)
-      - [Weight](#weight)
-      - [Type](#type)
-      - [Shape](#shape)
-      - [Color](#color)
-      - [Priority](#priority)
-      - [Pieces collision layer](#pieces-collision-layer)
-      - [Can be](#can-be)
+    - [Available normal \& special pieces](#available-normal--special-pieces)
+      - [Match3PieceConfiguration](#match3piececonfiguration)
+        - [Scene](#scene)
+        - [ID](#id)
+        - [Name \& Description](#name--description)
+        - [Weight](#weight)
+        - [Type](#type)
+        - [Shape](#shape)
+        - [Color](#color)
+        - [Priority](#priority)
+        - [Pieces collision layer](#pieces-collision-layer)
+        - [Can be](#can-be)
 - [Match3 Editor preview 🪲](#match3-editor-preview-)
 
 # 📦 Installation
@@ -76,29 +77,35 @@ Once you create one you will see this new fields in the editor:
 
 ![board_configuration](images/board_configuration.png)
 
-### Available pieces
+### Available normal & special pieces
 
 The board internally uses the `Match3PieceConfiguration` Resource to know how to instantiate the pieces.
 
-#### Scene
+In order for the board to know they exist, the normal and special pieces must have an associated `Match3PieceConfiguration` and add it to these arrays.
+
+#### Match3PieceConfiguration
+
+##### Scene
 
 The piece scene that will be instantiated, **is mandatory that the root node have attached a script that inherits from `Match3Piece`**
 
-#### ID
+When you create a new `Match3Piece` scene, you'll see that the script contains exportable parameters, they are automatically initialised based on this Match3PieceConfiguration so your values will not be taken into account, it's recommended to set this values only on `Match3PieceConfiguration`
+
+##### ID
 
 The unique id for this piece, **if you left this field empty an error will be thrown when initializing the board in the `SceneTree`**.
 
-#### Name & Description
+##### Name & Description
 
 PPurely informative for your use case, **these are optional fields.**
 
-#### Weight
+##### Weight
 
 This field is a `Match3PieceWeight` resource that only needs a weight value. This is used to randomly generate the pieces in the board when enter the `Fill` state. The higher the value of the weight for the piece, the more likely it is to come out.
 
 This value it's only used by pieces of `Normal` type.
 
-#### Type
+##### Type
 
 The type of the piece, there is available 3 options:
 
@@ -106,29 +113,31 @@ The type of the piece, there is available 3 options:
 - **Special**: A special piece that can be triggered and execute a special action
 - **Obstacle**: An obstacle piece, this piece cannot be moved.
 
-#### Shape
+##### Shape
 
 The custom shape for this piece, this is a text value which represents the shape of the piece.
 
-#### Color
+##### Color
 
 This color is informative just like the `shape`, it does not apply this colour to the piece on the board.
 
-#### Priority
+##### Priority
 
 The priority is used at the time of consumption as a sequence if it is a `Normal` piece or at the time of execution if it is a `Special` piece.
 
-#### Pieces collision layer
+##### Pieces collision layer
 
 A value between 1 and 32. By default uses the layer 8 and is used internally by the board to enable drag and slide modes that detect the pieces.
 
-#### Can be
+##### Can be
 
 A few boolean parameters to determine the actions that can be performed on this piece by the board.
 
 - **Swapped:** Define if the piece can be swapped with others
 - **Moved:** Define if the piece can be moved, means if it can be dropped after consuming sequences and has empty neighbour slots
 - **Shuffled** Define if the piece whether it can be mixed when this action is executed
-- **Replaced:**
+- **Triggered:** Define if the piece can be triggered, only used by `Special` type pieces
+- **Replaced:** Define if the piece can be replaced, if active, other pieces could be drawn and replace this one without restriction
+- **Consumed:** Define if the piece can be consumed in a sequence.
 
 # Match3 Editor preview 🪲
