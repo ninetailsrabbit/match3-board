@@ -37,10 +37,11 @@ func on_selected_piece(piece: Match3Piece) -> void:
 	if piece.is_special() and piece.can_be_triggered:
 		return
 	
+	remove_highlight()
+	
 	var cell: Match3GridCell = piece.cell
 	var neighbours: Dictionary = cell.usable_neighbours()
 	var target_cells: Array[Match3GridCell] = []
-	
 	
 	match board.configuration.swap_mode:
 		Match3BoardConfiguration.BoardMovements.Adjacent:

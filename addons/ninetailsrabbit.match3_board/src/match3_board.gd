@@ -665,16 +665,16 @@ func on_piece_drag_started(piece: Match3Piece) -> void:
 func on_piece_drag_ended(piece: Match3Piece) -> void:
 	if configuration.swap_mode_is_connect_line():
 		if configuration.is_selection_drag_mode() or configuration.is_selection_slide_mode():
-			piece_drag_ended.emit(current_selected_piece)
+			piece_drag_ended.emit(piece)
 			current_selected_piece = null
 
 	elif (configuration.is_selection_drag_mode() or configuration.is_selection_slide_mode()) and current_selected_piece == piece:
-		var other_piece = current_selected_piece.detect_near_piece()
+		var other_piece = piece.detect_near_piece()
 		
-		current_selected_piece.disable_drag()
+		piece.disable_drag()
 		
 		if other_piece:
-			swap_pieces(current_selected_piece, other_piece)
+			swap_pieces(piece, other_piece)
 		else:
 			if piece.reset_position_on_drag_release:
 				if animator:

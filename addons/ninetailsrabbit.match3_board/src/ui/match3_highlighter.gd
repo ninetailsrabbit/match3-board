@@ -10,6 +10,7 @@ func _ready() -> void:
 	if board == null:
 		board = get_tree().get_first_node_in_group(Match3Board.GroupName)
 	
+	board.locked.connect(on_board_locked)
 	board.selected_piece.connect(on_selected_piece)
 	board.unselected_piece.connect(on_unselected_piece)
 	board.piece_drag_started.connect(on_selected_piece)
@@ -32,9 +33,14 @@ func highlight_cell(cell: Match3GridCell) -> Match3Highlighter:
 func remove_highlight() -> Match3Highlighter:
 	return self
 
-
+#region Signal callbacks
+func on_board_locked() -> void:
+	remove_highlight()
+	
+	
 func on_selected_piece(piece: Match3Piece) -> void:
-	pass
+	if piece.is_special() and piece.can_be_triggered:
+		return
 	
 
 func on_unselected_piece(_piece: Match3Piece) -> void:
@@ -51,3 +57,5 @@ func on_confirmed_line_connector_match(pieces: Array[Match3Piece]) -> void:
 
 func on_canceled_line_connector_match(pieces: Array[Match3Piece]) -> void:
 	remove_highlight()
+
+#endregion
