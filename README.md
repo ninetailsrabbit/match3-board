@@ -31,8 +31,12 @@
         - [Shape](#shape)
         - [Color](#color)
         - [Priority](#priority)
-        - [Pieces collision layer](#pieces-collision-layer)
         - [Can be](#can-be)
+    - [Pieces collision layer](#pieces-collision-layer)
+    - [Size](#size)
+    - [Cells](#cells)
+      - [Empty Cells](#empty-cells)
+      - [Cell size](#cell-size)
 - [Match3 Editor preview 🪲](#match3-editor-preview-)
 
 # 📦 Installation
@@ -125,10 +129,6 @@ This color is informative just like the `shape`, it does not apply this colour t
 
 The priority is used at the time of consumption as a sequence if it is a `Normal` piece or at the time of execution if it is a `Special` piece.
 
-##### Pieces collision layer
-
-A value between 1 and 32. By default uses the layer 8 and is used internally by the board to enable drag and slide modes that detect the pieces.
-
 ##### Can be
 
 A few boolean parameters to determine the actions that can be performed on this piece by the board.
@@ -139,5 +139,23 @@ A few boolean parameters to determine the actions that can be performed on this 
 - **Triggered:** Define if the piece can be triggered, only used by `Special` type pieces
 - **Replaced:** Define if the piece can be replaced, if active, other pieces could be drawn and replace this one without restriction
 - **Consumed:** Define if the piece can be consumed in a sequence.
+
+### Pieces collision layer
+
+A value between 1 and 32. By default uses the layer 8 and is used internally by the board to enable drag and slide modes that detect the pieces.
+
+### Size
+
+The size of the board where `grid_width` represents the number of columns and `grid_height` the number of rows
+
+### Cells
+
+#### Empty Cells
+
+This parameter contains an array with board position values `Vector2i(column, row)` that represents empty cells that cannot contain pieces.
+
+#### Cell size
+
+The size of the cells, the textures of your cell scene will be adjusted to this size through scaling.
 
 # Match3 Editor preview 🪲

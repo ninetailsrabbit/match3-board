@@ -107,6 +107,9 @@ func draw_preview_cell(column: int, row: int) -> Sprite2D:
 		) * cell_texture_scale
 
 	cell_sprite.position = Vector2(board.configuration.cell_size.x * column, board.configuration.cell_size.y * row) * cell_texture_scale
+	cell_sprite.position.x += board.configuration.cell_offset.x * column
+	cell_sprite.position.y += board.configuration.cell_offset.y * row
+	
 	cell_sprite.z_index = 0
 	
 	return cell_sprite

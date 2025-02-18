@@ -177,7 +177,12 @@ func draw_cell(column: int, row: int) -> Match3GridCell:
 	var cell: Match3GridCell =  configuration.grid_cell_scene.instantiate()
 	cell.column = column
 	cell.row = row
-	cell.position = Vector2(configuration.cell_size.x * cell.column, configuration.cell_size.y * cell.row) * cell.texture_scale
+	cell.position = Vector2(
+		configuration.cell_size.x * cell.column, configuration.cell_size.y * cell.row
+		) * cell.texture_scale
+	
+	cell.position.x += configuration.cell_offset.x * column
+	cell.position.y += configuration.cell_offset.y * row
 	
 	if cell.board_position() in configuration.empty_cells:
 		clear_cell(cell, true)
