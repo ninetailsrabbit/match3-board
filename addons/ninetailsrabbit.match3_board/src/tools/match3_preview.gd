@@ -2,6 +2,7 @@
 class_name Match3Preview extends Node2D
 
 @export var button_Generate_Preview: String
+@export var button_Remove_Preview: String
 @export var board: Match3Board:
 	set(value):
 		if value != board:
@@ -47,6 +48,11 @@ class_name Match3Preview extends Node2D
 		if value != display_cell_position:
 			display_cell_position = value
 			draw_preview_cells()
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST:
+		remove_preview_cells()
 
 
 func _enter_tree() -> void:
@@ -100,7 +106,7 @@ func draw_preview_cell(column: int, row: int) -> Sprite2D:
 		board.configuration.cell_size.y / cell_texture_size.y
 		) * cell_texture_scale
 
-	cell_sprite.position = Vector2(board.configuration.cell_size.x * column, board.configuration.cell_size.y * row)
+	cell_sprite.position = Vector2(board.configuration.cell_size.x * column, board.configuration.cell_size.y * row) * cell_texture_scale
 	cell_sprite.z_index = 0
 	
 	return cell_sprite
@@ -130,7 +136,6 @@ func draw_label_cell_position(spawn_position: Vector2, column, row) -> Label:
 	label.text = "(%d,%d)" % [column, row]
 	label.add_theme_font_size_override("font_size", position_font_size)
 	label.position = spawn_position
-	label.set_anchors_preset(Control.PRESET_CENTER)
 	
 	return label
 
@@ -139,3 +144,5 @@ func _on_tool_button_pressed(text: String) -> void:
 	match text:
 		"Generate Preview":
 			draw_preview_cells()
+		"Remove Preview":
+			remove_preview_cells()

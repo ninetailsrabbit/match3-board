@@ -177,7 +177,7 @@ func draw_cell(column: int, row: int) -> Match3GridCell:
 	var cell: Match3GridCell =  configuration.grid_cell_scene.instantiate()
 	cell.column = column
 	cell.row = row
-	cell.position = Vector2(configuration.cell_size.x * cell.column, configuration.cell_size.y * cell.row)
+	cell.position = Vector2(configuration.cell_size.x * cell.column, configuration.cell_size.y * cell.row) * cell.texture_scale
 	add_child(cell)
 	
 	drawed_cell.emit(cell)
@@ -627,10 +627,8 @@ func on_selected_piece(piece: Match3Piece) -> void:
 		
 		elif current_selected_piece == piece:
 			current_selected_piece = null
-			print("no deberia entrar")
 		elif current_selected_piece and current_selected_piece != piece:
 			swap_pieces(current_selected_piece, piece)
-			print("no deberia entrar 2")
 			
 			current_selected_piece = null
 		

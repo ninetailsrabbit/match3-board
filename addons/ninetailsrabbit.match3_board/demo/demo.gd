@@ -1,9 +1,11 @@
-extends Node2D
+extends Control
 
 @onready var match_3_board: Match3Board = %Match3Board
 
 #region UI
 @onready var state_label: Label = %StateLabel
+@onready var board_information: Label = %BoardInformation
+
 @onready var selection_mode_option_button: OptionButton = %SelectionModeOptionButton
 @onready var swap_mode_option_button: OptionButton = %SwapModeOptionButton
 @onready var fill_mode_option_button: OptionButton = %FillModeOptionButton
@@ -53,6 +55,8 @@ func _ready() -> void:
 	
 	state_label.text = "WaitForInput"
 	match_3_board.state_changed.connect(on_state_changed)
+	
+	board_information.text = "%d columns x %d rows | %d pieces" % [match_3_board.configuration.grid_width, match_3_board.configuration.grid_height, match_3_board.pieces().size()]
 
 
 func prepare_demo_ui() -> void:

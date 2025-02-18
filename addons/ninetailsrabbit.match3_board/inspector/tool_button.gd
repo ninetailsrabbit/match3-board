@@ -18,6 +18,8 @@ func _init(obj: Object, text:String):
 	match text:
 		"Generate Preview":
 			emoji = "🖌️"
+		"Remove Preview":
+			emoji = "🗑️"
 	
 	if obj.has_method("_on_tool_button_pressed"):
 		button.size_flags_horizontal = SIZE_EXPAND_FILL
