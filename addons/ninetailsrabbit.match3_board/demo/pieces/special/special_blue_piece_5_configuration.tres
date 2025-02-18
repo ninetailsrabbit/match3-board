@@ -19,7 +19,6 @@ type = 1
 shape = &"special-triangle-5"
 color = Color(0.365898, 0.562773, 1, 1)
 priority = 1
-pieces_collision_layer = 8
 can_be_swapped = false
 can_be_moved = true
 can_be_shuffled = true

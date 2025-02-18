@@ -427,7 +427,12 @@ func consume_special_pieces(special_pieces: Array[Match3Piece] = pending_special
 		var special_animation_callback = func(anim_name: StringName, piece: Match3Piece):
 			if anim_name == Match3Animator.TriggerSpecialPieceAnimation:
 				pending_special_pieces.erase(piece)
-				consume_sequences(piece.trigger(self))
+				
+				var sequences: Array[Match3Sequence] = piece.trigger(self)
+				for sequence in sequences:
+					sequence.origin_special_piece = configuration.special_piece_configuration_by_id(piece.id)
+				
+				consume_sequences(sequences)
 				piece.cell.remove_piece(true)
 		
 		for piece in special_pieces:
@@ -436,7 +441,12 @@ func consume_special_pieces(special_pieces: Array[Match3Piece] = pending_special
 	else:
 		for piece in special_pieces:
 			pending_special_pieces.erase(piece)
-			consume_sequences(piece.trigger(self))
+			
+			var sequences: Array[Match3Sequence] = piece.trigger(self)
+			for sequence in sequences:
+				sequence.origin_special_piece = configuration.special_piece_configuration_by_id(piece.id)
+				
+			consume_sequences(sequences)
 			piece.cell.remove_piece(true)
 
 
