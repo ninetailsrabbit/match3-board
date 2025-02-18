@@ -101,7 +101,7 @@ func special_pieces() -> Array[Match3Piece]:
 	
 	result.assign(pieces().filter(
 		func(piece: Match3Piece): 
-			return is_instance_valid(piece) and piece.is_special() and not piece.on_queue and not piece.triggered)
+			return is_instance_valid(piece) and piece.is_special() and not piece.on_queue and not piece.is_triggered)
 		)
 	
 	if result.size() > 1:

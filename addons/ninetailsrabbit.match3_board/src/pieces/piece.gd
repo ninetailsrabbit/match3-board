@@ -3,6 +3,8 @@ class_name Match3Piece extends Node2D
 signal selected
 signal drag_started
 signal drag_ended
+signal triggered
+signal queued
 
 const GroupName: StringName = &"match3-pieces"
 const SpecialGroupName: StringName = &"match3-special-pieces"
@@ -68,8 +70,21 @@ var piece_area: Area2D
 var detection_area: Area2D
 var drag_target: Node2D = self
 
-var triggered: bool = false
-var on_queue: bool = false
+var is_triggered: bool = false:
+	set(value):
+		if value != is_triggered:
+			is_triggered = value
+			
+			if is_triggered:
+				triggered.emit()
+
+var on_queue: bool = false:
+	set(value):
+		if value != on_queue:
+			on_queue = value
+			
+			if on_queue:
+				queued.emit()
 
 
 static func from_configuration(configuration: Match3PieceConfiguration) -> Match3Piece:
@@ -208,9 +223,16 @@ func match_with(other_piece: Match3Piece) -> bool:
 ## Special pieces run this function when triggered from board
 func trigger(board: Match3Board) -> Array[Match3Sequence]:
 	if can_be_triggered:
-		triggered = true
+		is_triggered = true
 		
 	return []
+
+## When the piece comes from a sequence consume rule, this function choose
+## in what cell is going to be spawned. It receives the board and the origin sequence
+## in case you need additional information
+func spawn(board: Match3Board, sequence: Match3Sequence) -> Match3GridCell:
+	return sequence.middle_cell()
+
 #endregion
 
 

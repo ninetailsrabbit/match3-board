@@ -32,58 +32,65 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Match3BoardUIConfiguration"]
+[node name="MarginContainer" type="MarginContainer" parent="Match3BoardUIConfiguration"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 15
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Match3BoardUIConfiguration/MarginContainer"]
+layout_mode = 2
 size_flags_horizontal = 0
 theme_override_constants/separation = 20
 
-[node name="SelectionMode" type="VBoxContainer" parent="Match3BoardUIConfiguration/HBoxContainer"]
+[node name="SelectionMode" type="VBoxContainer" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="Match3BoardUIConfiguration/HBoxContainer/SelectionMode"]
+[node name="Label" type="Label" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/SelectionMode"]
 layout_mode = 2
 text = "Selection mode"
 
-[node name="SelectionModeOptionButton" type="OptionButton" parent="Match3BoardUIConfiguration/HBoxContainer/SelectionMode"]
+[node name="SelectionModeOptionButton" type="OptionButton" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/SelectionMode"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="Label2" type="Label" parent="Match3BoardUIConfiguration/HBoxContainer/SelectionMode"]
+[node name="Label2" type="Label" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/SelectionMode"]
 layout_mode = 2
 text = "Swap mode"
 
-[node name="SwapModeOptionButton" type="OptionButton" parent="Match3BoardUIConfiguration/HBoxContainer/SelectionMode"]
+[node name="SwapModeOptionButton" type="OptionButton" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/SelectionMode"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="FillMode" type="VBoxContainer" parent="Match3BoardUIConfiguration/HBoxContainer"]
+[node name="FillMode" type="VBoxContainer" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 4
 
-[node name="Label" type="Label" parent="Match3BoardUIConfiguration/HBoxContainer/FillMode"]
+[node name="Label" type="Label" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/FillMode"]
 layout_mode = 2
 text = "Fill Mode"
 
-[node name="FillModeOptionButton" type="OptionButton" parent="Match3BoardUIConfiguration/HBoxContainer/FillMode"]
+[node name="FillModeOptionButton" type="OptionButton" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/FillMode"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="VSeparator" type="VSeparator" parent="Match3BoardUIConfiguration/HBoxContainer"]
+[node name="VSeparator" type="VSeparator" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer"]
 layout_mode = 2
 
-[node name="MinMaxMatch" type="VBoxContainer" parent="Match3BoardUIConfiguration/HBoxContainer"]
+[node name="MinMaxMatch" type="VBoxContainer" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer"]
 layout_mode = 2
 
-[node name="MinMatchLabel" type="Label" parent="Match3BoardUIConfiguration/HBoxContainer/MinMaxMatch"]
+[node name="MinMatchLabel" type="Label" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/MinMaxMatch"]
 layout_mode = 2
 text = "Min Match"
 
-[node name="MinMatchSpinBox" type="SpinBox" parent="Match3BoardUIConfiguration/HBoxContainer/MinMaxMatch"]
+[node name="MinMatchSpinBox" type="SpinBox" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/MinMaxMatch"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 0
@@ -91,11 +98,11 @@ min_value = 3.0
 value = 3.0
 alignment = 1
 
-[node name="MaxMatchLabel" type="Label" parent="Match3BoardUIConfiguration/HBoxContainer/MinMaxMatch"]
+[node name="MaxMatchLabel" type="Label" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/MinMaxMatch"]
 layout_mode = 2
 text = "Max Match"
 
-[node name="MaxMatchSpinBox" type="SpinBox" parent="Match3BoardUIConfiguration/HBoxContainer/MinMaxMatch"]
+[node name="MaxMatchSpinBox" type="SpinBox" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/MinMaxMatch"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 0
@@ -103,42 +110,42 @@ min_value = 3.0
 value = 5.0
 alignment = 1
 
-[node name="SequenceShapes" type="VBoxContainer" parent="Match3BoardUIConfiguration/HBoxContainer"]
+[node name="SequenceShapes" type="VBoxContainer" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer"]
 layout_mode = 2
 
-[node name="HorizontalShape" type="CheckBox" parent="Match3BoardUIConfiguration/HBoxContainer/SequenceShapes"]
+[node name="HorizontalShape" type="CheckBox" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/SequenceShapes"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Horizontal"
 
-[node name="VerticalShape" type="CheckBox" parent="Match3BoardUIConfiguration/HBoxContainer/SequenceShapes"]
+[node name="VerticalShape" type="CheckBox" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/SequenceShapes"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Vertical"
 
-[node name="TShape" type="CheckBox" parent="Match3BoardUIConfiguration/HBoxContainer/SequenceShapes"]
+[node name="TShape" type="CheckBox" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/SequenceShapes"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "TShape"
 
-[node name="LShape" type="CheckBox" parent="Match3BoardUIConfiguration/HBoxContainer/SequenceShapes"]
+[node name="LShape" type="CheckBox" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/SequenceShapes"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "LShape"
 
-[node name="VSeparator2" type="VSeparator" parent="Match3BoardUIConfiguration/HBoxContainer"]
+[node name="VSeparator2" type="VSeparator" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer"]
 layout_mode = 2
 
-[node name="Animations" type="VBoxContainer" parent="Match3BoardUIConfiguration/HBoxContainer"]
+[node name="Animations" type="VBoxContainer" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
 
-[node name="Label" type="Label" parent="Match3BoardUIConfiguration/HBoxContainer/Animations"]
+[node name="Label" type="Label" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/Animations"]
 layout_mode = 2
 text = "Consume sequence animation flow"
 
-[node name="ConsumeSequenceAnimationFlow" type="OptionButton" parent="Match3BoardUIConfiguration/HBoxContainer/Animations"]
+[node name="ConsumeSequenceAnimationFlow" type="OptionButton" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/Animations"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 0
@@ -148,11 +155,11 @@ popup/item_0/text = "Serial"
 popup/item_1/text = "Parallel"
 popup/item_1/id = 1
 
-[node name="Label2" type="Label" parent="Match3BoardUIConfiguration/HBoxContainer/Animations"]
+[node name="Label2" type="Label" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/Animations"]
 layout_mode = 2
 text = "Fall animation flow"
 
-[node name="FallAnimationFlow" type="OptionButton" parent="Match3BoardUIConfiguration/HBoxContainer/Animations"]
+[node name="FallAnimationFlow" type="OptionButton" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/Animations"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 0
@@ -161,11 +168,11 @@ popup/item_0/text = "Serial"
 popup/item_1/text = "Parallel"
 popup/item_1/id = 1
 
-[node name="Label3" type="Label" parent="Match3BoardUIConfiguration/HBoxContainer/Animations"]
+[node name="Label3" type="Label" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/Animations"]
 layout_mode = 2
 text = "Fill animation flow"
 
-[node name="FillAnimationFlow" type="OptionButton" parent="Match3BoardUIConfiguration/HBoxContainer/Animations"]
+[node name="FillAnimationFlow" type="OptionButton" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/Animations"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 0
@@ -174,14 +181,14 @@ popup/item_0/text = "Serial"
 popup/item_1/text = "Parallel"
 popup/item_1/id = 1
 
-[node name="VSeparator3" type="VSeparator" parent="Match3BoardUIConfiguration/HBoxContainer"]
+[node name="VSeparator3" type="VSeparator" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer"]
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Match3BoardUIConfiguration/HBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 4
 
-[node name="ShuffleButton" type="Button" parent="Match3BoardUIConfiguration/HBoxContainer/VBoxContainer"]
+[node name="ShuffleButton" type="Button" parent="Match3BoardUIConfiguration/MarginContainer/HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "🎲 Shuffle Board"

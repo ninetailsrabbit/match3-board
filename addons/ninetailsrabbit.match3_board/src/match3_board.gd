@@ -68,7 +68,6 @@ var current_selected_piece: Match3Piece:
 	set(new_piece):
 		if new_piece != current_selected_piece:
 			var previous_piece := current_selected_piece
-			print("current selected set ", previous_piece, new_piece)
 			current_selected_piece = new_piece
 			
 			if current_selected_piece == null:
@@ -183,6 +182,11 @@ func draw_cell(column: int, row: int) -> Match3GridCell:
 	drawed_cell.emit(cell)
 	
 	return cell
+
+
+func clear_cell(cell: Match3GridCell, disable: bool = false) -> void:
+	cell.remove_piece()
+	cell.can_contain_piece = not disable
 
 
 func draw_pieces() -> Match3Board:
@@ -392,8 +396,9 @@ func consume_sequences(sequences: Array[Match3Sequence]) -> void:
 			combo.sequence.consume_normal_cells()
 			await get_tree().process_frame
 			
-			if combo.special_piece_to_spawn: ## TODO - TEMPORARY DRAW ON THE MIDDLE CELL
-				draw_piece_on_cell(combo.sequence.middle_cell(), Match3Piece.from_configuration(combo.special_piece_to_spawn))
+			if combo.special_piece_to_spawn:
+				var piece: Match3Piece = Match3Piece.from_configuration(combo.special_piece_to_spawn)
+				draw_piece_on_cell(piece.spawn(self, combo.sequence), piece)
 			
 	consumed_sequences.emit(sequences)
 	
