@@ -11,7 +11,7 @@ func _init(_board: Match3Board) -> void:
 func shuffle() -> Array[ShuffleMovement]:
 	var cells: Array[Match3GridCell] = []
 	cells.assign(board.pieces()\
-		.filter(func(piece: Match3Piece): return piece.cell and is_instance_valid(piece.cell))\
+		.filter(func(piece: Match3Piece): return piece.can_be_shuffled and piece.cell and is_instance_valid(piece.cell))\
 		.map(func(piece: Match3Piece): return piece.cell))
 	
 	var shuffled_cells: Array[Match3GridCell] = []
