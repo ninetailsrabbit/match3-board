@@ -64,6 +64,20 @@
       - [Available moves on the start](#available-moves-on-the-start)
       - [Allow matches on the start](#allow-matches-on-the-start)
     - [Sequences](#sequences)
+      - [Sequence rules](#sequence-rules)
+        - [ID](#id-1)
+        - [Priority](#priority-1)
+        - [Strict size comparison](#strict-size-comparison)
+        - [Shapes](#shapes)
+        - [Piece to spawn](#piece-to-spawn)
+        - [Target pieces](#target-pieces)
+        - [Enabled shapes](#enabled-shapes)
+    - [Animation flows](#animation-flows)
+      - [Draw cells \& pieces animation](#draw-cells--pieces-animation)
+      - [Sequence animation](#sequence-animation)
+      - [Fall animation](#fall-animation)
+      - [Fill animation](#fill-animation)
+      - [Delay after shuffle](#delay-after-shuffle)
 - [Match3 Editor preview 🪲](#match3-editor-preview-)
 
 # 📦 Installation
@@ -304,5 +318,73 @@ This property emits the signals `movement_consumed` and `finished_available_move
 When this property is enabled, when the board draws the pieces and there are matches, the board goes to the `Consume` state. If not, th board will remove the matches for new pieces to ensure that there are no matches in the first movement.
 
 ### Sequences
+
+This parameters are related around sequences, a sequence is a combination of pieces that can be consumed.
+
+#### Sequence rules
+
+An array of `SequenceConsumeRule`, these rules define which pieces are created in which combinations
+
+##### ID
+
+The unique id of the rule
+
+##### Priority
+
+The rules are checked in order of priority, a rule with a higher priority will be checked first.
+
+##### Strict size comparison
+
+When this property is enabled, the sequence size has to be the same as `target_pieces` when checked.
+
+This means that a sequence rule with a 4 blue pieces that receives a sequence of 5 blue pieces will fail the check but if this property were false, the rule would apply when having at least 4 blue pieces.
+
+##### Shapes
+
+An array of `Match3Sequence.Shape`, the received sequence must be one of these shapes in order to be accepted
+
+##### Piece to spawn
+
+A `Match3PieceConfiguration` that will be spawn when the rule is accepted
+
+##### Target pieces
+
+An amount of `Match3Configuration` the sequence must have for the rule to be accepted.
+
+##### Enabled shapes
+
+Enables or disables the sequences that the board can accept.
+
+- Horizontal
+- Vertical
+- T-Shape
+- L-Shape
+
+### Animation flows
+
+Animations can be executed in 2 flows: `Serial` or `Parallel`
+
+- **Serial:** an animation will be released after the previous one.
+- **Parallel:** They all run at the same time
+
+##### Draw cells & pieces animation
+
+The animations that draw cells and pieces to get the board ready
+
+##### Sequence animation
+
+The animation that runs when a sequence is consumed in the board
+
+##### Fall animation
+
+The animation that runs when enter the `Fall` state and the fall movements are applied according to the chosen mode.
+
+##### Fill animation
+
+The animation that runs when enter the `Fill` state and pieces spawned are applied according to the chosen mode.
+
+##### Delay after shuffle
+
+A timeout before unlocking the board after a shuffle.
 
 # Match3 Editor preview 🪲
