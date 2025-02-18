@@ -61,12 +61,13 @@ enum AnimationFlow {
 		set(value):
 			if grid_width != value:
 				grid_width = maxi(MinGridWidth, value)
-				
 @export var grid_height: int = 8:
 		set(value):
 			if grid_height != value:
 				grid_height = maxi(MinGridHeight, value)
-			
+
+@export_group("Cell")
+@export var empty_cells: Array[Vector2i] = []
 @export var cell_size: Vector2i = Vector2i(48, 48)
 @export var cell_offset: Vector2i = Vector2i(25, 25)
 @export var grid_cell_scene: PackedScene = preload("res://addons/ninetailsrabbit.match3_board/src/cells/grid_cell.tscn")

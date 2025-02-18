@@ -58,8 +58,11 @@ func _prepare_sprite() -> void:
 	
 	if sprite_2d is Sprite2D:
 		sprite_2d.texture = get_texture()
-		sprite_2d.scale = calculate_scale_texture_based_on_cell_size(sprite_2d.texture)
-		original_texture = sprite_2d.texture
+		
+		if sprite_2d.texture:
+			sprite_2d.scale = calculate_scale_texture_based_on_cell_size(sprite_2d.texture)
+			original_texture = sprite_2d.texture
+		
 	elif sprite_2d is AnimatedSprite2D:
 		sprite_2d.scale = calculate_scale_texture_based_on_cell_size(sprite_2d.get_sprite_2d_frames().get_frame(sprite_2d.animation, sprite_2d.get_frame()))
 	
@@ -70,6 +73,11 @@ func has_piece() -> bool:
 
 func is_empty() -> bool:
 	return piece == null
+
+
+func clear(disable: bool = false) -> void:
+	remove_piece()
+	can_contain_piece = not disable
 
 
 func remove_piece(queued: bool = false) -> void:
@@ -121,11 +129,9 @@ func get_texture() -> Texture2D:
 	
 	return empty_cell_texture
 
-
-
 #region Grid position
-func board_position() -> Vector2:
-	return Vector2(column, row)
+func board_position() -> Vector2i:
+	return Vector2i(column, row)
 
 
 func in_same_row_as(other_cell: Match3GridCell) -> bool:

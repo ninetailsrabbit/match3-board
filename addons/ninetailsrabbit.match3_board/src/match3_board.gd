@@ -157,13 +157,14 @@ func draw_cells() -> Match3Board:
 				
 		grid_cells_flattened.append_array(Match3BoardPluginUtilities.flatten(grid_cells))
 		_update_grid_cells_neighbours(grid_cells_flattened)
-		
+			
+			
 		if animator:
 			if configuration.draw_cells_and_pieces_animation_is_serial():
 				await animator.draw_cells(grid_cells_flattened)
 			elif configuration.draw_cells_and_pieces_animation_is_parallel():
 				animator.draw_cells(grid_cells_flattened)
-				
+			
 		drawed_cells.emit(grid_cells_flattened)
 		
 	return self
@@ -177,6 +178,10 @@ func draw_cell(column: int, row: int) -> Match3GridCell:
 	cell.column = column
 	cell.row = row
 	cell.position = Vector2(configuration.cell_size.x * cell.column, configuration.cell_size.y * cell.row) * cell.texture_scale
+	
+	if cell.board_position() in configuration.empty_cells:
+		clear_cell(cell, true)
+		
 	add_child(cell)
 	
 	drawed_cell.emit(cell)
@@ -185,8 +190,7 @@ func draw_cell(column: int, row: int) -> Match3GridCell:
 
 
 func clear_cell(cell: Match3GridCell, disable: bool = false) -> void:
-	cell.remove_piece()
-	cell.can_contain_piece = not disable
+	cell.clear(disable)
 
 
 func draw_pieces() -> Match3Board:
@@ -210,7 +214,7 @@ func draw_pieces() -> Match3Board:
 
 
 func draw_piece_on_cell(cell: Match3GridCell, piece: Match3Piece, replace: bool = false) -> void:
-	if cell.is_empty() or replace:
+	if cell.can_contain_piece and (cell.is_empty() or replace):
 		piece.cell = cell
 		piece.position = cell.position
 		
@@ -225,7 +229,7 @@ func draw_piece_on_cell(cell: Match3GridCell, piece: Match3Piece, replace: bool 
 
 
 func draw_random_piece_on_cell(cell: Match3GridCell, replace: bool = false) -> Match3Piece:
-	if cell.is_empty() or replace:
+	if cell.can_contain_piece and (cell.is_empty() or replace):
 		var piece: Match3Piece = Match3Piece.from_configuration(piece_generator.roll())
 		draw_piece_on_cell(cell, piece, replace)
 		
