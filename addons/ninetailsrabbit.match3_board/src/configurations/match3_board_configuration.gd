@@ -67,14 +67,14 @@ enum AnimationFlow {
 				grid_height = maxi(MinGridHeight, value)
 
 @export_group("Cell")
+## The scene that represents a cell in your board. The root node needs to inherit from Match3GridCell
+@export var grid_cell_scene: PackedScene
 ## This parameter contains an array with board position values `Vector2i(column, row)` that represents empty cells that cannot contain pieces.
 @export var empty_cells: Array[Vector2i] = []
 ## The size of the cells, the textures of your cell scene will be adjusted to this size through scaling.
 @export var cell_size: Vector2i = Vector2i(48, 48)
 ## The separation between cells where Vector2i(column_separation, row_separation)
 @export var cell_offset: Vector2i = Vector2i.ZERO
-## The scene that represents a cell in your board. The root node needs to inherit from Match3GridCell
-@export var grid_cell_scene: PackedScene
 
 @export_group("Modes")
 ## The swap mode to use on this board, each has its own particularities and can be changed at runtime.

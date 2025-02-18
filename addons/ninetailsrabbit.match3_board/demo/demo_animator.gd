@@ -1,14 +1,19 @@
 class_name Match3DemoAnimator extends Match3Animator
 
 
-func swap_pieces(from_piece: Match3Piece, to_piece: Match3Piece, from_piece_position: Vector2, to_piece_position: Vector2):
+func swap_pieces(
+	from_piece: Match3Piece,
+	to_piece: Match3Piece,
+	from_piece_target_position: Vector2,
+ 	to_piece_target_position: Vector2
+	):
 	animation_started.emit(SwapPiecesAnimation)
 	
 	var tween: Tween = create_tween().set_parallel(true)
 	
-	tween.tween_property(from_piece, "position", from_piece_position, 0.2).set_ease(Tween.EASE_IN)
+	tween.tween_property(from_piece, "position", from_piece_target_position, 0.2).set_ease(Tween.EASE_IN)
 	tween.tween_property(from_piece, "modulate:a", 0.1, 0.2).set_ease(Tween.EASE_IN)
-	tween.tween_property(to_piece, "position", to_piece_position, 0.2).set_ease(Tween.EASE_IN)
+	tween.tween_property(to_piece, "position", to_piece_target_position, 0.2).set_ease(Tween.EASE_IN)
 	tween.tween_property(to_piece, "modulate:a", 0.1, 0.2).set_ease(Tween.EASE_IN)
 	tween.chain()
 	
@@ -20,14 +25,18 @@ func swap_pieces(from_piece: Match3Piece, to_piece: Match3Piece, from_piece_posi
 	animation_finished.emit(SwapPiecesAnimation)
 	
 	
-func swap_rejected_pieces(from_piece: Match3Piece, to_piece: Match3Piece, from_piece_position: Vector2, to_piece_position: Vector2):
+func swap_rejected_pieces(from_piece: Match3Piece,
+	to_piece: Match3Piece,
+	from_piece_target_position: Vector2,
+	to_piece_target_position: Vector2
+):
 	animation_started.emit(SwapRejectedPiecesAnimation)
 	
 	var tween: Tween = create_tween().set_parallel(true)
 	
-	tween.tween_property(from_piece, "position", from_piece_position, 0.2).set_ease(Tween.EASE_IN)
+	tween.tween_property(from_piece, "position", from_piece_target_position, 0.2).set_ease(Tween.EASE_IN)
 	tween.tween_property(from_piece, "modulate:a", 0.1, 0.2).set_ease(Tween.EASE_IN)
-	tween.tween_property(to_piece, "position", to_piece_position, 0.2).set_ease(Tween.EASE_IN)
+	tween.tween_property(to_piece, "position", to_piece_target_position, 0.2).set_ease(Tween.EASE_IN)
 	tween.tween_property(to_piece, "modulate:a", 0.1, 0.2).set_ease(Tween.EASE_IN)
 	tween.chain()
 	
@@ -142,20 +151,21 @@ func spawn_pieces(cells: Array[Match3GridCell]) -> void:
 func trigger_special_piece(piece: Match3Piece) -> void:
 	animation_started.emit(TriggerSpecialPieceAnimation)
 	
-	match piece.id:
-		&"special-blue-triangle":
-			var tween: Tween = create_tween()
-			tween.tween_property(piece, "scale", Vector2(piece.scale.x * 1.2, piece.scale.y * 1.5), 1.0)\
-				.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO)
-			
-			await tween.finished
-		&"special-blue-triangle-5":
-			var tween: Tween = create_tween()
-			tween.tween_property(piece, "rotation", TAU, 0.5).set_ease(Tween.EASE_IN)
-			tween.set_loops(2)
-			
-			await tween.loop_finished
-			
+	if is_instance_valid(piece):
+		match piece.id:
+			&"special-blue-triangle":
+				var tween: Tween = create_tween()
+				tween.tween_property(piece, "scale", Vector2(piece.scale.x * 1.2, piece.scale.y * 1.5), 1.0)\
+					.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO)
+				
+				await tween.finished
+			&"special-blue-triangle-5":
+				var tween: Tween = create_tween()
+				tween.tween_property(piece, "rotation", TAU, 0.5).set_ease(Tween.EASE_IN)
+				tween.set_loops(2)
+				
+				await tween.loop_finished
+				
 	animation_finished.emit(TriggerSpecialPieceAnimation)
 	
 

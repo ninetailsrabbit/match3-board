@@ -17,7 +17,7 @@
 <br>
 
 - [📦 Installation](#-installation)
-- [Quick start 🚀](#quick-start-)
+- [Getting started 🚀](#getting-started-)
   - [Download and enable the plugin](#download-and-enable-the-plugin)
   - [Add the `Match3Board` node to your scene](#add-the-match3board-node-to-your-scene)
   - [Create a `Match3BoardConfiguration` resource](#create-a-match3boardconfiguration-resource)
@@ -35,8 +35,35 @@
     - [Pieces collision layer](#pieces-collision-layer)
     - [Size](#size)
     - [Cells](#cells)
+      - [Grid cell scene](#grid-cell-scene)
       - [Empty Cells](#empty-cells)
       - [Cell size](#cell-size)
+      - [Cell offset](#cell-offset)
+    - [Modes](#modes)
+      - [Swap](#swap)
+        - [Adjacent](#adjacent)
+        - [Adjacent with diagonals](#adjacent-with-diagonals)
+        - [Adjacent only diagonals](#adjacent-only-diagonals)
+        - [Free](#free)
+        - [Row](#row)
+        - [Column](#column)
+        - [Cross](#cross)
+        - [Cross Diagonal](#cross-diagonal)
+        - [Connect Line](#connect-line)
+      - [Selection](#selection)
+        - [Click](#click)
+        - [Drag](#drag)
+        - [Slide](#slide)
+      - [Fill](#fill)
+        - [Fall down](#fall-down)
+        - [Side](#side)
+        - [In place](#in-place)
+    - [Start](#start)
+      - [Auto Start](#auto-start)
+      - [Min \& Max match](#min--max-match)
+      - [Available moves on the start](#available-moves-on-the-start)
+      - [Allow matches on the start](#allow-matches-on-the-start)
+    - [Sequences](#sequences)
 - [Match3 Editor preview 🪲](#match3-editor-preview-)
 
 # 📦 Installation
@@ -50,7 +77,7 @@ To better understand what branch to choose from for which Godot version, please 
 |---|---|--|
 |[![GodotEngine](https://img.shields.io/badge/Godot_4.3.x_stable-blue?logo=godotengine&logoColor=white)](https://godotengine.org/)|`main`|`2.x`|
 
-# Quick start 🚀
+# Getting started 🚀
 
 This plugin shows in a simple way the customisation of to setup a Match3 Board and get started in no time.
 
@@ -150,6 +177,10 @@ The size of the board where `grid_width` represents the number of columns and `g
 
 ### Cells
 
+#### Grid cell scene
+
+This is your scene that represents a grid cell in the board. **The root node needs to inherit from `Match3GridCell`**
+
 #### Empty Cells
 
 This parameter contains an array with board position values `Vector2i(column, row)` that represents empty cells that cannot contain pieces.
@@ -157,5 +188,121 @@ This parameter contains an array with board position values `Vector2i(column, ro
 #### Cell size
 
 The size of the cells, the textures of your cell scene will be adjusted to this size through scaling.
+
+#### Cell offset
+
+The separation between cells where `Vector2i(column_separation, row_separation)`
+
+### Modes
+
+This group represents the modes that will determine which swap moves are made, how pieces are selected and how they fall and fill on the board.
+
+#### Swap
+
+##### Adjacent
+
+The piece can be swapped with adjacent cells _(not included diagonals)_
+
+![adjacent_swap](images/swap_adjacent.png)
+
+##### Adjacent with diagonals
+
+The piece can be swapped with adjacent cells including diagonals
+
+![adjacent_swap](images/swap_diagonal.png)
+
+##### Adjacent only diagonals
+
+The piece can be swapped only with adjacent diagonal cells
+
+![adjacent_swap](images/swap_adjacent_only_diagonal.png)
+
+##### Free
+
+The movement is free, pieces can be swapped with any other
+
+##### Row
+
+The pieces can be swapped on the same row it belongs
+
+![adjacent_swap](images/swap_row.png)
+
+##### Column
+
+The pieces can be swapped on the same column it belongs
+
+![adjacent_swap](images/swap_column.png)
+
+##### Cross
+
+The pieces can be swapped on the same column & row it belongs
+
+![adjacent_swap](images/swap_cross.png)
+
+##### Cross Diagonal
+
+The pieces can be swapped on the complete adjacent diagonals
+
+![adjacent_swap](images/swap_cross_diagonal.png)
+
+##### Connect Line
+
+**This mode needs a `Match3LineConnector` added and configured as child of the board.** The pieces can be swapped connecting adjacent matchs from the last connected piece.
+
+![adjacent_swap](images/swap_connect_line.png)
+
+---
+
+#### Selection
+
+##### Click
+
+The pieces are selected by click, clicking on it again deselects it. To make a swap you would have to click on the source piece and click again on the target piece.
+
+##### Drag
+
+The pieces can be dragged to do the swap, releasing the mouse will drop the piece. If there is a match, the swap is completed, if not, the piece returns to its cell of origin.
+
+##### Slide
+
+Same as drag but the piece stays in its original place, only when the mouse is released the movement is applied _(if valid)_.
+
+#### Fill
+
+##### Fall down
+
+The pieces fall vertically if there are empty slots after consuming the combo sequences and entering the `Fall` state.
+
+##### Side
+
+The pieces still falls vertically but if they can't, they take into account whether the bottom diagonals are empty and move towards them.
+
+##### In place
+
+The pieces does not fall, new pieces are created where the combos were consumed and left empty cells.
+
+### Start
+
+These parameters are taken into account for the start of the board.
+
+#### Auto Start
+
+The cell and pieces are drawed once the node is `_ready` on the scene tree. When this property is false, you need to manually call the functions `draw_cells()` and `draw_pieces()` in this order to draw and activate the board.
+
+#### Min & Max match
+
+The minimum match by default it's always `3` and cannot be assigned a value below. This values defines the minimum pieces to be detected as a sequence and the maximum pieces which may contain.
+
+#### Available moves on the start
+
+The number of limited moves for this board. Each time it makes a complete cycle and returns to the `WaitForInput` state, 1 move is consumed. Set to `-1` so that there is no limit to movement
+
+This property emits the signals `movement_consumed` and `finished_available_movements` when value changes. **This property is purely informative** and does not lock the board when it reaches zero. That decision will be made by you
+
+#### Allow matches on the start
+
+When this property is enabled, when the board draws the pieces and there are matches, the board goes to the `Consume` state. If not, th board will remove the matches for new pieces to ensure that there are no matches in the first movement.
+
+### Sequences
 
 # Match3 Editor preview 🪲
