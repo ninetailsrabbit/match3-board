@@ -47,15 +47,15 @@ func on_unselected_piece(_piece: Match3Piece) -> void:
 	remove_highlight()
 
 
-func on_connected_piece(piece: Match3Piece) -> void:
+func on_connected_piece(_piece: Match3Piece) -> void:
 	pass
 
 
-func on_confirmed_line_connector_match(pieces: Array[Match3Piece]) -> void:
+func on_confirmed_line_connector_match(_pieces: Array[Match3Piece]) -> void:
 	remove_highlight()
 
 
-func on_canceled_line_connector_match(pieces: Array[Match3Piece]) -> void:
+func on_canceled_line_connector_match(_pieces: Array[Match3Piece]) -> void:
 	remove_highlight()
 
 #endregion

@@ -7,6 +7,7 @@ signal confirmed_match(pieces: Array[Match3Piece])
 signal canceled_match(pieces: Array[Match3Piece])
 
 @export var board: Match3Board
+@export_category("Click mode")
 @export var confirm_match_input_action: StringName = &"ui_accept"
 @export var cancel_match_input_action: StringName = &"ui_cancel"
 

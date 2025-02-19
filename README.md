@@ -83,9 +83,13 @@
   - [Animation Hooks](#animation-hooks)
 - [Match3 Highlighter](#match3-highlighter)
   - [Highlighter hooks](#highlighter-hooks)
-- [Match3 Editor preview 🪲](#match3-editor-preview-)
+- [Match3 Line Connector](#match3-line-connector)
   - [Parameters](#parameters)
     - [Match3Board](#match3board)
+    - [Confirm \& Cancel match input action](#confirm--cancel-match-input-action)
+- [Match3 Editor preview 🪲](#match3-editor-preview-)
+  - [Parameters](#parameters-1)
+    - [Match3Board](#match3board-1)
     - [Generate \& Remove preview](#generate--remove-preview)
     - [Preview pieces textures](#preview-pieces-textures)
     - [Preview cell texture](#preview-cell-texture)
@@ -507,7 +511,7 @@ func remove_highlight() -> void
 // CALLBACKS //
 func on_selected_piece(piece: Match3Piece) -> void
 
-func on_unselected_piece(_piece: Match3Piece) -> void
+func on_unselected_piece(piece: Match3Piece) -> void
 
 // The pieces by the line connector are received here as it is a different flow.
 func on_connected_piece(piece: Match3Piece) -> void
@@ -519,6 +523,20 @@ func on_canceled_line_connector_match(pieces: Array[Match3Piece]) -> void
 ```
 
 ---
+
+# Match3 Line Connector
+
+This node allows you to customise the `Line2D` used by the board when the selected swap mode is `ConnectLine`.
+
+## Parameters
+
+### Match3Board
+
+A target `Match3Board`, if this value is null the node will try to get the board by the group name from the scene tree
+
+### Confirm & Cancel match input action
+
+They are only taken into account when the board selection mode is `Click`. This mode needs a manual confirmation and cancellation unlike drag & slide which works by holding and releasing the mouse.
 
 # Match3 Editor preview 🪲
 
