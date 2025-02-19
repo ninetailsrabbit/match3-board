@@ -19,8 +19,8 @@
 - [📦 Installation](#-installation)
 - [Getting started 🚀](#getting-started-)
   - [Download and enable the plugin](#download-and-enable-the-plugin)
-  - [Add the `Match3Board` node to your scene](#add-the-match3board-node-to-your-scene)
-  - [Create a `Match3BoardConfiguration` resource](#create-a-match3boardconfiguration-resource)
+  - [Add the `Match3Board` node to your scene 🟡🔺🔹](#add-the-match3board-node-to-your-scene-)
+  - [Create a `Match3BoardConfiguration` resource ⚙️](#create-a-match3boardconfiguration-resource-️)
     - [Available normal \& special pieces](#available-normal--special-pieces)
       - [Match3PieceConfiguration](#match3piececonfiguration)
         - [Scene](#scene)
@@ -78,17 +78,24 @@
       - [Fall animation](#fall-animation)
       - [Fill animation](#fill-animation)
       - [Delay after shuffle](#delay-after-shuffle)
-- [Match3 Animator](#match3-animator)
+- [Match3 Piece 💎](#match3-piece-)
+  - [Parameters](#parameters)
+  - [Access the cell](#access-the-cell)
+  - [Overridables](#overridables)
+    - [Match with](#match-with)
+    - [Trigger](#trigger)
+    - [Spawn](#spawn)
+- [Match3 Animator 🎞️](#match3-animator-️)
   - [Signals](#signals)
   - [Animation Hooks](#animation-hooks)
-- [Match3 Highlighter](#match3-highlighter)
+- [Match3 Highlighter ✨](#match3-highlighter-)
   - [Highlighter hooks](#highlighter-hooks)
-- [Match3 Line Connector](#match3-line-connector)
-  - [Parameters](#parameters)
+- [Match3 Line Connector ︴](#match3-line-connector-︴)
+  - [Parameters](#parameters-1)
     - [Match3Board](#match3board)
     - [Confirm \& Cancel match input action](#confirm--cancel-match-input-action)
 - [Match3 Editor preview 🪲](#match3-editor-preview-)
-  - [Parameters](#parameters-1)
+  - [Parameters](#parameters-2)
     - [Match3Board](#match3board-1)
     - [Generate \& Remove preview](#generate--remove-preview)
     - [Preview pieces textures](#preview-pieces-textures)
@@ -118,7 +125,7 @@ For a quick start, do the following steps:
 
 Check the [Godot documentation](https://docs.godotengine.org/en/stable/tutorials/plugins/editor/installing_plugins.html) if you have not done so before
 
-## Add the `Match3Board` node to your scene
+## Add the `Match3Board` node to your scene 🟡🔺🔹
 
 You will see nothing in the `2D` tab and it's ok, we need to create some initial configuration before seeing anything on the screen.
 
@@ -131,7 +138,7 @@ You should be able to see a few exported parameters:
 - **Highlighter (Optional):** This links a `Match3Highlighter` node that contains your custom highlights
 - **Line Connector (Optional):** This links a `Match3LineConnector` node that contains a custom `Line2D` to use when the selected mode is `ConnectLine`
 
-## Create a `Match3BoardConfiguration` resource
+## Create a `Match3BoardConfiguration` resource ⚙️
 
 The advantage of using one resource for the configuration is that you can create and save as many as you want to create different boards.
 
@@ -404,7 +411,94 @@ The animation that runs when enter the `Fill` state and pieces spawned are appli
 
 A timeout before unlocking the board after a shuffle.
 
-# Match3 Animator
+# Match3 Piece 💎
+
+Board pieces use this class by default. You must create your own scene where the root node inherits from this script and attach it on a `Match3PieceConfiguration` resource.
+
+Creating your own scene allows you with minimal dependency to add the nodes you want, Sprite2D, AnimateSprite2D, AnimationPlayer, GPUParticles, etc.
+
+## Parameters
+
+There are few parameters you can set on it that are mostly visual:
+
+```swift
+// The textures are scaling based on the `Match3Configuration.cell_size`, this value is usually lower in the pieces to fit better into the cell
+@export var texture_scale: float = 0.85
+
+// Reset position automatically on drag release, the animation can be customized on piece_drag_ended hook
+// from the Match3Animator
+@export var reset_position_on_drag_release: bool = true
+// The smooth factor feeling for the drag movement, lower values move the piece slowly into the mouse
+@export var drag_smooth_factor: float = 20.0
+```
+
+## Access the cell
+
+You have access to the `Match3GridCell` that is linked to this piece through the `cell` variable
+
+## Overridables
+
+There are a few functions that you can overwrite and they are useful when creating custom behaviours for normal pieces but especially for special pieces.
+
+### Match with
+
+The logic which determines whether a pieces matches another pieces to create the sequences.
+
+```swift
+
+// Definition
+func match_with(other_piece: Match3Piece) -> bool
+
+// Default behaviour on Match3Piece
+func match_with(other_piece: Match3Piece) -> bool:
+	if is_obstacle() or other_piece.is_obstacle():
+		return false
+
+	if is_normal() and other_piece.is_normal():
+		return equals_to(other_piece)
+
+	if (is_special() and other_piece.is_normal()) or (is_normal() and other_piece.is_special()):
+		return same_shape_as(other_piece)
+
+	return false
+```
+
+### Trigger
+
+Special pieces use this function to trigger an special effect. Basically it returns an array of `Match3Sequence` that will be consumed after launching its animation but it could perform other actions that your game needs.
+
+Receive the `Match3Board` as an argument to have all its functionalities available and more freedom to create customised behaviours.
+
+The `Match3PieceConfiguration` that creates this piece if `can_be_triggered` is enabled it will be triggered by touching it. To disable this behaviour and instead trigger it from a swap, set `can_be_triggered` to false and `can_be swapped` to true.
+
+Don't forget to call `super.trigger()` in your override function to change the boolean variable `is_triggered` as it is important for the board not to run it again.
+
+```swift
+// Definition
+func trigger(board: Match3Board) -> Array[Match3Sequence]
+
+// Default behaviour on Match3Piece
+func trigger(board: Match3Board) -> Array[Match3Sequence]:
+  is_triggered = true
+
+	return []
+```
+
+### Spawn
+
+This is the `piece_to_spawn` which was defined in a `SequenceConsumeRule`, this function choose in what `Match3GridCell` is going to be spawned. It receives the `Match3Board` and the origin `Match3Sequence`.
+
+```swift
+// Definition
+func spawn(board: Match3Board, sequence: Match3Sequence) -> Match3GridCell:
+
+// Default behaviour on Match3Piece
+func spawn(board: Match3Board, sequence: Match3Sequence) -> Match3GridCell:
+	return sequence.middle_cell()
+
+```
+
+# Match3 Animator 🎞️
 
 This script provides functions that are executed at certain points on the board, this is where you can include your own animations.
 
@@ -480,7 +574,7 @@ func piece_drag_ended(piece: Match3Piece) -> void
 func shuffle(movements: Array[Match3Shuffler.ShuffleMovement]) -> void
 ```
 
-# Match3 Highlighter
+# Match3 Highlighter ✨
 
 If you want to apply highlight effects when a piece is selected on the board, this is the place to do it.
 
@@ -524,7 +618,7 @@ func on_canceled_line_connector_match(pieces: Array[Match3Piece]) -> void
 
 ---
 
-# Match3 Line Connector
+# Match3 Line Connector ︴
 
 This node allows you to customise the `Line2D` used by the board when the selected swap mode is `ConnectLine`.
 

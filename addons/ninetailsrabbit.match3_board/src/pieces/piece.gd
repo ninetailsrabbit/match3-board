@@ -10,15 +10,21 @@ const GroupName: StringName = &"match3-pieces"
 const SpecialGroupName: StringName = &"match3-special-pieces"
 const ObstacleGroupName: StringName = &"match3-obstacle-pieces"
 
+@export_category("Visual")
+@export var texture_scale: float = 0.85
+@export_category("Drag&Drop")
+@export var reset_position_on_drag_release: bool = true
+@export var drag_smooth_factor: float = 20.0
 
-@export var id: StringName
-@export var type: Match3PieceConfiguration.PieceType = Match3PieceConfiguration.PieceType.Normal
-@export var shape: StringName = &""
-@export var color: Color = Color.WHITE
-@export var priority: int = 0:
+#region Inherit properties from Match3PieceConfiguration
+var id: StringName
+var type: Match3PieceConfiguration.PieceType = Match3PieceConfiguration.PieceType.Normal
+var shape: StringName = &""
+var color: Color = Color.WHITE
+var priority: int = 0:
 	set(value):
 		priority = maxi(0, value)
-@export var pieces_collision_layer: int = 8:
+var pieces_collision_layer: int = 8:
 	set(value):
 		pieces_collision_layer = clampi(value, 0, 32)
 		
@@ -28,19 +34,13 @@ const ObstacleGroupName: StringName = &"match3-obstacle-pieces"
 		if piece_area:
 			piece_area.collision_mask = pieces_collision_layer
 
-@export_category("Behaviours")
-@export var can_be_swapped: bool = true
-@export var can_be_moved: bool = true
-@export var can_be_shuffled: bool = true
-@export var can_be_triggered: bool = false
-@export var can_be_replaced: bool = true
-@export var can_be_consumed: bool = true
-
-@export_category("Visual")
-@export var texture_scale: float = 0.85
-@export_category("Drag&Drop")
-@export var reset_position_on_drag_release: bool = true
-@export var drag_smooth_factor: float = 20.0
+var can_be_swapped: bool = true
+var can_be_moved: bool = true
+var can_be_shuffled: bool = true
+var can_be_triggered: bool = false
+var can_be_replaced: bool = true
+var can_be_consumed: bool = true
+#endregion
 
 var mouse_region: Button
 var current_position: Vector2 = Vector2.ZERO
@@ -222,8 +222,7 @@ func match_with(other_piece: Match3Piece) -> bool:
 
 ## Special pieces run this function when triggered from board
 func trigger(board: Match3Board) -> Array[Match3Sequence]:
-	if can_be_triggered:
-		is_triggered = true
+	is_triggered = true
 		
 	return []
 
