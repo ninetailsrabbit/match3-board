@@ -80,7 +80,7 @@
       - [Delay after shuffle](#delay-after-shuffle)
 - [Match3 Animator](#match3-animator)
   - [Signals](#signals)
-  - [Available animations hooks](#available-animations-hooks)
+  - [Animation Hooks](#animation-hooks)
 - [Match3 Editor preview 🪲](#match3-editor-preview-)
 
 # 📦 Installation
@@ -411,7 +411,7 @@ signal animation_finished(animation_name: StringName)
 
 You can access to the current running animation on property `current_animation`
 
-## Available animations hooks
+## Animation Hooks
 
 ```swift
 // Used when the board draw cells for the first time, it receives all the drawed cells

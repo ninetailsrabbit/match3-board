@@ -154,11 +154,3 @@ func shuffle(movements: Array[Match3Shuffler.ShuffleMovement]) -> void:
 				.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
 		
 		await tween.finished
-	
-
-func on_animation_started(animation_name: StringName) -> void:
-	current_animation = animation_name
-
-
-func on_animation_finished(animation_name: StringName) -> void:
-	current_animation = &""
