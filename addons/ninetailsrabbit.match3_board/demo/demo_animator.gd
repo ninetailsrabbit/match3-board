@@ -7,7 +7,6 @@ func swap_pieces(
 	from_piece_target_position: Vector2,
  	to_piece_target_position: Vector2
 	):
-	animation_started.emit(SwapPiecesAnimation)
 	
 	var tween: Tween = create_tween().set_parallel(true)
 	
@@ -21,8 +20,6 @@ func swap_pieces(
 	tween.tween_property(to_piece, "modulate:a", 1.0, 0.2).set_ease(Tween.EASE_OUT)
 	
 	await tween.finished
-	
-	animation_finished.emit(SwapPiecesAnimation)
 	
 	
 func swap_rejected_pieces(from_piece: Match3Piece,
@@ -30,8 +27,6 @@ func swap_rejected_pieces(from_piece: Match3Piece,
 	from_piece_target_position: Vector2,
 	to_piece_target_position: Vector2
 ):
-	animation_started.emit(SwapRejectedPiecesAnimation)
-	
 	var tween: Tween = create_tween().set_parallel(true)
 	
 	tween.tween_property(from_piece, "position", from_piece_target_position, 0.2).set_ease(Tween.EASE_IN)
@@ -45,12 +40,8 @@ func swap_rejected_pieces(from_piece: Match3Piece,
 	
 	await tween.finished
 	
-	animation_finished.emit(SwapRejectedPiecesAnimation)
-	
 	
 func consume_sequence(sequence: Match3Sequence) -> void:
-	animation_started.emit(ConsumeSequenceAnimation)
-	
 	var pieces: Array[Match3Piece] = sequence.normal_pieces()
 	
 	if pieces.size() > 0:
@@ -61,12 +52,8 @@ func consume_sequence(sequence: Match3Sequence) -> void:
 		
 		await tween.finished
 	
-	animation_finished.emit(ConsumeSequenceAnimation)
-
 
 func consume_sequences(sequences: Array[Match3SequenceConsumer.Match3SequenceConsumeResult]) -> void:
-	animation_started.emit(ConsumeSequencesAnimation)
-	
 	if sequences.size() > 0:
 		var tween: Tween = create_tween().set_parallel(true)
 		
@@ -79,12 +66,8 @@ func consume_sequences(sequences: Array[Match3SequenceConsumer.Match3SequenceCon
 		
 		await tween.finished
 	
-	animation_finished.emit(ConsumeSequencesAnimation)
-
 
 func fall_piece(movement: Match3FallMover.FallMovement) -> void:
-	animation_started.emit(FallPieceAnimation)
-	
 	if is_instance_valid(movement.piece) and is_instance_valid(movement.to_cell):
 		var tween: Tween = create_tween()
 		
@@ -93,12 +76,8 @@ func fall_piece(movement: Match3FallMover.FallMovement) -> void:
 			
 		await tween.finished
 	
-	animation_finished.emit(FallPieceAnimation)
-	
 
 func fall_pieces(movements: Array[Match3FallMover.FallMovement]) -> void:
-	animation_started.emit(FallPiecesAnimation)
-	
 	if movements.size() > 0:
 		var tween: Tween = create_tween().set_parallel(true)
 		
@@ -108,13 +87,9 @@ func fall_pieces(movements: Array[Match3FallMover.FallMovement]) -> void:
 					.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_LINEAR)
 				
 		await tween.finished
-	
-	animation_finished.emit(FallPiecesAnimation)
-	
-	
+
+
 func spawn_piece(cell: Match3GridCell) -> void:
-	animation_started.emit(SpawnPieceAnimation)
-	
 	if cell.has_piece():
 		var tween: Tween = create_tween()
 		var fall_distance = board.configuration.cell_size.y * board.configuration.grid_height
@@ -126,12 +101,8 @@ func spawn_piece(cell: Match3GridCell) -> void:
 		
 		await tween.finished
 	
-	animation_finished.emit(SpawnPieceAnimation)
-	
 
 func spawn_pieces(cells: Array[Match3GridCell]) -> void:
-	animation_started.emit(SpawnPiecesAnimation)
-	
 	if cells.size() > 0:
 		var tween: Tween = create_tween().set_parallel(true)
 		
@@ -145,12 +116,8 @@ func spawn_pieces(cells: Array[Match3GridCell]) -> void:
 			
 		await tween.finished
 	
-	animation_finished.emit(SpawnPiecesAnimation)
-	
 	
 func trigger_special_piece(piece: Match3Piece) -> void:
-	animation_started.emit(TriggerSpecialPieceAnimation)
-	
 	if is_instance_valid(piece):
 		match piece.id:
 			&"special-blue-triangle":
@@ -166,12 +133,8 @@ func trigger_special_piece(piece: Match3Piece) -> void:
 				
 				await tween.loop_finished
 				
-	animation_finished.emit(TriggerSpecialPieceAnimation)
-	
 
 func piece_drag_ended(piece: Match3Piece) -> void:
-	animation_started.emit(PieceDragEndedAnimation)
-	
 	if is_instance_valid(piece):
 		var tween: Tween = create_tween()
 		tween.tween_property(piece, "position", piece.cell.position, 0.25)\
@@ -179,12 +142,8 @@ func piece_drag_ended(piece: Match3Piece) -> void:
 			
 		await tween.finished
 		
-	animation_finished.emit(PieceDragEndedAnimation)
-	
 	
 func shuffle(movements: Array[Match3Shuffler.ShuffleMovement]) -> void:
-	animation_started.emit(ShufflePiecesAnimation)
-	
 	if movements.size() > 0:
 		var tween: Tween = create_tween().set_parallel(true)
 		
@@ -195,9 +154,7 @@ func shuffle(movements: Array[Match3Shuffler.ShuffleMovement]) -> void:
 				.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
 		
 		await tween.finished
-		
-	animation_finished.emit(ShufflePiecesAnimation)
-
+	
 
 func on_animation_started(animation_name: StringName) -> void:
 	current_animation = animation_name
