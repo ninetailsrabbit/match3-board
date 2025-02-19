@@ -70,7 +70,7 @@ func remove_preview_cells() -> Match3Preview:
 		
 	
 func draw_preview_cells() -> Match3Preview:
-	if Engine.is_editor_hint() and board:
+	if is_inside_tree() and Engine.is_editor_hint() and board:
 		remove_preview_cells()
 			
 		for column in board.configuration.grid_width:
