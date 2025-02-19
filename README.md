@@ -78,6 +78,9 @@
       - [Fall animation](#fall-animation)
       - [Fill animation](#fill-animation)
       - [Delay after shuffle](#delay-after-shuffle)
+- [Match3 Animator](#match3-animator)
+  - [Signals](#signals)
+  - [Available animations hooks](#available-animations-hooks)
 - [Match3 Editor preview 🪲](#match3-editor-preview-)
 
 # 📦 Installation
@@ -386,5 +389,81 @@ The animation that runs when enter the `Fill` state and pieces spawned are appli
 ##### Delay after shuffle
 
 A timeout before unlocking the board after a shuffle.
+
+# Match3 Animator
+
+This script provides functions that are executed at certain points on the board, this is where you can include your own animations.
+
+To create your own, create a new script that inherits from `Match3Animator` and add it as a child node to the `Match3Board`
+
+![animator_scene_tree](images/animator_scene_tree.png)
+
+**_In the demo folder provide with this addon you can find a complete example of a custom animator_**
+
+## Signals
+
+When an animation start or end, signals `animation_started` `animation_finished` are emitted.
+
+```swift
+signal animation_started(animation_name: StringName)
+signal animation_finished(animation_name: StringName)
+```
+
+You can access to the current running animation on property `current_animation`
+
+## Available animations hooks
+
+```swift
+// Used when the board draw cells for the first time, it receives all the drawed cells
+func draw_cells(cells: Array[Match3GridCell]) -> void:
+
+// Used when the board draw pieces for the first time, it receives all the drawed pieces
+func draw_pieces(pieces: Array[Match3Piece]) -> void
+
+
+// When a valid swap is applied, receives the involved pieces and the target positions
+func swap_pieces(
+  from_piece: Match3Piece,
+  to_piece: Match3Piece,
+  from_piece_position: Vector2,
+  to_piece_position: Vector2
+)
+
+// When a valid swap is rejected, e.g: no match after swap, receives the involved pieces and the target positions
+func swap_rejected_pieces(
+  from_piece: Match3Piece,
+  to_piece: Match3Piece,
+  from_piece_position: Vector2,
+  to_piece_position: Vector2
+  )
+
+
+// When sequences are consumed in the board, only run when the sequence animation flow is Serial
+func consume_sequence(sequence: Match3Sequence) -> void
+
+// When sequences are consumed in the board, only run when the sequence animation flow is Parallel
+func consume_sequences(sequences: Array[Match3SequenceConsumer.Match3SequenceConsumeResult]) -> void
+
+// When falling pieces after consuming last sequences from the board. Only run when the fall animation flow is Serial
+func fall_piece(movement: Match3FallMover.FallMovement) -> void
+
+// When falling pieces after consuming last sequences from the board. Only run when the fall animation flow is Parallel
+func fall_pieces(movements: Array[Match3FallMover.FallMovement]) -> void
+
+// When filling pieces after falling pieces from the board. Only run when the fill animation flow is Serial
+func spawn_piece(cell: Match3GridCell) -> void
+
+// When filling pieces after falling pieces from the board. Only run when the fill animation flow is Parallel
+func spawn_pieces(cells: Array[Match3GridCell]) -> void
+
+// When a special piece is triggered on the board.
+func trigger_special_piece(piece: Match3Piece) -> void
+
+// When a piece drag ended, only runs if the mode is Drag or Slide.
+func piece_drag_ended(piece: Match3Piece) -> void
+
+// When a shuffle action is made on the board
+func shuffle(movements: Array[Match3Shuffler.ShuffleMovement]) -> void
+```
 
 # Match3 Editor preview 🪲

@@ -161,9 +161,9 @@ func draw_cells() -> Match3Board:
 			
 		if animator:
 			if configuration.draw_cells_and_pieces_animation_is_serial():
-				await animator.draw_cells(grid_cells_flattened)
+				await animator.run(Match3Animator.DrawCellsAnimation, [grid_cells_flattened])
 			elif configuration.draw_cells_and_pieces_animation_is_parallel():
-				animator.draw_cells(grid_cells_flattened)
+				animator.run(Match3Animator.DrawCellsAnimation, [grid_cells_flattened])
 			
 		drawed_cells.emit(grid_cells_flattened)
 		
@@ -208,9 +208,9 @@ func draw_pieces() -> Match3Board:
 	
 	if animator:
 		if configuration.draw_cells_and_pieces_animation_is_serial():
-			await animator.draw_pieces(pieces())
+			await animator.run(Match3Animator.DrawPiecesAnimation, [pieces()])
 		elif configuration.draw_cells_and_pieces_animation_is_parallel():
-			animator.draw_pieces(pieces())
+			animator.run(Match3Animator.DrawPiecesAnimation, [pieces()])
 	
 	unlock_all_pieces()
 	drawed_pieces.emit(pieces())
@@ -306,7 +306,7 @@ func shuffle() -> void:
 		var shuffle_movements := shuffler.shuffle()
 		
 		if animator:
-			await animator.shuffle(shuffle_movements)
+			await animator.run(Match3Animator.ShufflePiecesAnimation, [shuffle_movements])
 			
 		for shuffle_movement in shuffle_movements:
 			shuffle_movement.swap()
@@ -372,7 +372,7 @@ func consume_sequence(sequence: Match3Sequence) -> void:
 			add_special_piece_to_queue(special_piece)
 		
 	if animator:
-		await animator.consume_sequence(sequence)
+		await animator.run(Match3Animator.ConsumeSequenceAnimation, [sequence])
 	
 	consumed_sequence.emit(sequence)
 	sequence.consume()
@@ -391,10 +391,10 @@ func consume_sequences(sequences: Array[Match3Sequence]) -> void:
 		if configuration.sequence_animation_is_serial():
 			for sequence_result in sequences_result:
 				for combo: Match3SequenceConsumer.Match3SequenceConsumeCombo in sequence_result.combos:
-					await animator.consume_sequence(combo.sequence)
+					await animator.run(Match3Animator.ConsumeSequenceAnimation, [combo.sequence])
 					
 		elif configuration.sequence_animation_is_parallel():
-			await animator.consume_sequences(sequences_result)
+			await animator.run(Match3Animator.ConsumeSequencesAnimation, [sequences_result])
 		
 	for sequence_result in sequences_result:
 		for combo: Match3SequenceConsumer.Match3SequenceConsumeCombo in sequence_result.combos:
@@ -437,7 +437,7 @@ func consume_special_pieces(special_pieces: Array[Match3Piece] = pending_special
 		
 		for piece in special_pieces:
 			animator.animation_finished.connect(special_animation_callback.bind(piece), CONNECT_ONE_SHOT)
-			animator.trigger_special_piece(piece)
+			animator.run(Match3Animator.TriggerSpecialPieceAnimation, [piece])
 	else:
 		for piece in special_pieces:
 			pending_special_pieces.erase(piece)
@@ -460,9 +460,9 @@ func fall_pieces() -> void:
 	if animator:
 		if configuration.fall_animation_is_serial():
 			for movement in fall_movements:
-				await animator.fall_piece(movement)
+				await animator.run(Match3Animator.FallPieceAnimation, [movement])
 		elif configuration.fall_animation_is_parallel():
-			await animator.fall_pieces(fall_movements)
+			await animator.run(Match3Animator.FallPiecesAnimation, [fall_movements])
 	else:
 		for movement in fall_movements:
 			movement.to_cell.piece.position = movement.to_cell.position
@@ -474,9 +474,9 @@ func fill_pieces() -> void:
 	if animator:
 		if configuration.fill_animation_is_serial():
 			for filled_cell in filled_cells:
-				await animator.spawn_piece(filled_cell)
+				await animator.run(Match3Animator.SpawnPieceAnimation, [filled_cell])
 		elif configuration.fill_animation_is_parallel():
-			await animator.spawn_pieces(filled_cells)
+			await animator.run(Match3Animator.SpawnPiecesAnimation, [filled_cells])
 	
 #endregion
 
@@ -490,13 +490,11 @@ func swap_pieces(from_piece: Match3Piece, to_piece: Match3Piece) -> void:
 	
 	if swap_movement_is_valid(from_cell, to_cell):
 		lock_all_pieces()
-
+		
 		if animator:
-			await animator.swap_pieces(
-				from_piece, 
-				to_piece, 
-				to_cell.position,
-				from_cell.position
+			await animator.run(
+				Match3Animator.SwapPiecesAnimation, 
+				[from_piece, to_piece, to_cell.position, from_cell.position]
 				)
 		else:
 			from_piece.position = to_cell.position
@@ -522,12 +520,11 @@ func swap_pieces(from_piece: Match3Piece, to_piece: Match3Piece) -> void:
 				
 				if animator:
 					## The pieces already come up swapped so we can use the updated original cell position to apply the visual change
-					await animator.swap_rejected_pieces(
+					await animator.run(Match3Animator.SwapRejectedPiecesAnimation, [
 						from_piece, 
 						to_piece, 
 						from_cell.position,
-						to_cell.position
-						)
+						to_cell.position])
 				else:
 					from_piece.position = from_cell.position
 					to_piece.position = to_cell.position
@@ -693,7 +690,7 @@ func on_piece_drag_ended(piece: Match3Piece) -> void:
 		else:
 			if piece.reset_position_on_drag_release:
 				if animator:
-					await animator.piece_drag_ended(piece)
+					await animator.run(Match3Animator.PieceDragEndedAnimation, [piece])
 			
 				piece.reset_drag_position()
 			
@@ -708,7 +705,7 @@ func on_swap_accepted(_from: Match3GridCell, _to: Match3GridCell) -> void:
 func on_swap_rejected(from: Match3GridCell, _to: Match3GridCell) -> void:
 	if configuration.is_selection_drag_mode():
 		if animator and from.piece.reset_position_on_drag_release:
-			await animator.piece_drag_ended(from.piece)
+			await animator.run(Match3Animator.PieceDragEndedAnimation, [from.piece])
 
 	unlock()
 	
