@@ -36,17 +36,17 @@ class_name Match3Preview extends Node2D
 		if value != cell_texture_scale:
 			cell_texture_scale = value
 			draw_preview_cells()
-		
-@export var position_font_size: int = 32:
-	set(value):
-		if value != position_font_size:
-			position_font_size = value
-			draw_preview_cells()
-			
+					
 @export var display_cell_position: bool = true:
 	set(value):
 		if value != display_cell_position:
 			display_cell_position = value
+			draw_preview_cells()
+
+@export var position_font_size: int = 32:
+	set(value):
+		if value != position_font_size:
+			position_font_size = value
 			draw_preview_cells()
 
 

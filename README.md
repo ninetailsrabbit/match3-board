@@ -81,7 +81,17 @@
 - [Match3 Animator](#match3-animator)
   - [Signals](#signals)
   - [Animation Hooks](#animation-hooks)
+- [Match3 Highlighter](#match3-highlighter)
+  - [Highlighter hooks](#highlighter-hooks)
 - [Match3 Editor preview 🪲](#match3-editor-preview-)
+  - [Parameters](#parameters)
+    - [Match3Board](#match3board)
+    - [Generate \& Remove preview](#generate--remove-preview)
+    - [Preview pieces textures](#preview-pieces-textures)
+    - [Preview cell texture](#preview-cell-texture)
+    - [Cell \& Piece texture scale](#cell--piece-texture-scale)
+    - [Display position](#display-position)
+    - [Position font size](#position-font-size)
 
 # 📦 Installation
 
@@ -466,4 +476,88 @@ func piece_drag_ended(piece: Match3Piece) -> void
 func shuffle(movements: Array[Match3Shuffler.ShuffleMovement]) -> void
 ```
 
+# Match3 Highlighter
+
+If you want to apply highlight effects when a piece is selected on the board, this is the place to do it.
+
+The setup is exactly the same as the `Match3Animator`, to create your own, create a new script that inherits from `Match3Highlighter` and add it as a child node to the `Match3Board`
+
+**\_In the demo folder provide with this addon you can find a complete example of a custom highlighter**
+
+![match3_highlighter](images/highlighter.png)
+
+## Highlighter hooks
+
+The advantage of receiving the cell is that if it contains a piece, it can also be treated here.
+
+In the case of the `ConnectLine` mode, the pieces are received instead of cells but nothing happens because their associated cell can be accessed via the `piece.cell` property from `Match3Piece`
+
+You have access to the `current_highlighted_cells` and `current_highlighted_pieces` from this class when an highlight is active
+
+```swift
+// Highlight the cells after select a piece. Receive the valid cells based on the selected swap mode.
+func highlight_cells(cells: Array[Match3GridCell]) -> void
+
+// Highlight an individual cell after select a piece. This cells comes from the highlight_cells hook
+func highlight_cell(cell: Match3GridCell) -> void
+
+// Remove the highlights after unselect a piece either by user input or by applying a swap movement.
+func remove_highlight() -> void
+
+// CALLBACKS //
+func on_selected_piece(piece: Match3Piece) -> void
+
+func on_unselected_piece(_piece: Match3Piece) -> void
+
+// The pieces by the line connector are received here as it is a different flow.
+func on_connected_piece(piece: Match3Piece) -> void
+
+func on_confirmed_line_connector_match(pieces: Array[Match3Piece]) -> void
+
+func on_canceled_line_connector_match(pieces: Array[Match3Piece]) -> void
+
+```
+
+---
+
 # Match3 Editor preview 🪲
+
+With this node, you can see how much space the board will take up in the scene. It is a very simple node just to see the grid in the editor. The display position is in the format `Vector2(column, row)`
+
+![preview_grid](images/preview_grid.png)
+
+---
+
+## Parameters
+
+![preview_parameters](images/preview_parameters.png)
+
+### Match3Board
+
+The `Match3Board` from which to read the `Match3Configuration`, if this value is null the node will try to get the board by the group name from the scene tree
+
+### Generate & Remove preview
+
+You can manually update the board with this tool buttons. Take into account that if you change any configuration on the main board, they are not reflected in the preview. You have to manually re-generate the preview with this buttons.
+
+Contrary to the parameters of this node, any changes will be updated in the editor.
+
+### Preview pieces textures
+
+An array of textures to draw the pieces inside the cells, they does not need to be the same as the pieces you have set up in the board
+
+### Preview cell texture
+
+The texture to use to display the board cells
+
+### Cell & Piece texture scale
+
+The textures are scaling based on the `Match3Configuration.cell_size`, this value is usually lower in the pieces to fit better into the cell.
+
+### Display position
+
+Displays the position in the board for each cell with the format `Vector2(column, row)`
+
+### Position font size
+
+The font size of the label that displays the cell position

@@ -22,16 +22,16 @@ func _ready() -> void:
 		board.line_connector.canceled_match.connect(on_canceled_line_connector_match)
 
 
-func highlight_cells(cells: Array[Match3GridCell]) -> Match3Highlighter:
-	return self
+func highlight_cells(cells: Array[Match3GridCell]) -> void:
+	pass
 
 
-func highlight_cell(cell: Match3GridCell) -> Match3Highlighter:
-	return self
+func highlight_cell(cell: Match3GridCell) -> void:
+	pass
 
 
-func remove_highlight() -> Match3Highlighter:
-	return self
+func remove_highlight() -> void:
+	pass
 
 #region Signal callbacks
 func on_board_locked() -> void:

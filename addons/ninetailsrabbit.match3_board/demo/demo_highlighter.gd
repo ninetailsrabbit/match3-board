@@ -3,22 +3,18 @@ class_name Match3DemoHighlighter extends Match3Highlighter
 const highlight_texture = preload("res://addons/ninetailsrabbit.match3_board/demo/assets/highlighted.png")
 
 
-func highlight_cells(cells: Array[Match3GridCell]) -> Match3Highlighter:
+func highlight_cells(cells: Array[Match3GridCell]) -> void:
 	current_highlighted_cells = cells
 	
 	for cell in current_highlighted_cells:
 		highlight_cell(cell)
-		
-	return self
 
 
-func highlight_cell(cell: Match3GridCell) -> Match3Highlighter:
+func highlight_cell(cell: Match3GridCell) -> void:
 	cell.sprite_2d.texture = highlight_texture
-	
-	return self
 
 
-func remove_highlight() -> Match3Highlighter:
+func remove_highlight() -> void:
 	for cell in current_highlighted_cells:
 		if cell.sprite_2d and cell.sprite_2d is Sprite2D:
 			cell.sprite_2d.texture = cell.original_texture
@@ -29,8 +25,6 @@ func remove_highlight() -> Match3Highlighter:
 		pass
 		
 	current_highlighted_pieces.clear()
-	
-	return self
 
 
 func on_selected_piece(piece: Match3Piece) -> void:
