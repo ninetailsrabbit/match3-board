@@ -214,7 +214,67 @@ func usable_neighbours() -> Dictionary:
 			current_neighbours[position_key] = null
 	
 	return current_neighbours
-	
+
+
+func neighbour_up_has_piece() -> bool:
+	return neighbour_up and neighbour_up.has_piece()
+
+
+func neighbour_bottom_has_piece() -> bool:
+	return neighbour_up and neighbour_up.has_piece()
+
+
+func neighbour_right_has_piece() -> bool:
+	return neighbour_right and neighbour_right.has_piece()
+
+
+func neighbour_left_has_piece() -> bool:
+	return neighbour_right and neighbour_right.has_piece()
+
+
+func diagonal_neighbour_bottom_left_has_piece() -> bool:
+	return diagonal_neighbour_bottom_left and diagonal_neighbour_bottom_left.has_piece()
+
+
+func diagonal_neighbour_bottom_right_has_piece() -> bool:
+	return diagonal_neighbour_bottom_right and diagonal_neighbour_bottom_right.has_piece()
+
+
+func diagonal_neighbour_top_left_has_piece() -> bool:
+	return diagonal_neighbour_top_left and diagonal_neighbour_top_left.has_piece()
+
+
+func diagonal_neighbour_top_right_has_piece() -> bool:
+	return diagonal_neighbour_top_right and diagonal_neighbour_top_right.has_piece()
+
+
+func neighbour_bottom_is_empty() -> bool:
+	return neighbour_up and neighbour_up.is_empty()
+
+
+func neighbour_right_is_empty() -> bool:
+	return neighbour_right and neighbour_right.is_empty()
+
+
+func neighbour_left_is_empty() -> bool:
+	return neighbour_right and neighbour_right.is_empty()
+
+
+func diagonal_neighbour_bottom_left_is_empty() -> bool:
+	return diagonal_neighbour_bottom_left and diagonal_neighbour_bottom_left.is_empty()
+
+
+func diagonal_neighbour_bottom_right_is_empty() -> bool:
+	return diagonal_neighbour_bottom_right and diagonal_neighbour_bottom_right.is_empty()
+
+
+func diagonal_neighbour_top_left_is_empty() -> bool:
+	return diagonal_neighbour_top_left and diagonal_neighbour_top_left.is_empty()
+
+
+func diagonal_neighbour_top_right_is_empty() -> bool:
+	return diagonal_neighbour_top_right and diagonal_neighbour_top_right.is_empty()
+
 
 func is_top_left_corner() -> bool:
 	return neighbour_up == null and neighbour_left == null \

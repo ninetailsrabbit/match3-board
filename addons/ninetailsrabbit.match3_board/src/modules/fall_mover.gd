@@ -30,8 +30,8 @@ func calculate_fall_movements_on_column(column: int) -> Array:
 		var to_cells: Array[Match3GridCell] = []
 		
 		for cell: Match3GridCell in column_cells:
-			if cell.can_contain_piece and cell.has_piece():
-				if cell.piece.can_be_moved and not cell.is_bottom_border() and cell.neighbour_bottom.is_empty():
+			if not cell.is_bottom_border() and cell.can_contain_piece and cell.has_piece() and cell.piece.can_be_moved:
+				if cell.neighbour_bottom.is_empty():
 					from_cells.append(cell)
 					var to_cell: Match3GridCell = cell.neighbour_bottom
 					
@@ -40,12 +40,19 @@ func calculate_fall_movements_on_column(column: int) -> Array:
 					
 					to_cells.append(cell.neighbour_bottom)
 					
-				if board.configuration.fill_mode_is_side() and cell.neighbour_bottom and cell.neighbour_bottom.has_piece():
-					if cell.diagonal_neighbour_bottom_left and cell.diagonal_neighbour_bottom_left.is_empty():
+				elif from_cells.size() > 0 and board.configuration.fill_mode_is_side():
+					if cell.neighbour_right_has_piece() \
+						and cell.diagonal_neighbour_bottom_right_is_empty() \
+						and cell.diagonal_neighbour_bottom_right.can_contain_piece:
+							
+						to_cells.append(cell.diagonal_neighbour_bottom_right)
+						
+					elif cell.neighbour_left_has_piece() \
+						and cell.diagonal_neighbour_bottom_left_is_empty()\
+						and cell.diagonal_neighbour_bottom_left.can_contain_piece:
+							
 						to_cells.append(cell.diagonal_neighbour_bottom_left)
 						
-					elif cell.diagonal_neighbour_bottom_right and cell.diagonal_neighbour_bottom_right.is_empty():
-						to_cells.append(cell.diagonal_neighbour_bottom_right)
 
 		if from_cells.size() > 0 and to_cells.size() > 0:
 			for from_cell_index in from_cells.size():

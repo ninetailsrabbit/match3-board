@@ -243,16 +243,16 @@ func draw_random_piece_on_cell(cell: Match3GridCell, replace: bool = false) -> M
 	return null
 	
 	
-func _update_grid_cells_neighbours(grid_cells: Array[Match3GridCell] = grid_cells_flattened) -> void:
-	for grid_cell: Match3GridCell in grid_cells:
-		grid_cell.neighbour_up = finder.get_cell(grid_cell.column, grid_cell.row - 1)
-		grid_cell.neighbour_bottom = finder.get_cell(grid_cell.column, grid_cell.row + 1)
-		grid_cell.neighbour_right = finder.get_cell(grid_cell.column + 1, grid_cell.row )
-		grid_cell.neighbour_left = finder.get_cell(grid_cell.column - 1, grid_cell.row)
-		grid_cell.diagonal_neighbour_top_right = finder.get_cell(grid_cell.column + 1, grid_cell.row - 1)
-		grid_cell.diagonal_neighbour_top_left = finder.get_cell(grid_cell.column - 1, grid_cell.row - 1)
-		grid_cell.diagonal_neighbour_bottom_right = finder.get_cell(grid_cell.column + 1, grid_cell.row + 1)
-		grid_cell.diagonal_neighbour_bottom_left = finder.get_cell(grid_cell.column - 1, grid_cell.row + 1)
+func _update_grid_cells_neighbours(cells: Array[Match3GridCell] = grid_cells_flattened) -> void:
+	for cell: Match3GridCell in cells:
+		cell.neighbour_up = finder.get_cell(cell.column, cell.row - 1)
+		cell.neighbour_bottom = finder.get_cell(cell.column, cell.row + 1)
+		cell.neighbour_right = finder.get_cell(cell.column + 1, cell.row )
+		cell.neighbour_left = finder.get_cell(cell.column - 1, cell.row)
+		cell.diagonal_neighbour_top_right = finder.get_cell(cell.column + 1, cell.row - 1)
+		cell.diagonal_neighbour_top_left = finder.get_cell(cell.column - 1, cell.row - 1)
+		cell.diagonal_neighbour_bottom_right = finder.get_cell(cell.column + 1, cell.row + 1)
+		cell.diagonal_neighbour_bottom_left = finder.get_cell(cell.column - 1, cell.row + 1)
 
 
 func add_pieces_to_generator(pieces: Array[Match3PieceConfiguration]) -> Match3Board:
