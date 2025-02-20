@@ -2,17 +2,16 @@ class_name Match3GridCell extends Node2D
 
 const GroupName: StringName = &"grid_cells"
 
-@export_category("Parameters")
-@export var column: int = 0
-@export var row: int = 0
-@export var size: Vector2i = Vector2i(48, 48)
-@export var can_contain_piece: bool = true
 @export_category("Textures")
 @export var texture_scale: float = 1.0
 @export var odd_cell_texture: Texture2D
 @export var even_cell_texture: Texture2D
 @export var empty_cell_texture: Texture2D
 
+var column: int = 0
+var row: int = 0
+var size: Vector2i = Vector2i(48, 48)
+var can_contain_piece: bool = true
 
 #region Cached neighbours
 ## The Match3Board assign this values when preparing the cells so that they are always available as a cache.

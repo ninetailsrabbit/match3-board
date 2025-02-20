@@ -175,6 +175,7 @@ func draw_cell(column: int, row: int) -> Match3GridCell:
 		return
 		
 	var cell: Match3GridCell =  configuration.grid_cell_scene.instantiate()
+	cell.size = configuration.cell_size
 	cell.column = column
 	cell.row = row
 	cell.position = Vector2(
