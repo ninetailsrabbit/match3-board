@@ -16,7 +16,8 @@
 <br>
 <br>
 
-- [📦 Installation](#-installation)
+- [Installation 📦](#installation-)
+- [Demo 🎬](#demo-)
 - [Getting started 🚀](#getting-started-)
   - [Download and enable the plugin](#download-and-enable-the-plugin)
   - [Add the `Match3Board` node to your scene 🟡🔺🔹](#add-the-match3board-node-to-your-scene-)
@@ -81,12 +82,14 @@
 - [Match3 Board ⬛](#match3-board-)
   - [States](#states)
   - [Signals](#signals)
+  - [Properties](#properties)
+  - [Methods](#methods)
   - [Finder module](#finder-module)
-    - [Sequence detector module](#sequence-detector-module)
+  - [Sequence detector module](#sequence-detector-module)
   - [Sequence consumer module](#sequence-consumer-module)
     - [Match3SequenceConsumeResult](#match3sequenceconsumeresult)
     - [Match3SequenceConsumeCombo](#match3sequenceconsumecombo)
-    - [Methods](#methods)
+    - [Methods](#methods-1)
 - [Match3 Cell 🔲](#match3-cell-)
   - [Parameters](#parameters)
     - [Column \& Row](#column--row)
@@ -95,7 +98,7 @@
     - [Texture scale](#texture-scale)
     - [Odd \& Even \& Empty textures](#odd--even--empty-textures)
   - [Neighbours](#neighbours)
-  - [Methods](#methods-1)
+  - [Methods](#methods-2)
 - [Match3 Piece 💎](#match3-piece-)
   - [Parameters](#parameters-1)
   - [Access the cell](#access-the-cell)
@@ -126,7 +129,7 @@
     - [Display position](#display-position)
     - [Position font size](#position-font-size)
 
-# 📦 Installation
+# Installation 📦
 
 1. [Download Latest Release](https://github.com/ninetailsrabbit/match3-board/releases/latest)
 2. Unpack the `ninetailsrabbit.match3_board` folder into your `/addons` folder within the Godot project
@@ -136,6 +139,14 @@ To better understand what branch to choose from for which Godot version, please 
 |Godot Version|match3-board Branch|match3-board Version|
 |---|---|--|
 |[![GodotEngine](https://img.shields.io/badge/Godot_4.3.x_stable-blue?logo=godotengine&logoColor=white)](https://godotengine.org/)|`main`|`2.x`|
+
+# Demo 🎬
+
+There is a complete [demo](addons/ninetailsrabbit.match3_board//demo/) scene available where you can see the setup of an example board.
+
+If you already have experience with Godot you can get almost all the information on how to create your own board just looking how it is this scene mounted.
+
+![demo_scene](images/demo.png)
 
 # Getting started 🚀
 
@@ -496,6 +507,69 @@ signal movement_consumed
 signal finished_available_movements
 ```
 
+## Properties
+
+```swift
+var grid_cells: Array = [] // Multidimensional to access cells by column & row
+var grid_cells_flattened: Array[Match3GridCell] = []
+
+var current_available_moves: int = 0
+var current_selected_piece: Match3Piece
+var current_state: BoardState = BoardState.WaitForInput
+
+var is_locked: bool = false
+```
+
+## Methods
+
+```swift
+func distance() -> int
+
+func size() -> int
+
+func travel_to(new_state: BoardState) -> void
+
+func lock() -> void
+
+func unlock() -> void
+
+
+func draw_cells() -> Match3Board
+
+func draw_cell(column: int, row: int) -> Match3GridCell
+
+func clear_cell(cell: Match3GridCell, disable: bool = false) -> void
+
+func draw_pieces() -> Match3Board
+
+func draw_piece_on_cell(cell: Match3GridCell, piece: Match3Piece, replace: bool = false) -> void
+
+func draw_random_piece_on_cell(cell: Match3GridCell, replace: bool = false) -> Match3Piece
+
+
+func add_pieces_to_generator(pieces: Array[Match3PieceConfiguration]) -> Match3Board:
+
+func add_piece_to_generator(piece_configuration: Match3PieceConfiguration) -> Match3Board
+
+func remove_matches_from_board() -> void:
+
+func shuffle() -> void:
+
+
+func swap_pieces(from_piece: Match3Piece, to_piece: Match3Piece) -> void:
+
+func lock_all_pieces() -> void
+
+func unlock_all_pieces() -> void
+
+func consume_sequence(sequence: Match3Sequence) -> void
+
+func consume_sequences(sequences: Array[Match3Sequence]) -> void
+
+
+
+```
+
 ## Finder module
 
 This module provides methods to find cells and pieces inside the board easily and intuitively.
@@ -544,6 +618,12 @@ func cell_with_pieces_of_type(type: Match3PieceConfiguration.PieceType) -> Array
 func cell_with_pieces_of_color(color: Match3PieceConfiguration.PieceType) -> Array[Match3GridCell]
 
 // PIECES
+func pieces() -> Array[Match3Piece]:
+
+func special_pieces() -> Array[Match3Piece]:
+
+func obstacle_pieces() -> Array[Match3Piece]:
+
 func pieces_of_id(id: StringName) -> Array[Match3Piece]
 
 func pieces_of_shape(shape: StringName) -> Array[Match3Piece]
@@ -557,7 +637,7 @@ func pieces_from_row(row: int) -> Array[Match3Piece]
 func pieces_from_column(column: int) -> Array[Match3Piece]
 ```
 
-### Sequence detector module
+## Sequence detector module
 
 This module can detect valid sequences on the board by applying the correct shape _(vertical, horizontal, tshape...)_ to them if they are enabled in the configuration.
 

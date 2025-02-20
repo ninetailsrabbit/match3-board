@@ -217,39 +217,60 @@ func cell_with_pieces_of_color(color: Match3PieceConfiguration.PieceType) -> Arr
 	return cells
 
 
-func pieces_of_id(id: StringName) -> Array[Match3Piece]:
+func pieces() -> Array[Match3Piece]:
 	var pieces: Array[Match3Piece] = []
-	pieces.assign(board.pieces().filter(func(piece: Match3Piece): return piece.id == id))
-	
+	pieces.assign(board.get_tree().get_nodes_in_group(Match3Piece.GroupName))
+
 	return pieces
+	
+
+func special_pieces() -> Array[Match3Piece]:
+	var pieces: Array[Match3Piece] = []
+	pieces.assign(board.get_tree().get_nodes_in_group(Match3Piece.SpecialGroupName))
+
+	return pieces
+
+
+func obstacle_pieces() -> Array[Match3Piece]:
+	var pieces: Array[Match3Piece] = []
+	pieces.assign(board.get_tree().get_nodes_in_group(Match3Piece.ObstacleGroupName))
+
+	return pieces
+
+
+func pieces_of_id(id: StringName) -> Array[Match3Piece]:
+	var result: Array[Match3Piece] = []
+	result.assign(pieces().filter(func(piece: Match3Piece): return piece.id == id))
+	
+	return result
 
 
 func pieces_of_shape(shape: StringName) -> Array[Match3Piece]:
-	var pieces: Array[Match3Piece] = []
-	pieces.assign(board.pieces().filter(func(piece: Match3Piece): return piece.shape == shape))
+	var result: Array[Match3Piece] = []
+	result.assign(pieces().filter(func(piece: Match3Piece): return piece.shape == shape))
 	
-	return pieces
+	return result
 
 
 func pieces_of_type(type: Match3PieceConfiguration.PieceType) -> Array[Match3Piece]:
-	var pieces: Array[Match3Piece] = []
+	var result: Array[Match3Piece] = []
 	
 	match type:
 		Match3PieceConfiguration.PieceType.Normal:
-			pieces.assign(board.get_tree().get_nodes_in_group(Match3Piece.GroupName))
+			result.assign(board.get_tree().get_nodes_in_group(Match3Piece.GroupName))
 		Match3PieceConfiguration.PieceType.Special:
-			pieces.assign(board.get_tree().get_nodes_in_group(Match3Piece.SpecialGroupName))
+			result.assign(board.get_tree().get_nodes_in_group(Match3Piece.SpecialGroupName))
 		Match3PieceConfiguration.PieceType.Obstacle:
-			pieces.assign(board.get_tree().get_nodes_in_group(Match3Piece.ObstacleGroupName))
+			result.assign(board.get_tree().get_nodes_in_group(Match3Piece.ObstacleGroupName))
 			
-	return pieces
+	return result
 
 
 func pieces_of_color(color: Color) -> Array[Match3Piece]:
-	var pieces: Array[Match3Piece] = []
-	pieces.assign(board.pieces().filter(func(piece: Match3Piece): return piece.color.is_equal_approx(color)))
+	var result: Array[Match3Piece] = []
+	result.assign(pieces().filter(func(piece: Match3Piece): return piece.color.is_equal_approx(color)))
 	
-	return pieces
+	return result
 	
 
 func _is_empty_cell(cell: Match3GridCell) -> bool:
@@ -262,19 +283,19 @@ func _is_usable_cell(cell: Match3GridCell) -> bool:
 #region Pieces
 	
 func pieces_from_row(row: int) -> Array[Match3Piece]:
-	var pieces: Array[Match3Piece] = []
+	var result: Array[Match3Piece] = []
 	
-	pieces.assign(cells_from_row(row).filter(func(cell: Match3GridCell): return cell.has_piece())\
+	result.assign(cells_from_row(row).filter(func(cell: Match3GridCell): return cell.has_piece())\
 		.map(func(cell: Match3GridCell): return cell.piece))
 	
-	return pieces
+	return result
 
 
 func pieces_from_column(column: int) -> Array[Match3Piece]:
-	var pieces: Array[Match3Piece] = []
+	var result: Array[Match3Piece] = []
 	
-	pieces.assign(cells_from_column(column).filter(func(cell: Match3GridCell): return cell.has_piece())\
+	result.assign(cells_from_column(column).filter(func(cell: Match3GridCell): return cell.has_piece())\
 		.map(func(cell: Match3GridCell): return cell.piece))
 		
-	return pieces
+	return result
 #endregion

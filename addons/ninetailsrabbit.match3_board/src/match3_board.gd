@@ -319,24 +319,15 @@ func shuffle() -> void:
 		
 
 func pieces() -> Array[Match3Piece]:
-	var pieces: Array[Match3Piece] = []
-	pieces.assign(get_tree().get_nodes_in_group(Match3Piece.GroupName))
-
-	return pieces
+	return finder.pieces()
 	
 
 func special_pieces() -> Array[Match3Piece]:
-	var pieces: Array[Match3Piece] = []
-	pieces.assign(get_tree().get_nodes_in_group(Match3Piece.SpecialGroupName))
-
-	return pieces
+	return finder.special_pieces()
 
 
 func obstacle_pieces() -> Array[Match3Piece]:
-	var pieces: Array[Match3Piece] = []
-	pieces.assign(get_tree().get_nodes_in_group(Match3Piece.ObstacleGroupName))
-
-	return pieces
+	return finder.obstacle_pieces()
 
 
 func lock_all_pieces() -> void:
