@@ -94,6 +94,10 @@
     - [Match with](#match-with)
     - [Trigger](#trigger)
     - [Spawn](#spawn)
+- [Match3 Sequence💠💠💠](#match3-sequence)
+  - [Shapes](#shapes-1)
+  - [Information](#information)
+  - [Manual creation](#manual-creation)
 - [Match3 Animator 🎞️](#match3-animator-️)
   - [Signals](#signals)
   - [Animation Hooks](#animation-hooks)
@@ -424,7 +428,9 @@ A timeout before unlocking the board after a shuffle.
 
 Represents a cell on the board, they are used as a reference for piece positions thus eliminating the need for pieces to have position information.
 
-Board cells use this class by default. You must create your own scene where the root node inherits from this script
+Board cells use this class by default. You must create your own scene where the root node inherits from this script.
+
+All the cells have access to current linked `Match3Piece` through the variable `piece`.
 
 Creating your own scene allows you with minimal dependency to add the nodes you want, Sprite2D, AnimateSprite2D, AnimationPlayer, GPUParticles, etc.
 
@@ -482,7 +488,6 @@ func neighbours() -> Dictionary:
 // Return the neighbours that can contain pieces and is not empty, neighbours that does not meet
 // this conditions will be turned to null
 func usable_neighbours() -> Dictionary
-
 
 ```
 
@@ -657,6 +662,72 @@ func spawn(board: Match3Board, sequence: Match3Sequence) -> Match3GridCell:
 // Default behaviour on Match3Piece
 func spawn(board: Match3Board, sequence: Match3Sequence) -> Match3GridCell:
 	return sequence.middle_cell()
+
+```
+
+# Match3 Sequence💠💠💠
+
+A sequence is a combination of pieces that on your board are defined as a valid match.
+
+This is true for the normal flow of the board but you can create a sequence with any combination of pieces and consume it without problems.
+
+You only need to use a few of the methods of this class.
+
+## Shapes
+
+A sequence can be of a specific shape listed here, by defualt it's Irregular when no Shape is provided
+
+```swift
+enum Shapes {
+	Horizontal,
+	Vertical,
+	TShape,
+	LShape,
+	Diagonal,
+	LineConnected,
+	Cross,
+	CrossDiagonal,
+	Irregular,
+	Special
+}
+
+```
+
+## Information
+
+Contains few variables that holds information about:
+
+```swift
+var cells: Array[Match3GridCell] = []
+var shape: Shapes = Shapes.Irregular
+
+// This variable it's only set when the Shape is Match3Sequence.Shapes.Special from a Match3Piece.trigger()
+// Unless you have manually created the sequence, the board assigns it automatically.
+var origin_special_piece: Match3PieceConfiguration
+```
+
+## Manual creation
+
+Creating a manual sequence is as easy as knowing the cells from which you want to create the sequence and the shape of the cells.
+
+```swift
+func _init(sequence_cells: Array[Match3GridCell], _shape: Shapes = Shapes.Irregular) -> void
+
+Match3Sequence.new([your_cells...], Match3Sequence.Shapes.Vertical)
+
+// Or you can create a new sequence from a list of pieces
+
+static func create_from_pieces(pieces: Array[Match3Piece], selected_shape: Shapes = Shapes.Irregular) -> Match3Sequence
+
+Match3Sequence.create_from_pieces(pieces, Match3Sequence.Shapes.LineConnected)]
+
+// Or you can combine multiple sequences to create a new one
+
+func combine_with(other_sequence: Match3Sequence) -> Match3Sequence
+
+var sequence := Match3Sequence.new([your_cells...], Match3Sequence.Shapes.Vertical)
+
+var new_sequence := sequence.combine_with(Match3Sequence.create_from_pieces(pieces, Match3Sequence.Shapes.LineConnected)])
 
 ```
 
