@@ -21,7 +21,7 @@ func fall_pieces() -> Array[FallMovement]:
 
 
 func calculate_fall_movements_on_column(column: int) -> Array:
-	var column_cells: Array[Match3GridCell] = board.finder.grid_cells_from_column(column)
+	var column_cells: Array[Match3GridCell] = board.finder.cells_from_column(column)
 	var column_movements: Array[FallMovement] = [] 
 	
 	while pieces_can_fall_in_column(column):
@@ -75,7 +75,7 @@ func calculate_fall_movements_on_column(column: int) -> Array:
 	
 		
 func pieces_can_fall_in_column(column: int) -> bool:
-	var column_cells: Array[Match3GridCell] = board.finder.grid_cells_from_column(column)
+	var column_cells: Array[Match3GridCell] = board.finder.cells_from_column(column)
 	
 	return column_cells.filter(_piece_can_fall).size() > 0
 	

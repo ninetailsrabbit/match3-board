@@ -16,19 +16,16 @@ func get_cell(column: int, row: int) -> Match3GridCell:
 			
 	return null
 	
-
-func grid_cell_from_piece(piece: Match3Piece) -> Match3GridCell:
-	var found_pieces = board.grid_cells_flattened.filter(
-		func(cell: Match3GridCell): return cell.has_piece() and cell.piece == piece
-	)
+func get_cell_piece(column: int, row: int) -> Match3Piece:
+	var cell: Match3GridCell = get_cell(column, row)
 	
-	if found_pieces.size() == 1:
-		return found_pieces.front()
-	
+	if cell and cell.has_piece():
+		return cell.piece
+		
 	return null
+
 	
-	
-func grid_cells_from_row(row: int, only_usables: bool = false) -> Array[Match3GridCell]:
+func cells_from_row(row: int, only_usables: bool = false) -> Array[Match3GridCell]:
 	var cells: Array[Match3GridCell] = []
 	
 	if board.grid_cells.size() > 0 and Match3BoardPluginUtilities.value_is_between(row, 0, board.configuration.grid_height - 1):
@@ -39,7 +36,7 @@ func grid_cells_from_row(row: int, only_usables: bool = false) -> Array[Match3Gr
 	return cells.filter(_is_usable_cell) if only_usables else cells
 	
 
-func grid_cells_from_column(column: int, only_usables: bool = false) -> Array[Match3GridCell]:
+func cells_from_column(column: int, only_usables: bool = false) -> Array[Match3GridCell]:
 	var cells: Array[Match3GridCell] = []
 		
 	if board.grid_cells.size() > 0 and Match3BoardPluginUtilities.value_is_between(column, 0, board.configuration.grid_width - 1):
@@ -164,7 +161,7 @@ func cross_cells_from(origin_cell: Match3GridCell, only_usables: bool = false) -
 	var cross_cells:  Array[Match3GridCell] = []
 	
 	cross_cells.assign(Match3BoardPluginUtilities.remove_duplicates(
-		grid_cells_from_row(origin_cell.row, only_usables) + grid_cells_from_column(origin_cell.column, only_usables)
+		cells_from_row(origin_cell.row, only_usables) + cells_from_column(origin_cell.column, only_usables)
 		))
 	
 	return cross_cells
@@ -267,7 +264,7 @@ func _is_usable_cell(cell: Match3GridCell) -> bool:
 func pieces_from_row(row: int) -> Array[Match3Piece]:
 	var pieces: Array[Match3Piece] = []
 	
-	pieces.assign(grid_cells_from_row(row).filter(func(cell: Match3GridCell): return cell.has_piece())\
+	pieces.assign(cells_from_row(row).filter(func(cell: Match3GridCell): return cell.has_piece())\
 		.map(func(cell: Match3GridCell): return cell.piece))
 	
 	return pieces
@@ -276,7 +273,7 @@ func pieces_from_row(row: int) -> Array[Match3Piece]:
 func pieces_from_column(column: int) -> Array[Match3Piece]:
 	var pieces: Array[Match3Piece] = []
 	
-	pieces.assign(grid_cells_from_column(column).filter(func(cell: Match3GridCell): return cell.has_piece())\
+	pieces.assign(cells_from_column(column).filter(func(cell: Match3GridCell): return cell.has_piece())\
 		.map(func(cell: Match3GridCell): return cell.piece))
 		
 	return pieces

@@ -78,6 +78,15 @@
       - [Fall animation](#fall-animation)
       - [Fill animation](#fill-animation)
       - [Delay after shuffle](#delay-after-shuffle)
+- [Match3 Board ⬛](#match3-board-)
+  - [States](#states)
+  - [Signals](#signals)
+  - [Finder module](#finder-module)
+    - [Sequence detector module](#sequence-detector-module)
+  - [Sequence consumer module](#sequence-consumer-module)
+    - [Match3SequenceConsumeResult](#match3sequenceconsumeresult)
+    - [Match3SequenceConsumeCombo](#match3sequenceconsumecombo)
+    - [Methods](#methods)
 - [Match3 Cell 🔲](#match3-cell-)
   - [Parameters](#parameters)
     - [Column \& Row](#column--row)
@@ -86,7 +95,7 @@
     - [Texture scale](#texture-scale)
     - [Odd \& Even \& Empty textures](#odd--even--empty-textures)
   - [Neighbours](#neighbours)
-  - [Methods](#methods)
+  - [Methods](#methods-1)
 - [Match3 Piece 💎](#match3-piece-)
   - [Parameters](#parameters-1)
   - [Access the cell](#access-the-cell)
@@ -99,7 +108,7 @@
   - [Information](#information)
   - [Manual creation](#manual-creation)
 - [Match3 Animator 🎞️](#match3-animator-️)
-  - [Signals](#signals)
+  - [Signals](#signals-1)
   - [Animation Hooks](#animation-hooks)
 - [Match3 Highlighter ✨](#match3-highlighter-)
   - [Highlighter hooks](#highlighter-hooks)
@@ -423,6 +432,226 @@ The animation that runs when enter the `Fill` state and pieces spawned are appli
 ##### Delay after shuffle
 
 A timeout before unlocking the board after a shuffle.
+
+# Match3 Board ⬛
+
+This is the core of the plugin and probably the class you want to manipulate to get or modify information from the Board.
+
+Apart from the parameters already explained in the [Getting started](#getting-started-) section, it contains a number of modules to manipulate the board
+
+## States
+
+These states are used internally, to know the current state of the board use the variable `current_state` as well the methods provided.
+
+```swift
+enum BoardState {
+	WaitForInput, // Waiting for the player input
+	Consume, // Consuming found sequences in the board
+	SpecialConsume, // Consuming special pieces triggered
+	Fall, // Falling pieces based on the fall mode selected
+	Fill // Filling the board based on the fill mode selected
+}
+
+var current_state: BoardState = BoardState.WaitForInput
+
+
+func state_is_wait_for_input() -> bool
+
+func state_is_consume() -> bool
+
+func state_is_special_consume() -> bool
+
+func state_is_fall() -> bool
+
+func state_is_fill() -> bool
+```
+
+## Signals
+
+This are all the signals available to react to changes that happens inside
+
+```swift
+signal state_changed(from: BoardState, to: BoardState)
+signal swap_accepted(from: Match3GridCell, to: Match3GridCell)
+signal swap_rejected(from: Match3GridCell, to: Match3GridCell)
+
+signal consumed_sequence(sequence: Match3Sequence)
+signal consumed_sequences(sequences: Array[Match3Sequence])
+
+signal selected_piece(piece: Match3Piece)
+signal unselected_piece(piece: Match3Piece)
+signal piece_drag_started(piece: Match3Piece)
+signal piece_drag_ended(piece: Match3Piece)
+
+signal drawed_cells(cells: Array[Match3GridCell])
+signal drawed_cell(cell: Match3GridCell)
+signal drawed_piece(piece: Match3Piece)
+signal drawed_pieces(pieces: Array[Match3Piece])
+
+signal shuffle_started
+signal shuffle_ended
+signal locked
+signal unlocked
+signal movement_consumed
+signal finished_available_movements
+```
+
+## Finder module
+
+This module provides methods to find cells and pieces inside the board easily and intuitively.
+
+Just access through the board with `board.finder`
+
+```swift
+func get_cell(column: int, row: int) -> Match3GridCell
+
+func get_cell_piece(column: int, row: int) -> Match3Piece:
+
+func cells_from_row(row: int, only_usables: bool = false) -> Array[Match3GridCell]
+
+func cells_from_column(column: int, only_usables: bool = false) -> Array[Match3GridCell]
+
+func top_cells_from(origin_cell: Match3GridCell, only_usables: bool = false) -> Array[Match3GridCell]
+
+func bottom_cells_from(origin_cell: Match3GridCell, only_usables: bool = false) -> Array[Match3GridCell]
+
+func right_cells_from(origin_cell: Match3GridCell, only_usables: bool = false) -> Array[Match3GridCell]
+
+func left_cells_from(origin_cell: Match3GridCell, only_usables: bool = false) -> Array[Match3GridCell]
+
+func diagonal_top_right_cells_from(cell: Match3GridCell, distance: int, only_usables: bool = false) -> Array[Match3GridCell]
+
+func diagonal_top_left_cells_from(cell: Match3GridCell, distance: int, only_usables: bool = false) -> Array[Match3GridCell]
+
+func diagonal_bottom_left_cells_from(cell: Match3GridCell, distance: int, only_usables: bool = false) -> Array[Match3GridCell]
+
+func diagonal_bottom_right_cells_from(cell: Match3GridCell, distance: int, only_usables: bool = false) -> Array[Match3GridCell]
+
+func adjacent_cells_from(origin_cell: Match3GridCell, only_usables: bool = false) -> Dictionary
+
+func cross_cells_from(origin_cell: Match3GridCell, only_usables: bool = false) -> Array[Match3GridCell]
+
+func cross_diagonal_cells_from(origin_cell: Match3GridCell, only_usables: bool = false) -> Array[Match3GridCell]
+
+func empty_cells() -> Array[Match3GridCell]
+
+func cell_with_pieces_of_id(id: StringName) -> Array[Match3GridCell]
+
+func cell_with_pieces_of_shape(shape: StringName) -> Array[Match3GridCell]
+
+func cell_with_pieces_of_type(type: Match3PieceConfiguration.PieceType) -> Array[Match3GridCell]
+
+func cell_with_pieces_of_color(color: Match3PieceConfiguration.PieceType) -> Array[Match3GridCell]
+
+// PIECES
+func pieces_of_id(id: StringName) -> Array[Match3Piece]
+
+func pieces_of_shape(shape: StringName) -> Array[Match3Piece]
+
+func pieces_of_type(type: Match3PieceConfiguration.PieceType) -> Array[Match3Piece]
+
+func pieces_of_color(color: Color) -> Array[Match3Piece]
+
+func pieces_from_row(row: int) -> Array[Match3Piece]
+
+func pieces_from_column(column: int) -> Array[Match3Piece]
+```
+
+### Sequence detector module
+
+This module can detect valid sequences on the board by applying the correct shape _(vertical, horizontal, tshape...)_ to them if they are enabled in the configuration.
+
+Just access through the board with `board.sequence_detector`
+
+```swift
+
+func find_horizontal_sequences(cells: Array[Match3GridCell]) -> Array[Match3Sequence]
+
+func find_vertical_sequences(cells: Array[Match3GridCell]) -> Array[Match3Sequence]
+
+func find_tshape_sequence(sequence_a: Match3Sequence, sequence_b: Match3Sequence)
+
+func find_lshape_sequence(sequence_a: Match3Sequence, sequence_b: Match3Sequence)
+
+
+func find_board_sequences() -> Array[Match3Sequence]
+
+func find_horizontal_board_sequences() -> Array[Match3Sequence]
+
+func find_vertical_board_sequences() -> Array[Match3Sequence]
+
+func find_match_from_piece(piece: Match3Piece) -> Match3Sequence
+
+func find_match_from_cell(cell: Match3GridCell) -> Match3Sequence
+
+```
+
+## Sequence consumer module
+
+Although this module is actually used internally when changing the status, it is publicly exposed and can be used at any time. Instead of returning sequences, it returns a class that allows to obtain more information from the resulting sequences.
+
+This module also can manipulate _(add, update, remove)_ `SequenceConsumeRule`
+
+Just access it through the board with `board.sequence_consumer`
+
+### Match3SequenceConsumeResult
+
+```swift
+class Match3SequenceConsumeResult:
+	var sequence_size: int
+	var combos: Array[Match3SequenceConsumeCombo]
+
+	func _init(sequence_combos: Array[Match3SequenceConsumeCombo]) -> void:
+		sequence_size = sequence_combos.reduce(func(accum, combo: Match3SequenceConsumeCombo): return accum + combo.size(), 0)
+		combos = sequence_combos
+
+
+	func unique_pieces() -> Array[Match3Piece]:
+		var pieces: Array[Match3Piece] = []
+
+		for combo: Match3SequenceConsumeCombo in combos:
+			if pieces.any(func(piece: Match3Piece): return piece.id == combo.piece.id):
+				continue
+
+			pieces.append(combo.piece)
+
+		return pieces
+```
+
+### Match3SequenceConsumeCombo
+
+```swift
+
+class Match3SequenceConsumeCombo:
+	var sequence: Match3Sequence
+	var special_piece_to_spawn: Match3PieceConfiguration
+
+	func _init(_sequence: Match3Sequence, piece_to_spawn: Match3PieceConfiguration = null) -> void:
+		sequence = _sequence
+		special_piece_to_spawn = piece_to_spawn
+
+
+	func size() -> int:
+		return sequence.size()
+```
+
+---
+
+### Methods
+
+```swift
+func add_sequence_consume_rules(rules: Array[SequenceConsumeRule]) -> Match3SequenceConsumer
+
+func add_sequence_consume_rule(rule: SequenceConsumeRule) -> Match3SequenceConsumer
+
+func remove_rules(rules: Array[SequenceConsumeRule]) -> Match3SequenceConsumer
+
+func remove_rule(rule: SequenceConsumeRule) -> Match3SequenceConsumer
+
+func sequences_to_combo_rules(matches: Array[Match3Sequence]) -> Array[Match3SequenceConsumer.Match3SequenceConsumeResult]
+
+func consume_sequence(sequence: Match3Sequence) -> Match3SequenceConsumeResult
+```
 
 # Match3 Cell 🔲
 

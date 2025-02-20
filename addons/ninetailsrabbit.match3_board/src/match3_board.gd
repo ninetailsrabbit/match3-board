@@ -299,7 +299,7 @@ func remove_matches_from_board() -> void:
 
 
 func shuffle() -> void:
-	if current_state == BoardState.WaitForInput:
+	if state_is_wait_for_input():
 		lock_all_pieces()
 		shuffle_started.emit()
 		
@@ -417,7 +417,7 @@ func consume_sequences(sequences: Array[Match3Sequence]) -> void:
 	if pending_special_pieces.is_empty():
 		travel_to(BoardState.Fall if (BoardState.Consume or BoardState.SpecialConsume) else BoardState.Consume)
 	else:
-		if current_state == BoardState.SpecialConsume:
+		if state_is_special_consume():
 			consume_special_pieces(pending_special_pieces)
 		else:
 			travel_to(BoardState.SpecialConsume)
@@ -581,6 +581,22 @@ func swap_movement_is_valid(from_cell: Match3GridCell, to_cell: Match3GridCell) 
 			return finder.cross_diagonal_cells_from(from_cell).has(to_cell)
 		_:
 			return false
+			
+			
+func state_is_wait_for_input() -> bool:
+	return current_state == BoardState.WaitForInput
+	
+func state_is_consume() -> bool:
+	return current_state == BoardState.Consume
+	
+func state_is_special_consume() -> bool:
+	return current_state == BoardState.SpecialConsume
+	
+func state_is_fall() -> bool:
+	return current_state == BoardState.Fall
+	
+func state_is_fill() -> bool:
+	return current_state == BoardState.Fill
 #endregion
 #
 #

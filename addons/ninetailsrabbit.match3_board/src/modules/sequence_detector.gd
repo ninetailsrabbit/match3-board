@@ -180,7 +180,7 @@ func find_horizontal_board_sequences() -> Array[Match3Sequence]:
 	var horizontal_sequences: Array[Match3Sequence] = []
 	
 	for row in board.configuration.grid_height:
-		horizontal_sequences.append_array(find_horizontal_sequences(board.finder.grid_cells_from_row(row)))
+		horizontal_sequences.append_array(find_horizontal_sequences(board.finder.cells_from_row(row)))
 	
 	return horizontal_sequences
 
@@ -189,7 +189,7 @@ func find_vertical_board_sequences() -> Array[Match3Sequence]:
 	var vertical_sequences: Array[Match3Sequence] = []
 	
 	for column in board.configuration.grid_width:
-		vertical_sequences.append_array(find_vertical_sequences(board.finder.grid_cells_from_column(column)))
+		vertical_sequences.append_array(find_vertical_sequences(board.finder.cells_from_column(column)))
 	
 	return vertical_sequences
 
