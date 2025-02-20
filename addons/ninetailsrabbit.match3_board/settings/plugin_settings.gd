@@ -22,7 +22,7 @@ static var UpdateNotificationSetting: String = PluginSettingsBasePath + "/update
 ## Enable to test the updater without need to have a latest release version to trigger it
 static var DebugMode: bool = false
 
-static func set_update_notification(enable: bool = true) -> void:
+static func set_update_notification(enable: bool = ProjectSettings.get_setting(UpdateNotificationSetting, true)) -> void:
 	ProjectSettings.set_setting(UpdateNotificationSetting, enable)
 	ProjectSettings.add_property_info({
 		"name": UpdateNotificationSetting,
