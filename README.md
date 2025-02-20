@@ -78,8 +78,17 @@
       - [Fall animation](#fall-animation)
       - [Fill animation](#fill-animation)
       - [Delay after shuffle](#delay-after-shuffle)
-- [Match3 Piece 💎](#match3-piece-)
+- [Match3 Cell 🔲](#match3-cell-)
   - [Parameters](#parameters)
+    - [Column \& Row](#column--row)
+    - [Size](#size-1)
+    - [Can contain piece](#can-contain-piece)
+    - [Texture scale](#texture-scale)
+    - [Odd \& Even \& Empty textures](#odd--even--empty-textures)
+  - [Neighbours](#neighbours)
+  - [Methods](#methods)
+- [Match3 Piece 💎](#match3-piece-)
+  - [Parameters](#parameters-1)
   - [Access the cell](#access-the-cell)
   - [Overridables](#overridables)
     - [Match with](#match-with)
@@ -91,11 +100,11 @@
 - [Match3 Highlighter ✨](#match3-highlighter-)
   - [Highlighter hooks](#highlighter-hooks)
 - [Match3 Line Connector ︴](#match3-line-connector-︴)
-  - [Parameters](#parameters-1)
+  - [Parameters](#parameters-2)
     - [Match3Board](#match3board)
     - [Confirm \& Cancel match input action](#confirm--cancel-match-input-action)
 - [Match3 Editor preview 🪲](#match3-editor-preview-)
-  - [Parameters](#parameters-2)
+  - [Parameters](#parameters-3)
     - [Match3Board](#match3board-1)
     - [Generate \& Remove preview](#generate--remove-preview)
     - [Preview pieces textures](#preview-pieces-textures)
@@ -410,6 +419,159 @@ The animation that runs when enter the `Fill` state and pieces spawned are appli
 ##### Delay after shuffle
 
 A timeout before unlocking the board after a shuffle.
+
+# Match3 Cell 🔲
+
+Represents a cell on the board, they are used as a reference for piece positions thus eliminating the need for pieces to have position information.
+
+Board cells use this class by default. You must create your own scene where the root node inherits from this script
+
+Creating your own scene allows you with minimal dependency to add the nodes you want, Sprite2D, AnimateSprite2D, AnimationPlayer, GPUParticles, etc.
+
+## Parameters
+
+### Column & Row
+
+The column and row this cell belongs, this board position translates to Vector2i(column, row)
+
+### Size
+
+The size of the cell, if you add textures using sprite nodes in your custom cell scene, they will adjust to this cell size through scaling.
+
+### Can contain piece
+
+Define if this cell can contain a piece, usually empty drawed cells have this value to false
+
+### Texture scale
+
+Using the size as reference to 1.0, scale the texture of this cell. By default it is always set to 1 but you can still change it here
+
+### Odd & Even & Empty textures
+
+You can assign a series of textures to be drawn in odd and even positions, they are optional and serve to speed up the display of single cells.
+
+## Neighbours
+
+You have access to the cell neighbours after drawed the cells on the board
+
+```swift
+var neighbour_up: Match3GridCell
+var neighbour_bottom: Match3GridCell
+var neighbour_right: Match3GridCell
+var neighbour_left: Match3GridCell
+
+var diagonal_neighbour_top_right: Match3GridCell
+var diagonal_neighbour_top_left: Match3GridCell
+var diagonal_neighbour_bottom_right: Match3GridCell
+var diagonal_neighbour_bottom_left: Match3GridCell
+
+// Access the neighbours in a dictionary format
+func neighbours() -> Dictionary:
+  return {
+      "up": neighbour_up,
+      "bottom": neighbour_bottom,
+      "right": neighbour_right,
+      "left": neighbour_left,
+      "diagonal_top_right": diagonal_neighbour_top_right,
+      "diagonal_top_left": diagonal_neighbour_top_left,
+      "diagonal_bottom_right": diagonal_neighbour_bottom_right,
+      "diagonal_bottom_left": diagonal_neighbour_bottom_left,
+    }
+
+
+// Return the neighbours that can contain pieces and is not empty, neighbours that does not meet
+// this conditions will be turned to null
+func usable_neighbours() -> Dictionary
+
+
+```
+
+## Methods
+
+This class contains a lot of methods related to get information, assign pieces, etc
+
+```swift
+func has_piece() -> bool
+
+func is_empty() -> bool
+
+//Clear the cell removing the piece, when disable is passed as true it also changes can_contain_piece to false
+func clear(disable: bool = false) -> void
+
+func remove_piece(queued: bool = false) -> void
+
+// This methods actually are used internally, it is recommended not to use unless you know what you are doing.
+func can_swap_piece_with_cell(other_cell: Match3GridCell) -> bool
+func swap_piece_with_cell(other_cell: Match3GridCell) -> bool
+
+// POSITION RELATED
+func board_position() -> Vector2i:
+
+func in_same_row_as(other_cell: Match3GridCell) -> bool
+
+func in_same_column_as(other_cell: Match3GridCell) -> bool
+
+func in_same_position_as(other_cell: Match3GridCell) -> bool
+
+func in_same_grid_position_as(grid_position: Vector2) -> bool
+
+func is_row_neighbour_of(other_cell: Match3GridCell) -> bool
+
+func is_column_neighbour_of(other_cell: Match3GridCell) -> bool
+
+func is_adjacent_to(other_cell: Match3GridCell, check_diagonal: bool = false) -> bool
+
+func is_diagonal_adjacent_to(other_cell: Match3GridCell) -> bool
+
+func in_diagonal_with(other_cell: Match3GridCell) -> bool
+
+func neighbour_up_has_piece() -> bool
+
+func neighbour_bottom_has_piece() -> bool
+
+func neighbour_right_has_piece() -> bool
+
+func neighbour_left_has_piece() -> bool
+
+func diagonal_neighbour_bottom_left_has_piece() -> bool
+
+func diagonal_neighbour_bottom_right_has_piece() -> bool
+
+func diagonal_neighbour_top_left_has_piece() -> bool
+
+func diagonal_neighbour_top_right_has_piece() -> bool
+
+func neighbour_bottom_is_empty() -> bool
+
+func neighbour_right_is_empty() -> bool
+
+func neighbour_left_is_empty() -> bool
+
+func diagonal_neighbour_bottom_left_is_empty() -> bool
+
+func diagonal_neighbour_bottom_right_is_empty() -> bool
+
+func diagonal_neighbour_top_left_is_empty() -> bool
+
+func diagonal_neighbour_top_right_is_empty() -> bool
+
+func is_top_left_corner() -> bool
+
+func is_top_right_corner() -> bool
+
+func is_bottom_left_corner() -> bool
+
+func is_bottom_right_corner() -> bool
+
+func is_top_border() -> bool
+
+func is_bottom_border() -> bool
+
+func is_right_border() -> bool
+
+func is_left_border() -> bool
+
+```
 
 # Match3 Piece 💎
 

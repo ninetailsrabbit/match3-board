@@ -171,7 +171,7 @@ func draw_cells() -> Match3Board:
 
 
 func draw_cell(column: int, row: int) -> Match3GridCell:
-	if grid_cells_flattened.any(func(cell: Match3GridCell): cell.in_same_grid_position_as(Vector2(column, row))):
+	if grid_cells_flattened.any(func(cell: Match3GridCell): cell.in_same_grid_position_as(Vector2i(column, row))):
 		return
 		
 	var cell: Match3GridCell =  configuration.grid_cell_scene.instantiate()
@@ -408,6 +408,7 @@ func consume_sequences(sequences: Array[Match3Sequence]) -> void:
 			if combo.special_piece_to_spawn:
 				var piece: Match3Piece = Match3Piece.from_configuration(combo.special_piece_to_spawn)
 				draw_piece_on_cell(piece.spawn(self, combo.sequence), piece)
+				piece.is_locked = true
 			
 	consumed_sequences.emit(sequences)
 	

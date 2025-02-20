@@ -2,12 +2,11 @@ class_name Match3GridCell extends Node2D
 
 const GroupName: StringName = &"grid_cells"
 
-
 @export_category("Parameters")
 @export var column: int = 0
 @export var row: int = 0
-@export var can_contain_piece: bool = true
 @export var size: Vector2i = Vector2i(48, 48)
+@export var can_contain_piece: bool = true
 @export_category("Textures")
 @export var texture_scale: float = 1.0
 @export var odd_cell_texture: Texture2D
@@ -146,7 +145,7 @@ func in_same_position_as(other_cell: Match3GridCell) -> bool:
 	return in_same_column_as(other_cell) and in_same_row_as(other_cell)
 
 
-func in_same_grid_position_as(grid_position: Vector2) -> bool:
+func in_same_grid_position_as(grid_position: Vector2i) -> bool:
 	return grid_position.x == column and grid_position.y == row
 
 #endregion
@@ -180,10 +179,10 @@ func is_diagonal_adjacent_to(other_cell: Match3GridCell) -> bool:
 
 
 func in_diagonal_with(other_cell: Match3GridCell) -> bool:
-	var diagonal_top_right: Vector2 = Vector2(column + 1, row - 1)
-	var diagonal_top_left: Vector2 = Vector2( column - 1, row - 1)
-	var diagonal_bottom_right: Vector2 = Vector2( column + 1, row + 1)
-	var diagonal_bottom_left: Vector2 = Vector2(column - 1, row + 1)
+	var diagonal_top_right: Vector2i = Vector2i(column + 1, row - 1)
+	var diagonal_top_left: Vector2i = Vector2i( column - 1, row - 1)
+	var diagonal_bottom_right: Vector2i = Vector2i( column + 1, row + 1)
+	var diagonal_bottom_left: Vector2i = Vector2i(column - 1, row + 1)
 
 	return other_cell.in_same_grid_position_as(diagonal_top_right) \
 		or other_cell.in_same_grid_position_as(diagonal_top_left) \
