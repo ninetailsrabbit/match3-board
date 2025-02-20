@@ -119,7 +119,7 @@ func draw_preview_piece(spawn_position: Vector2, column: int, row: int) -> Sprit
 	var piece_sprite: Sprite2D = Sprite2D.new()
 	piece_sprite.name = "Piece(%d,%d)" % [column, row]
 	
-	piece_sprite.texture = preview_pieces.pick_random()
+	piece_sprite.texture = Match3BoardPluginUtilities.remove_falsy_values(preview_pieces).pick_random()
 	var piece_texture_size = piece_sprite.texture.get_size()
 	piece_sprite.scale = Vector2(
 		board.configuration.cell_size.x / piece_texture_size.x, 

@@ -65,7 +65,14 @@ var drag_enabled: bool = false:
 var sprite: Node2D
 var original_z_index: int = 0
 
-var cell: Match3GridCell
+var cell: Match3GridCell:
+	set(value):
+		if value != cell:
+			cell = value
+			
+			if cell and is_inside_tree():
+				_prepare_sprite()
+				
 var piece_area: Area2D
 var detection_area: Area2D
 var drag_target: Node2D = self
@@ -323,7 +330,7 @@ func _prepare_sprite() -> void:
 	assert(sprite != null, "Match3Piece: %s needs to have a Sprite2D or AnimatedSprite2D as child to create the mouse region" % name)
 	
 	if sprite is Sprite2D:
-		sprite.scale = calculate_texture_scale(sprite.texture)
+		sprite.scale = calculate_texture_scale(sprite.texture, cell.size if cell else null)
 	elif sprite is AnimatedSprite2D:
 		sprite.scale = calculate_texture_scale(sprite.get_sprite_frames().get_frame(sprite.animation, sprite.get_frame()))
 
